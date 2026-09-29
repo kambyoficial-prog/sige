@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useTransition } from "react";
+import { useState, useTransition } from "react";
 import type { ClassSessionDirectory, ClassSessionRoster, TimetableEntry } from "@sige/contracts";
 import { Button } from "@/components/ui/button";
 import {
@@ -47,24 +47,52 @@ export function SessionWorkbench({
   roster: ClassSessionRoster[];
 }) {
   const router = useRouter();
+  const [error, setError] = useState<string | null>(null);
+  const [lateMinutes, setLateMinutes] = useState<Record<string, string>>({});
 
   async function openSession(scheduleEntryId: string) {
-    await openClassSessionAction({ scheduleEntryId, sessionDate: date });
+    const result = await openClassSessionAction({ scheduleEntryId, sessionDate: date });
+    if (!result.ok) {
+      setError(result.code);
+      return;
+    }
+    setError(null);
     router.refresh();
   }
 
   async function closeSession(classSessionId: string) {
-    await closeClassSessionAction({ classSessionId });
+    const result = await closeClassSessionAction({ classSessionId });
+    if (!result.ok) {
+      setError(result.code);
+      return;
+    }
+    setError(null);
     router.refresh();
   }
 
-  async function setAttendance(studentId: string, status: "PRESENT" | "ABSENT" | "EXCUSED" | "LATE") {
+  async function setAttendance(
+    studentId: string,
+    status: "PRESENT" | "ABSENT" | "EXCUSED" | "LATE",
+  ) {
     if (!selectedSession) return;
-    await recordSessionAttendanceAction({
+    const minutes = status === "LATE" ? Number(lateMinutes[studentId] ?? "") : undefined;
+    if (status === "LATE" && (!Number.isInteger(minutes) || minutes < 1)) {
+      setError("Indique os minutos de atraso antes de registar.");
+      return;
+    }
+
+    const result = await recordSessionAttendanceAction({
       classSessionId: selectedSession.id,
       studentId,
       status,
+      ...(status === "LATE" ? { minutesLate: minutes } : {}),
     });
+
+    if (!result.ok) {
+      setError(result.code);
+      return;
+    }
+    setError(null);
     router.refresh();
   }
 
@@ -74,6 +102,12 @@ export function SessionWorkbench({
 
   return (
     <div className="space-y-6">
+      {error ? (
+        <div role="alert" className="rounded-xl border border-destructive/30 bg-destructive/5 p-4 text-sm text-destructive">
+          Operação não concluída: {error}
+        </div>
+      ) : null}
+
       <section className="rounded-xl border border-border bg-card">
         <div className="border-b border-border p-5">
           <h2 className="font-semibold">Aulas previstas</h2>
@@ -168,21 +202,31 @@ export function SessionWorkbench({
           </div>
           <div className="divide-y divide-border">
             {roster.map((student) => (
-              <div key={student.student_id} className="flex flex-col gap-3 p-4 sm:flex-row sm:items-center sm:justify-between">
+              <div key={student.student_id} className="flex flex-col gap-3 p-4 lg:grid lg:grid-cols-[minmax(220px,1fr)_auto] lg:items-center">
                 <div className="min-w-0">
                   <div className="font-medium">{student.student_name}</div>
-                  <div className="text-xs text-muted-foreground">{student.school_number}</div>
+                  <div className="text-xs text-muted-foreground">
+                    {student.school_number}
+                    {student.attendance_status ? ` · ${student.attendance_status}` : ""}
+                  </div>
                 </div>
-                <div className="flex flex-wrap gap-2">
-                  {(["PRESENT", "ABSENT", "EXCUSED", "LATE"] as const).map((status) => (
-                    <ActionButton
-                      key={status}
-                      disabled={selectedSession.status !== "OPEN"}
-                      onClick={() => setAttendance(student.student_id, status)}
-                    >
-                      {status === "PRESENT" ? "Presente" : status === "ABSENT" ? "Falta" : status === "EXCUSED" ? "Justificada" : "Atraso"}
-                    </ActionButton>
-                  ))}
+                <div className="flex flex-wrap items-center gap-2">
+                  <ActionButton disabled={selectedSession.status !== "OPEN"} onClick={() => setAttendance(student.student_id, "PRESENT")}>Presente</ActionButton>
+                  <ActionButton disabled={selectedSession.status !== "OPEN"} onClick={() => setAttendance(student.student_id, "ABSENT")}>Falta</ActionButton>
+                  <ActionButton disabled={selectedSession.status !== "OPEN"} onClick={() => setAttendance(student.student_id, "EXCUSED")}>Justificada</ActionButton>
+                  <input
+                    aria-label={`Minutos de atraso de ${student.student_name}`}
+                    type="number"
+                    min={1}
+                    max={600}
+                    inputMode="numeric"
+                    value={lateMinutes[student.student_id] ?? ""}
+                    onChange={(event) => setLateMinutes((current) => ({ ...current, [student.student_id]: event.target.value }))}
+                    placeholder="min."
+                    className="h-9 w-20 rounded-md border border-input bg-background px-2 text-sm"
+                    disabled={selectedSession.status !== "OPEN"}
+                  />
+                  <ActionButton disabled={selectedSession.status !== "OPEN"} onClick={() => setAttendance(student.student_id, "LATE")}>Atraso</ActionButton>
                 </div>
               </div>
             ))}
