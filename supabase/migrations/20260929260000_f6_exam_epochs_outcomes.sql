@@ -422,8 +422,8 @@ begin
 end;
 $$;
 
-revoke all on function public.calculate_cycle_outcome(uuid,uuid,uuid,uuid,text,text) from public;
-grant execute on function public.calculate_cycle_outcome(uuid,uuid,uuid,uuid,text,text) to authenticated;
+revoke all on function public.calculate_cycle_outcome(uuid,uuid,uuid,text,text) from public;
+grant execute on function public.calculate_cycle_outcome(uuid,uuid,uuid,text,text) to authenticated;
 
 -- Exam read models
 drop view if exists public.exam_candidate_directory;
