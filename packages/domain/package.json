@@ -3,5 +3,10 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
-  "scripts": { "test": "node --test" }
+  "scripts": {
+    "test": "tsx --test"
+  },
+  "devDependencies": {
+    "tsx": "4.23.15"
+  }
 }
