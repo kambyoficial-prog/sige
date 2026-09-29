@@ -1,0 +1,6 @@
+# SIGE Supabase CLI configuration
+# Remote project for the SIGE application.
+# Secrets are intentionally not stored in this file.
+
+[remotes.sige]
+project_id = "pfnxvhwpbvlshjjdwbtj"
