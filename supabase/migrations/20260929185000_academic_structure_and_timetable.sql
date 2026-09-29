@@ -150,6 +150,240 @@ create index if not exists student_course_participations_student_idx
 create index if not exists class_placements_group_idx
   on public.class_placements (class_group_id, status, starts_on);
 
+create or replace function private.validate_class_group_academic_structure()
+returns trigger
+language plpgsql
+security definer
+set search_path = ''
+as $
+declare
+  grade_cycle uuid;
+  pathway_cycle uuid;
+  pathway_school uuid;
+begin
+  select gl.academic_cycle_id
+    into grade_cycle
+  from public.grade_levels gl
+  where gl.id = new.grade_level_id;
+
+  if grade_cycle is null then
+    raise exception 'GRADE_LEVEL_NOT_FOUND';
+  end if;
+
+  if new.pathway_id is not null then
+    select ap.academic_cycle_id, ap.school_id
+      into pathway_cycle, pathway_school
+    from public.academic_pathways ap
+    where ap.id = new.pathway_id;
+
+    if pathway_cycle is null then
+      raise exception 'PATHWAY_NOT_FOUND';
+    end if;
+
+    if pathway_cycle <> grade_cycle then
+      raise exception 'CLASS_GROUP_PATHWAY_CYCLE_MISMATCH';
+    end if;
+
+    if pathway_school is not null and pathway_school <> new.school_id then
+      raise exception 'CLASS_GROUP_PATHWAY_SCHOOL_MISMATCH';
+    end if;
+  end if;
+
+  return new;
+end;
+$;
+
+drop trigger if exists trg_validate_class_group_academic_structure on public.class_groups;
+create trigger trg_validate_class_group_academic_structure
+before insert or update on public.class_groups
+for each row execute function private.validate_class_group_academic_structure();
+
+create or replace function public.assign_class_group_director(
+  p_class_group_id uuid,
+  p_teacher_id uuid,
+  p_starts_on date,
+  p_ends_on date default null,
+  p_reason text default null,
+  p_idempotency_key text default null,
+  p_request_hash text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = ''
+as $
+declare
+  actor uuid := (select auth.uid());
+  school_id uuid;
+  year_id uuid;
+  year_start date;
+  year_end date;
+  leadership_id uuid;
+  command_state jsonb;
+  result jsonb;
+begin
+  if actor is null then raise exception 'AUTH_REQUIRED'; end if;
+  if p_idempotency_key is null then raise exception 'IDEMPOTENCY_KEY_REQUIRED'; end if;
+
+  select cg.school_id, cg.academic_year_id, ay.starts_on, ay.ends_on
+    into school_id, year_id, year_start, year_end
+  from public.class_groups cg
+  join public.academic_years ay on ay.id = cg.academic_year_id
+  where cg.id = p_class_group_id
+  for update;
+
+  if school_id is null then raise exception 'CLASS_GROUP_NOT_FOUND'; end if;
+  if not (select private.has_permission('operations.manage', school_id)) then
+    raise exception 'FORBIDDEN';
+  end if;
+
+  if p_starts_on < year_start
+     or p_starts_on > year_end
+     or (p_ends_on is not null and (p_ends_on < p_starts_on or p_ends_on > year_end)) then
+    raise exception 'DIRECTOR_DATES_OUTSIDE_ACADEMIC_YEAR';
+  end if;
+
+  if not exists (
+    select 1
+    from public.teachers t
+    where t.id = p_teacher_id
+      and t.school_id = school_id
+  ) then
+    raise exception 'TEACHER_NOT_FOUND_IN_SCHOOL';
+  end if;
+
+  if not exists (
+    select 1
+    from public.course_offerings co
+    join public.teacher_assignments ta on ta.course_offering_id = co.id
+    where co.class_group_id = p_class_group_id
+      and ta.teacher_id = p_teacher_id
+      and ta.active
+      and ta.starts_on <= coalesce(p_ends_on, year_end)
+      and (ta.ends_on is null or ta.ends_on >= p_starts_on)
+  ) then
+    raise exception 'DIRECTOR_MUST_TEACH_CLASS';
+  end if;
+
+  command_state := private.begin_command(
+    'assign_class_group_director',
+    school_id,
+    p_idempotency_key,
+    p_request_hash
+  );
+
+  if coalesce((command_state->>'replayed')::boolean, false) then
+    return command_state->'result';
+  end if;
+
+  update public.class_group_leadership
+     set active = false,
+         ends_on = least(
+           coalesce(ends_on, p_starts_on - 1),
+           p_starts_on - 1
+         )
+   where class_group_id = p_class_group_id
+     and active
+     and starts_on < p_starts_on
+     and (ends_on is null or ends_on >= p_starts_on);
+
+  insert into public.class_group_leadership (
+    class_group_id,
+    teacher_id,
+    starts_on,
+    ends_on,
+    active,
+    reason
+  )
+  values (
+    p_class_group_id,
+    p_teacher_id,
+    p_starts_on,
+    p_ends_on,
+    true,
+    nullif(trim(p_reason), '')
+  )
+  returning id into leadership_id;
+
+  insert into public.audit_events (
+    school_id,
+    actor_auth_user_id,
+    action,
+    entity_type,
+    entity_id,
+    reason,
+    after_data
+  )
+  values (
+    school_id,
+    actor,
+    'ASSIGN_CLASS_GROUP_DIRECTOR',
+    'class_group_leadership',
+    leadership_id,
+    nullif(trim(p_reason), ''),
+    jsonb_build_object(
+      'class_group_id', p_class_group_id,
+      'teacher_id', p_teacher_id,
+      'starts_on', p_starts_on,
+      'ends_on', p_ends_on
+    )
+  );
+
+  result := jsonb_build_object(
+    'class_group_leadership_id', leadership_id,
+    'class_group_id', p_class_group_id,
+    'teacher_id', p_teacher_id,
+    'starts_on', p_starts_on,
+    'ends_on', p_ends_on
+  );
+
+  perform private.complete_command(
+    'assign_class_group_director',
+    school_id,
+    p_idempotency_key,
+    result
+  );
+
+  return result;
+end;
+$;
+
+revoke all on function private.validate_class_group_academic_structure() from public;
+revoke all on function public.assign_class_group_director(uuid,uuid,date,date,text,text,text) from public;
+grant execute on function public.assign_class_group_director(uuid,uuid,date,date,text,text,text) to authenticated;
+
+revoke insert, update, delete on public.class_group_leadership from authenticated;
+revoke insert, update, delete on public.teacher_workload_targets from authenticated;
+
+create policy class_group_leadership_manage
+on public.class_group_leadership
+for select to authenticated
+using (
+  exists (
+    select 1 from public.class_groups cg
+    where cg.id = class_group_leadership.class_group_id
+      and private.has_permission('operations.manage', cg.school_id)
+  )
+);
+
+create policy teacher_workload_targets_manage
+on public.teacher_workload_targets
+for all to authenticated
+using (
+  exists (
+    select 1 from public.academic_years ay
+    where ay.id = teacher_workload_targets.academic_year_id
+      and private.has_permission('operations.manage', ay.school_id)
+  )
+)
+with check (
+  exists (
+    select 1 from public.academic_years ay
+    where ay.id = teacher_workload_targets.academic_year_id
+      and private.has_permission('operations.manage', ay.school_id)
+  )
+);
+
 -- Controlled projections for the UI and reports. They are not sources of truth.
 
 create or replace view public.class_group_overview
