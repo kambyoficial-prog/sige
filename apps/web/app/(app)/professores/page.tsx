@@ -1,5 +1,4 @@
 import Link from "next/link";
-import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TeacherDirectory } from "@sige/contracts";
 import { DataTable, type DataTableFeatures } from "@/components/ui/data-table";
