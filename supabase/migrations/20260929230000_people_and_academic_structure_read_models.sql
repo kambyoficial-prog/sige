@@ -383,7 +383,7 @@ select
   e.exited_on,
   e.exit_reason,
   e.enrollment_sequence,
-  cp.class_group_id,
+  placement.class_group_id,
   coalesce(cg.name, cg.code) as class_name
 from public.student_enrollments e
 join public.students s on s.id = e.student_id
