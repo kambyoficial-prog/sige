@@ -18,7 +18,7 @@ create table if not exists private.command_idempotency (
   created_at timestamptz not null default now(),
   completed_at timestamptz,
   expires_at timestamptz,
-  unique (actor_auth_user_id, command_name, idempotency_key)
+  unique (actor_auth_user_id, school_id, command_name, idempotency_key)
 );
 
 create index if not exists command_idempotency_expiry_idx
