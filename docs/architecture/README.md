@@ -33,3 +33,4 @@ Transformar o modelo lógico já documentado em contratos PostgreSQL: enums, tab
 
 - [21 — Estrutura académica, turmas, grupos e horários](./21-academic-structure-and-timetable.md)
 - [22 — Planeamento e distribuição de horários](./22-timetable-distribution-engine.md)
+- [23 — Operações académicas: turmas, ofertas, docentes e transferência](./23-academic-operations-commands.md)
