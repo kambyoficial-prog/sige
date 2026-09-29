@@ -1,12 +1,9 @@
 import Link from "next/link";
-import type { ColumnDef } from "@tanstack/react-table";
-import { DataTable, type DataTableFeatures } from "@/components/ui/data-table";
+import { DirectoryTable } from "@/components/ui/directory-table";
 import { PageHeader } from "@/components/ui/page-header";
 import { Button, buttonVariants } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { searchStudentDirectory } from "@/lib/sige/queries";
 import { getCurrentAccessContext } from "@/lib/sige/access";
-import type { StudentDirectory } from "@sige/contracts";
 import { cn } from "@/lib/utils";
 
 export default async function StudentsPage({ searchParams }: { searchParams: Promise<{ q?: string }> }) {
@@ -15,13 +12,6 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
   const canManage = access.memberships.some((m) => m.permissions.includes("enrollment.manage"));
   const search = params.q?.trim() ?? "";
   const rows = await searchStudentDirectory(search);
-  const columns: ColumnDef<DataTableFeatures, StudentDirectory, unknown>[] = [
-    { accessorKey: "school_number", header: "N.º" },
-    { accessorKey: "full_name", header: "Aluno", cell: ({ row }) => <Link className="font-medium hover:underline" href={`/alunos/${row.original.id}`}>{row.original.full_name}</Link> },
-    { accessorKey: "gender", header: "Sexo", cell: ({ getValue }) => getValue<string>() || "—" },
-    { accessorKey: "class_name", header: "Turma", cell: ({ getValue }) => getValue<string>() || "Sem turma" },
-    { accessorKey: "enrollment_status", header: "Matrícula", cell: ({ getValue }) => <Badge variant="secondary">{getValue<string>() || "Sem matrícula"}</Badge> },
-  ];
 
   return (
     <div className="space-y-6">
@@ -31,7 +21,7 @@ export default async function StudentsPage({ searchParams }: { searchParams: Pro
         <Button type="submit" variant="outline">Pesquisar</Button>
         {search ? <Link href="/alunos" className={cn(buttonVariants({ variant: "ghost" }))}>Limpar</Link> : null}
       </form>
-      <DataTable columns={columns} data={rows} emptyTitle={search ? "Nenhum aluno encontrado" : "Sem alunos"} emptyDescription={search ? "A pesquisa não encontrou correspondências." : "Ainda não existem alunos registados nesta escola."} />
+      <DirectoryTable kind="students" data={rows} emptyTitle={search ? "Nenhum aluno encontrado" : "Sem alunos"} emptyDescription={search ? "A pesquisa não encontrou correspondências." : "Ainda não existem alunos registados nesta escola."} />
     </div>
   );
 }
