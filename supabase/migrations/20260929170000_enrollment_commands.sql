@@ -19,7 +19,7 @@ create or replace function private.begin_command(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   existing private.command_idempotency%rowtype;
@@ -96,7 +96,7 @@ create or replace function private.complete_command(
 returns void
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 begin
   update private.command_idempotency
@@ -126,7 +126,7 @@ create or replace function public.enroll_student(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -316,7 +316,7 @@ create or replace function public.place_student_in_class(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
