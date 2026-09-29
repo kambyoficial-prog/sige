@@ -21,7 +21,7 @@ export async function updateSupabaseSession(request: NextRequest) {
       getAll() {
         return request.cookies.getAll();
       },
-      setAll(cookiesToSet, _headers) {
+      setAll(cookiesToSet) {
         for (const { name, value, options } of cookiesToSet) {
           request.cookies.set(name, value);
           response.cookies.set(name, value, options);
