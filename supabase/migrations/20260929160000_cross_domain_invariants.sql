@@ -21,7 +21,7 @@ create or replace function private.validate_class_group_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   ay_school uuid;
@@ -42,7 +42,7 @@ create or replace function private.validate_enrollment_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   student_school uuid;
@@ -68,7 +68,7 @@ create or replace function private.validate_class_placement_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   e_school uuid;
@@ -104,7 +104,7 @@ create or replace function private.validate_curriculum_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   ay_school uuid;
@@ -134,7 +134,7 @@ create or replace function private.validate_course_offering_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   ay_school uuid;
@@ -191,7 +191,7 @@ create or replace function private.validate_teacher_assignment_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   teacher_school uuid;
@@ -227,7 +227,7 @@ create or replace function private.validate_student_course_participation_context
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   student_school uuid;
@@ -266,7 +266,7 @@ create or replace function private.validate_assessment_period_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   year_school uuid;
@@ -287,7 +287,7 @@ create or replace function private.validate_assessment_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   offering_year uuid;
@@ -313,7 +313,7 @@ create or replace function private.validate_assessment_result_context()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   offering_id uuid;
@@ -457,7 +457,7 @@ create or replace function private.capture_published_result_revision()
 returns trigger
 language plpgsql
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   next_revision integer;
