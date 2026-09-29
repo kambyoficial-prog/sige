@@ -683,9 +683,9 @@ alter table public.payment_allocations enable row level security;
 alter table public.payment_reversals enable row level security;
 alter table public.receipts enable row level security;
 
-create policy education_levels_read on public.education_levels for select to authenticated using (true);
-create policy academic_cycles_read on public.academic_cycles for select to authenticated using (true);
-create policy grade_levels_read on public.grade_levels for select to authenticated using (true);
+create policy foundation_education_levels_read on public.education_levels for select to authenticated using (true);
+create policy foundation_academic_cycles_read on public.academic_cycles for select to authenticated using (true);
+create policy foundation_grade_levels_read on public.grade_levels for select to authenticated using (true);
 
 create policy people_read on public.people for select to authenticated using (true);
 create policy roles_read on public.roles for select to authenticated using (true);
