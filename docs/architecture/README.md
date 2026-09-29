@@ -35,3 +35,7 @@ Transformar o modelo lógico já documentado em contratos PostgreSQL: enums, tab
 - [22 — Planeamento e distribuição de horários](./22-timetable-distribution-engine.md)
 - [23 — Operações académicas: turmas, ofertas, docentes e transferência](./23-academic-operations-commands.md)
 - [24 — Motor curricular](./24-curriculum-engine.md)
+
+- [25 — Regras de avaliação e motor](./25-assessment-rules-and-engine.md)
+- [26 — Ciclo temporal, fecho e histórico](./26-temporal-lifecycle-and-history.md)
+- [27 — Hardening temporal das operações](./27-temporal-operations-hardening.md)
