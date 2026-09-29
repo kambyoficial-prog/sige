@@ -24,8 +24,8 @@ No placeholder data may masquerade as production data.
 | Block | Scope | Main output | Gate |
 |---|---|---|---|
 | F0 | Design-system/runtime foundation | tokens, theme, primitives, shell foundation, accessibility baseline | web compiles + visual verification |
-| F1 | Authentication & access context | login, callback, session boundary, capability-derived shell | real auth contract + protected routes |
-| F2 | Operational primitives | tables, filters, pagination, forms, dialogs, errors, empty/loading states | reusable patterns proven on real queries |
+| F1 | Authentication & access context | login, callback, session boundary, capability-derived shell | real auth contract + protected routes | Implemented; runtime auth verification pending SIGE Supabase |
+| F2 | Operational primitives | tables, filters, pagination, forms, dialogs, errors, empty/loading states | reusable patterns proven on real queries | Implemented baseline; runtime verification pending |
 | F3 | Pessoas & matrícula | students, teachers, guardians, enrollment lifecycle | real commands/queries + no duplicate workflows |
 | F4 | Estrutura pedagógica | classes, subjects/offers, curriculum, teacher assignments | class workflows use real backend contracts |
 | F5 | Horários & operações | timetable, calendar, class sessions, livro de ponto | conflict-aware workflow + responsive verification |
@@ -68,7 +68,7 @@ Explicitly do not build fake dashboards, fake records, fake authentication, char
 
 ## F1 — Authentication & access
 
-Status: next execution block.
+Status: implemented baseline; runtime verification pending authorized SIGE Supabase.
 
 - real Supabase Auth sign-in;
 - callback/session handling;
@@ -79,6 +79,8 @@ Status: next execution block.
 - authorization failures that never expose backend internals.
 
 ## F2 — Operational primitives
+
+Status: implemented baseline; runtime verification pending CI/browser environment.
 
 - data-table primitives;
 - server-backed search/filter state;
