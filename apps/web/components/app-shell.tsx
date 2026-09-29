@@ -8,6 +8,7 @@ import { navigationSections } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SignOutButton } from "@/components/auth/sign-out-button";
 
 type AppShellProps = {
   children: React.ReactNode;
@@ -74,6 +75,7 @@ export function AppShell({
             </div>
             <ThemeToggle />
           </div>
+          <SignOutButton />
         </div>
       </aside>
 
