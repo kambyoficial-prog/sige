@@ -123,7 +123,7 @@ A/B/C-style labels remain configurable section/pathway data, never hardcoded bus
 
 ## F5 — Operações
 
-Status: command/domain layer and class-session/livro-de-ponto vertical slice implemented; timetable projections and browser/database verification remain.
+Status: operational vertical slice implemented; database runtime verification completed for the command boundary and RLS gate. Browser QA remains pending because SIGE is not connected to a Vercel project in the available account.
 
 Implemented in the current vertical slice:
 - timetable grid by class;
