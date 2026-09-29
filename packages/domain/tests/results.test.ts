@@ -45,7 +45,7 @@ describe("Mozambique secondary assessment rules 2022", () => {
       at: { score: 15, status: "ENTERED" },
     });
 
-    expect(result.complete).toBe(false);
+    assert.equal(result.complete, false);
     assert.equal(result.mt, null);
   });
 
