@@ -128,7 +128,7 @@ begin
 
   if not (
     (select private.has_permission('assessment.manage', school_id))
-    or (select private.has_permission('assessment.read', school_id))
+    or (select private.has_permission('assessment.manage', school_id))
   ) then
     raise exception 'FORBIDDEN';
   end if;
@@ -306,7 +306,7 @@ begin
 
   if school_id is null then raise exception 'ACADEMIC_RESULT_NOT_FOUND'; end if;
   if current_status <> 'CALCULATED' then raise exception 'RESULT_NOT_CALCULATED'; end if;
-  if not (select private.has_permission('assessment.homologate', school_id)) then
+  if not (select private.has_permission('assessment.manage', school_id)) then
     raise exception 'FORBIDDEN';
   end if;
 
@@ -376,7 +376,7 @@ begin
 
   if school_id is null then raise exception 'ACADEMIC_RESULT_NOT_FOUND'; end if;
   if current_status <> 'HOMOLOGATED' then raise exception 'RESULT_NOT_HOMOLOGATED'; end if;
-  if not (select private.has_permission('assessment.publish', school_id)) then
+  if not (select private.has_permission('assessment.manage', school_id)) then
     raise exception 'FORBIDDEN';
   end if;
 
