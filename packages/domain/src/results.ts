@@ -1,5 +1,5 @@
-import { assertScoreInScale } from "./index.js";
-import { mean, roundForPresentation } from "./assessment.js";
+import { assertScoreInScale, mean } from "./index.js";
+import { roundForPresentation } from "./assessment.js";
 
 export const MOZAMBIQUE_SECONDARY_2022_RULE_VERSION =
   "MZ-ES-2022-06-30";
