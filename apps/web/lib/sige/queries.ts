@@ -15,6 +15,12 @@ import {
 import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 
 type ViewName =
+  | "student_directory"
+  | "student_profile"
+  | "enrollment_directory"
+  | "teacher_directory"
+  | "guardian_directory"
+  | "class_group_directory"
   | "class_group_overview"
   | "class_group_students"
   | "class_group_teachers"
@@ -49,6 +55,25 @@ export async function queryView<T extends object>(
     throw normalizeSigeError(error);
   }
 }
+
+export const getStudentDirectory = () =>
+  queryView<import("@sige/contracts").StudentDirectory>("student_directory", {});
+
+export const getStudentProfile = (studentId: string) =>
+  queryView<import("@sige/contracts").StudentProfile>("student_profile", { id: studentId });
+
+export const getEnrollmentDirectory = () =>
+  queryView<import("@sige/contracts").EnrollmentDirectory>("enrollment_directory", {});
+
+export const getTeacherDirectory = () =>
+  queryView<import("@sige/contracts").TeacherDirectory>("teacher_directory", {});
+
+export const getGuardianDirectory = () =>
+  queryView<import("@sige/contracts").GuardianDirectory>("guardian_directory", {});
+
+export const getClassGroupDirectory = (academicYearId?: string) =>
+  queryView<import("@sige/contracts").ClassGroupDirectory>("class_group_directory",
+    academicYearId ? { academic_year_id: academicYearId } : {});
 
 export const getClassGroupOverview = (academicYearId: string) =>
   queryView<ClassGroupOverview>("class_group_overview", {
