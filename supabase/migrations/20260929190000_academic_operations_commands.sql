@@ -963,6 +963,7 @@ using (
         or private.has_permission('operations.manage', cg.school_id)
         or private.has_permission('enrollment.read', cg.school_id)
       )
+  )
 );
 
 create policy academic_ops_student_course_participations_read
@@ -978,6 +979,7 @@ using (
         or private.has_permission('operations.manage', co.school_id)
         or private.has_permission('assessment.read', co.school_id)
       )
+  )
 );
 
 -- The privileged functions run with an empty search_path and every relation is
