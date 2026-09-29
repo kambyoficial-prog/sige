@@ -46,3 +46,6 @@ export async function requireAuthenticatedServerClient() {
 
   return { supabase, claims: data.claims };
 }
+
+// Compatibility alias for route/query modules using the generic server-client name.
+export const createClient = createSupabaseServerClient;
