@@ -12,8 +12,8 @@ export interface StudentDirectory {
   id: UUID; school_id: UUID; school_number: string; status: string;
   admission_date: string | null; full_name: string; first_name: string | null;
   last_name: string | null; gender: string | null; birth_date: string | null;
-  phone: string | null; email: string | null; enrollment_id: UUID | null;
-  academic_year_id: UUID | null; grade_level_id: UUID | null;
+  phone: string | null; email: string | null; address: string | null; enrollment_id: UUID | null;
+  academic_year_id: UUID | null; academic_year_label: string | null; grade_level_id: UUID | null; grade_level_name: string | null;
   enrollment_status: string | null; enrolled_on: string | null;
   class_group_id: UUID | null; class_name: string | null; section_code: string | null;
 }
