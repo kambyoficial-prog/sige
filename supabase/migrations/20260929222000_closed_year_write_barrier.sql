@@ -16,7 +16,7 @@ begin
     year_id := coalesce(new.id, old.id);
   elsif tg_table_name in ('student_enrollments','class_groups','course_offerings',
                           'assessment_periods','curriculum_subjects','school_calendar_days',
-                          'schedule_entries','academic_results') then
+                          'academic_results') then
     year_id := coalesce(new.academic_year_id, old.academic_year_id);
   elsif tg_table_name = 'class_placements' then
     select e.academic_year_id into year_id
