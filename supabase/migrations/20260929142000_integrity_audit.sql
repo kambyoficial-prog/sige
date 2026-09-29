@@ -228,55 +228,35 @@ select
   sum(
     case
       when c.status in ('CANCELLED','WAIVED') then 0
-      else greatest(
-        0,
-        c.amount + coalesce((
-          select sum(
-            case
-              when ca.type in ('DISCOUNT','WAIVER','REVERSAL') then -ca.amount
-              when ca.type in ('SURCHARGE','CORRECTION') then ca.amount
-              else 0
-            end
-          )
-          from public.charge_adjustments ca
-          where ca.charge_id = c.id
-        ), 0)
-      )
+      else greatest(0, c.amount + adjustment.adjustment_amount)
     end
   ) as charged_amount,
-  coalesce((
-    select sum(pa.amount)
-    from public.payment_allocations pa
-    join public.payments p on p.id = pa.payment_id
-    where pa.charge_id = c.id
-      and p.status = 'CONFIRMED'
-  ), 0) as paid_amount,
+  sum(paid.paid_amount) as paid_amount,
   sum(
     case
       when c.status in ('CANCELLED','WAIVED') then 0
-      else greatest(
-        0,
-        c.amount + coalesce((
-          select sum(
-            case
-              when ca.type in ('DISCOUNT','WAIVER','REVERSAL') then -ca.amount
-              when ca.type in ('SURCHARGE','CORRECTION') then ca.amount
-              else 0
-            end
-          )
-          from public.charge_adjustments ca
-          where ca.charge_id = c.id
-        ), 0)
-      )
+      else greatest(0, c.amount + adjustment.adjustment_amount)
     end
-  ) - coalesce((
-    select sum(pa.amount)
-    from public.payment_allocations pa
-    join public.payments p on p.id = pa.payment_id
-    where pa.charge_id = c.id
-      and p.status = 'CONFIRMED'
-  ), 0) as balance_amount
+  ) - sum(paid.paid_amount) as balance_amount
 from public.charges c
+left join lateral (
+  select coalesce(sum(
+    case
+      when ca.type in ('DISCOUNT','WAIVER','REVERSAL') then -ca.amount
+      when ca.type in ('SURCHARGE','CORRECTION') then ca.amount
+      else 0
+    end
+  ), 0) as adjustment_amount
+  from public.charge_adjustments ca
+  where ca.charge_id = c.id
+) adjustment on true
+left join lateral (
+  select coalesce(sum(pa.amount), 0) as paid_amount
+  from public.payment_allocations pa
+  join public.payments p on p.id = pa.payment_id
+  where pa.charge_id = c.id
+    and p.status = 'CONFIRMED'
+) paid on true
 group by c.school_id, c.student_id;
 
 create or replace function private.refresh_payment_related_charges()
