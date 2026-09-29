@@ -122,3 +122,68 @@ export const getAssessmentPeriodHistory = (academicYearId: string) =>
   queryView<AssessmentPeriodHistory>("assessment_period_history", {
     academic_year_id: academicYearId,
   });
+
+
+function sanitizeSearchTerm(value: string) {
+  return value
+    .replace(/[\\%_]/g, "")
+    .replace(/[(),]/g, " ")
+    .trim()
+    .slice(0, 80);
+}
+
+export async function searchStudentDirectory(search = "") {
+  const { supabase } = await requireAuthenticatedServerClient();
+  const term = sanitizeSearchTerm(search);
+  try {
+    let query = supabase.from("student_directory").select("*").order("full_name", { ascending: true });
+    if (term) query = query.or(`full_name.ilike.%${term}%,school_number.ilike.%${term}%`);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data ?? []) as import("@sige/contracts").StudentDirectory[];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
+
+export async function searchEnrollmentDirectory(search = "") {
+  const { supabase } = await requireAuthenticatedServerClient();
+  const term = sanitizeSearchTerm(search);
+  try {
+    let query = supabase.from("enrollment_directory").select("*").order("enrolled_on", { ascending: false });
+    if (term) query = query.or(`student_name.ilike.%${term}%,school_number.ilike.%${term}%,class_name.ilike.%${term}%`);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data ?? []) as import("@sige/contracts").EnrollmentDirectory[];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
+
+export async function searchTeacherDirectory(search = "") {
+  const { supabase } = await requireAuthenticatedServerClient();
+  const term = sanitizeSearchTerm(search);
+  try {
+    let query = supabase.from("teacher_directory").select("*").order("full_name", { ascending: true });
+    if (term) query = query.or(`full_name.ilike.%${term}%,employee_code.ilike.%${term}%`);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data ?? []) as import("@sige/contracts").TeacherDirectory[];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
+
+export async function searchGuardianDirectory(search = "") {
+  const { supabase } = await requireAuthenticatedServerClient();
+  const term = sanitizeSearchTerm(search);
+  try {
+    let query = supabase.from("guardian_directory").select("*").order("full_name", { ascending: true });
+    if (term) query = query.or(`full_name.ilike.%${term}%,identity_number.ilike.%${term}%`);
+    const { data, error } = await query;
+    if (error) throw error;
+    return (data ?? []) as import("@sige/contracts").GuardianDirectory[];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
