@@ -13,7 +13,8 @@ import { errorMessage } from "@/lib/sige/presentation";
 import { createClassGroupAction } from "@/lib/sige/class-actions";
 
 const schema=z.object({academicYearId:z.string().uuid(),gradeLevelId:z.string().uuid(),sectionCode:z.string().trim().min(1),pathwayId:z.string().optional(),shift:z.string().optional(),capacity:z.coerce.number().int().positive().optional(),name:z.string().optional()});
-type FormInput=z.input<typeof schema>;\ntype Values=z.output<typeof schema>;
+type FormInput=z.input<typeof schema>;
+type Values=z.output<typeof schema>;
 
 export function ClassForm({years,grades}:{years:Array<{id:string;label:string;status:string}>;grades:Array<{id:string;name:string}>}){
  const router=useRouter();const[pending,startTransition]=useTransition();const form=useForm<FormInput, unknown, Values>({resolver:zodResolver(schema),defaultValues:{academicYearId:years.find(y=>y.status==="OPEN")?.id??"",gradeLevelId:"",shift:"MORNING"}});
