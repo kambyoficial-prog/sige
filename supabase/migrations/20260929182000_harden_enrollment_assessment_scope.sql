@@ -15,7 +15,7 @@ create or replace function public.withdraw_student(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -34,7 +34,7 @@ begin
   select s.school_id, e.status, e.enrolled_on
     into school_id, enrollment_status, enrolled_on
   from public.student_enrollments e
-  join public.schools s on s.id = e.school_id
+  join public.students s on s.id = e.student_id
   where e.id = p_enrollment_id
   for update;
 
@@ -108,7 +108,7 @@ create or replace function public.transfer_student_out(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -130,7 +130,7 @@ begin
   select s.school_id, e.status, e.enrolled_on
     into school_id, enrollment_status, enrolled_on
   from public.student_enrollments e
-  join public.schools s on s.id = e.school_id
+  join public.students s on s.id = e.student_id
   where e.id = p_enrollment_id
   for update;
 
@@ -214,7 +214,7 @@ create or replace function public.save_assessment_result(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -364,7 +364,7 @@ create or replace function public.publish_assessment(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
