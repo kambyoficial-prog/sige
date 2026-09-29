@@ -33,6 +33,7 @@ export const navigationSections: NavigationSection[] = [
       { label: "Turmas", href: "/turmas", permission: "operations.read" },
       { label: "Notas", href: "/notas", permission: "assessment.read" },
       { label: "Pautas", href: "/pautas", permission: "assessment.read" },
+      { label: "Exames", href: "/exames", permission: "assessment.manage" },
     ],
   },
   {
