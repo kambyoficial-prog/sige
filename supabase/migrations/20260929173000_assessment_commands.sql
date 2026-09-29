@@ -20,7 +20,7 @@ create or replace function public.create_assessment(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -113,7 +113,7 @@ create or replace function public.save_assessment_result(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -238,7 +238,7 @@ create or replace function public.publish_assessment(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -369,7 +369,7 @@ create or replace function public.correct_published_result(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
