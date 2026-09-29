@@ -8,5 +8,8 @@
     "./commands": "./src/commands.ts",
     "./errors": "./src/errors.ts",
     "./queries": "./src/queries.ts"
+  },
+  "scripts": {
+    "typecheck": "tsc --noEmit"
   }
 }
