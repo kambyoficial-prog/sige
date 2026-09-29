@@ -1,11 +1,11 @@
 export type CommandName =
   | "enroll_student"
   | "place_student_in_class"
-  | "transfer_student"
+  | "transfer_student_out"
   | "withdraw_student"
   | "create_assessment"
-  | "save_assessment_results"
-  | "publish_results"
+  | "save_assessment_result"
+  | "publish_assessment"
   | "correct_published_result"
   | "close_assessment_period"
   | "issue_charge"
@@ -35,7 +35,7 @@ export interface CommandResult<T> {
 
 export interface EnrollStudentInput {
   context: CommandContext;
-  personId: string;
+  studentId: string;
   academicYearId: string;
   gradeLevelId: string;
 }
