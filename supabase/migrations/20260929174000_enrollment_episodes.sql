@@ -23,9 +23,11 @@ alter table public.student_enrollments
 
 alter table public.student_enrollments
   drop constraint if exists student_enrollments_student_id_academic_year_id_key;
+alter table public.student_enrollments
+  drop constraint if exists student_enrollments_student_id_academic_year_id_enrollment__key;
 
-create unique index student_enrollments_episode_uq
-  on public.student_enrollments (student_id, academic_year_id, enrollment_sequence);
+-- The foundation already owns this uniqueness as a table constraint.
+-- Do not create a second identical unique index here.
 
 alter table public.student_enrollments
   add constraint student_enrollments_no_temporal_overlap
