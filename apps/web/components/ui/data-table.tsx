@@ -6,7 +6,8 @@ import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 
-const features = tableFeatures({});
+export const dataTableFeatures = tableFeatures({});
+export type DataTableFeatures = typeof dataTableFeatures;
 
 export function DataTable<TData extends Record<string, unknown>>({
   columns,
@@ -15,13 +16,13 @@ export function DataTable<TData extends Record<string, unknown>>({
   emptyTitle = "Sem registos",
   emptyDescription = "Não existem registos para apresentar.",
 }: {
-  columns: ColumnDef<typeof features, TData, unknown>[];
+  columns: ColumnDef<DataTableFeatures, TData, unknown>[];
   data: TData[];
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
 }) {
-  const table = useTable({ features, data, columns });
+  const table = useTable({ features: dataTableFeatures, data, columns });
 
   if (loading) {
     return (
