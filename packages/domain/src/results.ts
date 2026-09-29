@@ -1,4 +1,4 @@
-import { mean, roundForPresentation } from "./assessment.js";
+import { assertScoreInScale, mean, roundForPresentation } from "./assessment.js";
 
 export const MOZAMBIQUE_SECONDARY_2022_RULE_VERSION =
   "MZ-ES-2022-06-30";
@@ -39,7 +39,11 @@ function enteredScores(
 ): number[] {
   return values
     .filter((value) => value.status === "ENTERED" && value.score !== null)
-    .map((value) => value.score as number);
+    .map((value) => {
+      const score = value.score as number;
+      assertScoreInScale(score, 20);
+      return score;
+    });
 }
 
 /**
