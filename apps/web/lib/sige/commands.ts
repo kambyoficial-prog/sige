@@ -11,6 +11,9 @@ import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 type RpcArgs = Record<string, unknown>;
 
 const RPC_NAMES: Record<CommandName, string> = {
+  create_exam_session: "create_exam_session",
+  set_exam_session_status: "set_exam_session_status",
+  register_exam_candidate: "register_exam_candidate",
   register_student: "register_student",
   create_guardian: "create_guardian",
   assign_class_group_director: "assign_class_group_director",
@@ -64,6 +67,9 @@ function toRpcArgs<Name extends CommandName>(
   };
 
   const map: Record<CommandName, RpcArgs> = {
+    create_exam_session: { p_academic_year_id: i.academicYearId, p_grade_level_id: i.gradeLevelId, p_epoch: i.epoch, p_starts_on: i.startsOn, p_ends_on: i.endsOn, ...common },
+    set_exam_session_status: { p_exam_session_id: i.examSessionId, p_status: i.status, ...common },
+    register_exam_candidate: { p_exam_session_id: i.examSessionId, p_student_id: i.studentId, p_course_offering_id: i.courseOfferingId, p_eligibility_status: i.eligibilityStatus, p_reason: i.reason ?? null, ...common },
     assign_class_group_director: {
       p_class_group_id: i.classGroupId,
       p_teacher_id: i.teacherId,
