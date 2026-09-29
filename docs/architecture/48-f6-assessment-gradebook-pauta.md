@@ -106,3 +106,64 @@ Os avisos do Security Advisor sobre funções `SECURITY DEFINER` são conhecidos
 ## Testes
 
 O repositório contém `0033_f6_normative_gradebook.sql` para assertions estruturais. A instância remota não tem pgTAP instalado; por isso a verificação remota equivalente foi executada directamente sobre catálogo PostgreSQL e definições das funções.
+
+## Fecho de exames
+
+O domínio de exames agora possui ciclo de vida próprio:
+
+`ExamSession → ExamRegistration → Assessment(EXAM) → AssessmentResult → FinalResult`
+
+Uma sessão possui ano lectivo, classe, época 1 ou 2, período de realização e estado DRAFT/OPEN/CLOSED/CANCELLED.
+
+A inscrição do candidato regista explicitamente a decisão de elegibilidade. A decisão é auditada; o frontend não pode fabricar uma inscrição através de INSERT directo.
+
+### Segunda época
+
+A 2.ª época é um evento distinto. Quando existe um resultado de exame publicado da 2.ª época para o mesmo aluno/disciplina, um cálculo baseado na 1.ª época é rejeitado. Isto implementa a regra normativa segundo a qual a nota da 2.ª época anula a da 1.ª época. citeturn5view0
+
+### Fórmulas terminais
+
+Para a regra `MZ-ESG-RGA-2019`, a definição congelada contém coeficientes numéricos:
+
+- 10.ª, com paralelismo: `(3 × NCD + NE) / 4`;
+- 12.ª, com paralelismo: `(2 × NCD + NE) / 3`;
+- sem paralelismo: `(NCD + NE) / 2`.
+
+Essas fórmulas estão na versão da regra e são consumidas pelo motor. A UI não contém coeficientes normativos. citeturn6view0
+
+### Admissão e aprovação
+
+O regulamento separa admissão ao exame, nota do exame, nota final por disciplina e aprovação/conclusão do ciclo. A implementação não transforma esses quatro conceitos numa única nota.
+
+Para 10.ª e 12.ª, o motor de resultado do ciclo verifica os limiares normativos armazenados na versão da regra. A determinação detalhada de disciplinas de exame continua dependente da estrutura curricular configurada para a escola.
+
+### Recurso de exame
+
+Foi criado `exam_reviews` com workflow `REQUESTED → UNDER_REVIEW → DECIDED`.
+
+A decisão mantém motivo, decisão, nota revista quando aplicável, relatório, decisor e timestamps. Uma revisão não sobrescreve silenciosamente o resultado histórico.
+
+## Estado de release F6
+
+F6 inclui agora:
+
+- regra normativa versionada;
+- definições configuráveis;
+- gradebook;
+- lançamento de avaliações;
+- publicação;
+- cálculo trimestral;
+- MFD;
+- exame;
+- épocas 1/2;
+- elegibilidade explícita;
+- resultado final;
+- aprovação/conclusão de ciclo;
+- recurso/revisão;
+- homologação/publicação;
+- pauta derivada;
+- auditoria;
+- RLS e command boundary;
+- testes estruturais.
+
+F6 só será marcado como release-ready depois de o CI do repositório concluir lint, typecheck, testes e build.
