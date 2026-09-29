@@ -11,6 +11,8 @@ import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 type RpcArgs = Record<string, unknown>;
 
 const RPC_NAMES: Record<CommandName, string> = {
+  register_student: "register_student",
+  create_guardian: "create_guardian",
   enroll_student: "enroll_student",
   place_student_in_class: "place_student_in_class",
   record_payment: "record_payment",
@@ -52,6 +54,37 @@ function toRpcArgs<Name extends CommandName>(
   };
 
   const map: Record<CommandName, RpcArgs> = {
+    register_student: {
+      p_school_id: i.schoolId,
+      p_school_number: i.schoolNumber,
+      p_full_name: i.fullName,
+      p_first_name: i.firstName ?? null,
+      p_last_name: i.lastName ?? null,
+      p_gender: i.gender ?? null,
+      p_birth_date: i.birthDate ?? null,
+      p_national_id: i.nationalId ?? null,
+      p_phone: i.phone ?? null,
+      p_email: i.email ?? null,
+      p_address: i.address ?? null,
+      p_admission_date: i.admissionDate ?? undefined,
+      ...common,
+    },
+    create_guardian: {
+      p_school_id: i.schoolId,
+      p_student_id: i.studentId,
+      p_full_name: i.fullName,
+      p_relationship: i.relationship ?? null,
+      p_occupation: i.occupation ?? null,
+      p_identity_number: i.identityNumber ?? null,
+      p_address: i.address ?? null,
+      p_phone: i.phone ?? null,
+      p_gender: i.gender ?? null,
+      p_birth_date: i.birthDate ?? null,
+      p_national_id: i.nationalId ?? null,
+      p_is_primary: i.isPrimary ?? false,
+      p_lives_with_student: i.livesWithStudent ?? null,
+      ...common,
+    },
     enroll_student: {
       p_student_id: i.studentId,
       p_academic_year_id: i.academicYearId,
