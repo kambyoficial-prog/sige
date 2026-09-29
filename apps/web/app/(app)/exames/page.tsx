@@ -28,7 +28,7 @@ async function changeStatus(formData: FormData) {
 export default async function ExamsPage() {
   const supabase = await createSupabaseServerClient();
   const [{ data: years }, { data: grades }, { data: sessions }] = await Promise.all([
-    supabase.from("academic_years").select("id,label").order("starts_on",{ascending:false}),
+    supabase.from("academic_years").select("id,name").order("starts_on",{ascending:false}),
     supabase.from("grade_levels").select("id,code,name").order("ordinal"),
     supabase.from("exam_sessions").select("id,academic_year_id,grade_level_id,epoch,starts_on,ends_on,status").order("starts_on",{ascending:false}),
   ]);
@@ -38,7 +38,7 @@ export default async function ExamsPage() {
       <PageHeader title="Exames" description="Sessões, épocas e governação do processo de exame." />
       <form action={createSession} className="grid gap-3 rounded-xl border p-4 md:grid-cols-5">
         <select name="academicYearId" required className="h-10 rounded-md border bg-background px-3">
-          {(years ?? []).map((y) => <option key={y.id} value={y.id}>{y.label}</option>)}
+          {(years ?? []).map((y) => <option key={y.id} value={y.id}>{y.name}</option>)}
         </select>
         <select name="gradeLevelId" required className="h-10 rounded-md border bg-background px-3">
           {(grades ?? []).map((g) => <option key={g.id} value={g.id}>{g.code} · {g.name}</option>)}
