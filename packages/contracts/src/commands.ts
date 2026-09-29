@@ -156,6 +156,26 @@ export interface AssignTeacherToOfferingInput extends IdempotentCommand {
 export interface TransferStudentClassInput extends IdempotentCommand {
   enrollmentId: UUID; targetClassGroupId: UUID; transferOn: ISODate; reason: string;
 }
+export type ScheduleEntryStatus = "DRAFT" | "ACTIVE" | "ENDED" | "CANCELLED";
+
+export interface CreateRoomInput extends IdempotentCommand {
+  schoolId: UUID; code: string; name: string; capacity?: number;
+}
+export interface CreateSchedulePeriodInput extends IdempotentCommand {
+  schoolId: UUID; code: string; name: string; ordinal: number; startsAt: string; endsAt: string;
+}
+export interface UpsertSchoolCalendarDayInput extends IdempotentCommand {
+  academicYearId: UUID; schoolDate: ISODate; instructional?: boolean; label?: string;
+}
+export interface CreateScheduleEntryInput extends IdempotentCommand {
+  academicYearId: UUID; classGroupId: UUID; courseOfferingId: UUID;
+  teacherAssignmentId: UUID; teacherId: UUID; roomId?: UUID; periodId: UUID;
+  dayOfWeek: number; validFrom: ISODate; validUntil?: ISODate; notes?: string;
+}
+export interface SetScheduleEntryStatusInput extends IdempotentCommand {
+  scheduleEntryId: UUID; status: ScheduleEntryStatus; reason?: string;
+}
+
 export interface ConfigureCurriculumSubjectInput extends IdempotentCommand {
   academicYearId: UUID; gradeLevelId: UUID; subjectId: UUID; pathwayId?: UUID;
   curriculumAreaId?: UUID; selectionMode?: CurriculumSelectionMode;
@@ -193,6 +213,11 @@ export type SigeCommandInputMap = {
   assign_teacher_to_offering: AssignTeacherToOfferingInput;
   transfer_student_class: TransferStudentClassInput;
   configure_curriculum_subject: ConfigureCurriculumSubjectInput;
+  create_room: CreateRoomInput;
+  create_schedule_period: CreateSchedulePeriodInput;
+  upsert_school_calendar_day: UpsertSchoolCalendarDayInput;
+  create_schedule_entry: CreateScheduleEntryInput;
+  set_schedule_entry_status: SetScheduleEntryStatusInput;
 };
 
 export type CommandName = keyof SigeCommandInputMap;
