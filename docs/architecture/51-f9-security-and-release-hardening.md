@@ -43,3 +43,12 @@ These are documented architectural decisions, not ignored findings.
 The database release gate has been executed directly against the authoritative SIGE Supabase project. Repository structural assertions are committed under `supabase/tests/0037_f9_security_release_gate.sql`.
 
 CI and browser verification remain separate release gates and must be green before production deployment.
+
+
+## Release verification — 2026-09-30
+
+- GitHub CI run #510 is green: lint, TypeScript, domain tests and production build all passed.
+- Production build uses `next build --webpack` because the current Turbopack path fails while bundling the native `@tailwindcss/oxide` and `lightningcss` bindings under the repository's pnpm layout. Next.js 16 documents `--webpack` as the supported production fallback.
+- Supabase Security Advisor findings remain intentional architectural findings: command APIs are SECURITY DEFINER transaction boundaries; `account_roles`, `app_accounts` and `employments` are internal RLS-protected tables; `btree_gist` remains public because timetable exclusion constraints depend on it.
+- The authoritative Supabase project currently exposes 8 reporting read models.
+- Browser/runtime QA is pending because the Vercel team currently has no SIGE project/deployment. No browser pass is claimed until a real deployment exists.
