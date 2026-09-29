@@ -15,6 +15,9 @@ alter table public.student_enrollments
   alter column enrollment_sequence set not null;
 
 alter table public.student_enrollments
+  drop constraint if exists student_enrollments_sequence_ck;
+
+alter table public.student_enrollments
   add constraint student_enrollments_sequence_ck
   check (enrollment_sequence > 0);
 
