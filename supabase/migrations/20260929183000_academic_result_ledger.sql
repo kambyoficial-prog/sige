@@ -212,6 +212,10 @@ begin
     ), '[]'::jsonb)
   );
 
+  if exists (select 1 from public.academic_results where student_id = p_student_id and course_offering_id = p_course_offering_id and assessment_period_id = p_assessment_period_id and result_type = 'TRIMESTER' and status = 'PUBLISHED') then
+    raise exception 'PUBLISHED_RESULT_REQUIRES_CORRECTION';
+  end if;
+
   select id into old_result_id
   from public.academic_results
   where student_id = p_student_id
