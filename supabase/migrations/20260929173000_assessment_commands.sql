@@ -138,7 +138,7 @@ begin
   for share;
 
   if school_id is null then raise exception 'ASSESSMENT_NOT_FOUND'; end if;
-  if assessment_status_value not in ('OPEN','CLOSED') then raise exception 'ASSESSMENT_NOT_EDITABLE'; end if;
+  if assessment_status_value <> 'OPEN' then raise exception 'ASSESSMENT_NOT_EDITABLE'; end if;
 
   if p_status = 'ENTERED' then
     if p_raw_score is null or p_raw_score < 0 or p_raw_score > max_score then
@@ -275,8 +275,11 @@ begin
   select count(*)
     into participants_count
   from public.student_course_participations scp
+  join public.assessments a on a.id = p_assessment_id
   where scp.course_offering_id = offering_id
-    and scp.status = 'ACTIVE';
+    and scp.status = 'ACTIVE'
+    and (a.assessment_date is null or scp.starts_on <= a.assessment_date)
+    and (scp.ends_on is null or a.assessment_date is null or scp.ends_on >= a.assessment_date);
 
   select count(*)
     into results_count
@@ -286,11 +289,14 @@ begin
   select count(*)
     into missing_count
   from public.student_course_participations scp
+  join public.assessments a on a.id = p_assessment_id
   left join public.assessment_results ar
     on ar.student_id = scp.student_id
    and ar.assessment_id = p_assessment_id
   where scp.course_offering_id = offering_id
     and scp.status = 'ACTIVE'
+    and (a.assessment_date is null or scp.starts_on <= a.assessment_date)
+    and (scp.ends_on is null or a.assessment_date is null or scp.ends_on >= a.assessment_date)
     and (ar.id is null or ar.status = 'MISSING');
 
   if participants_count = 0 then raise exception 'ASSESSMENT_HAS_NO_PARTICIPANTS'; end if;
@@ -349,3 +355,113 @@ revoke insert, update, delete on public.assessments from authenticated;
 revoke insert, update, delete on public.assessment_results from authenticated;
 grant select on public.assessments to authenticated;
 grant select on public.assessment_results to authenticated;
+
+
+create or replace function public.correct_published_result(
+  p_assessment_result_id uuid,
+  p_raw_score numeric(8,4),
+  p_status public.assessment_result_status default 'PUBLISHED',
+  p_comment text default null,
+  p_reason text default null,
+  p_idempotency_key text default null,
+  p_request_hash text default null
+)
+returns jsonb
+language plpgsql
+security definer
+set search_path = public, auth, pg_temp
+as $$
+declare
+  actor uuid := (select auth.uid());
+  school_id uuid;
+  assessment_id uuid;
+  max_score numeric(8,4);
+  current_status public.assessment_result_status;
+  normalized numeric(8,4);
+  result jsonb;
+  command_state jsonb;
+begin
+  if actor is null then raise exception 'AUTH_REQUIRED'; end if;
+  if p_idempotency_key is null then raise exception 'IDEMPOTENCY_KEY_REQUIRED'; end if;
+  if p_reason is null or length(trim(p_reason)) < 5 then
+    raise exception 'CORRECTION_REASON_REQUIRED';
+  end if;
+
+  select co.school_id, ar.assessment_id, a.max_score, ar.status
+    into school_id, assessment_id, max_score, current_status
+  from public.assessment_results ar
+  join public.assessments a on a.id = ar.assessment_id
+  join public.course_offerings co on co.id = a.course_offering_id
+  where ar.id = p_assessment_result_id
+  for update;
+
+  if school_id is null then raise exception 'ASSESSMENT_RESULT_NOT_FOUND'; end if;
+  if current_status <> 'PUBLISHED' then raise exception 'RESULT_IS_NOT_PUBLISHED'; end if;
+  if p_status <> 'PUBLISHED' then raise exception 'CORRECTION_MUST_REMAIN_PUBLISHED'; end if;
+  if p_raw_score is null or p_raw_score < 0 or p_raw_score > max_score then
+    raise exception 'INVALID_SCORE';
+  end if;
+
+  if not (select private.has_permission('assessment.manage', school_id)) then
+    raise exception 'FORBIDDEN';
+  end if;
+
+  command_state := private.begin_command(
+    'correct_published_result',
+    school_id,
+    p_idempotency_key,
+    p_request_hash
+  );
+
+  if coalesce((command_state->>'replayed')::boolean, false) then
+    return command_state->'result';
+  end if;
+
+  normalized := (p_raw_score / max_score) * 20;
+
+  update public.assessment_results
+     set raw_score = p_raw_score,
+         normalized_score = normalized,
+         status = 'PUBLISHED',
+         comment = p_comment,
+         entered_by = actor,
+         entered_at = now(),
+         published_at = now(),
+         published_by = actor,
+         correction_reason = trim(p_reason)
+   where id = p_assessment_result_id;
+
+  insert into public.audit_events (
+    school_id, actor_auth_user_id, action, entity_type, entity_id,
+    reason, after_data
+  )
+  values (
+    school_id, actor, 'CORRECT_PUBLISHED_RESULT', 'assessment_result',
+    p_assessment_result_id, trim(p_reason),
+    jsonb_build_object(
+      'assessment_id', assessment_id,
+      'raw_score', p_raw_score,
+      'normalized_score', normalized,
+      'status', 'PUBLISHED'
+    )
+  );
+
+  result := jsonb_build_object(
+    'assessment_result_id', p_assessment_result_id,
+    'status', 'PUBLISHED',
+    'normalized_score', normalized
+  );
+
+  perform private.complete_command(
+    'correct_published_result',
+    school_id,
+    p_idempotency_key,
+    result
+  );
+
+  return result;
+end;
+$$;
+
+revoke all on function public.correct_published_result(uuid,numeric,public.assessment_result_status,text,text,text,text) from public;
+grant execute on function public.correct_published_result(uuid,numeric,public.assessment_result_status,text,text,text,text) to authenticated;
