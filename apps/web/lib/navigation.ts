@@ -10,6 +10,7 @@ export type NavigationItem = {
 };
 
 export const navigationSections: NavigationSection[] = [
+  { label: "Conta", items: [{ label: "Perfil", href: "/perfil" }] },
   {
     label: "Visão geral",
     items: [{ label: "Visão geral", href: "/" }],
