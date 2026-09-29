@@ -123,14 +123,27 @@ A/B/C-style labels remain configurable section/pathway data, never hardcoded bus
 
 ## F5 — Operações
 
-Status: command/domain layer implemented; operational UI and browser/database verification remain.
+Status: command/domain layer and class-session/livro-de-ponto vertical slice implemented; timetable projections and browser/database verification remain.
 
-- timetable grid;
-- teacher and student timetables;
-- teacher/room conflict feedback;
-- school calendar;
-- class sessions;
-- livro de ponto surfaces according to the actual attendance workflow.
+Implemented in the current vertical slice:
+- timetable grid by class;
+- class-session command boundary;
+- session lifecycle `OPEN → CLOSED`;
+- session creation anchored to a real schedule entry;
+- calendar/day and schedule-validity guards;
+- teacher-own-session authorization;
+- attendance command scoped to enrolled students in the scheduled class;
+- idempotent/audited session and attendance mutations;
+- removal of direct authenticated writes to sessions and attendance;
+- `class_session_directory` and `class_session_roster` read projections;
+- operational livro de ponto UI.
+
+Still open:
+- dedicated teacher timetable surface;
+- dedicated student timetable surface;
+- richer schedule planning/distribution UI;
+- browser QA;
+- execution of PostgreSQL suite against the authorized SIGE database.
 
 Scheduling remains a constrained operational tool, not a generic calendar.
 
