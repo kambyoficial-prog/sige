@@ -4,7 +4,7 @@ import { notFound } from "next/navigation";
 import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { buttonVariants } from "@/components/ui/button";
-import { getStudentProfile, getEnrollmentDirectory } from "@/lib/sige/queries";
+import { getStudentProfile, getStudentEnrollmentHistory } from "@/lib/sige/queries";
 import { cn } from "@/lib/utils";
 
 export default async function StudentProfilePage({ params }: { params: Promise<{ id: string }> }) {
@@ -13,11 +13,11 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
   const canManage = access.memberships.some((m) => m.permissions.includes("enrollment.manage"));
   const [profileRows, enrollmentRows] = await Promise.all([
     getStudentProfile(id),
-    getEnrollmentDirectory(),
+    getStudentEnrollmentHistory(id),
   ]);
   const student = profileRows[0];
   if (!student) notFound();
-  const history = enrollmentRows.filter((row) => row.student_id === id);
+  const history = enrollmentRows;
 
   return (
     <div className="space-y-8">
