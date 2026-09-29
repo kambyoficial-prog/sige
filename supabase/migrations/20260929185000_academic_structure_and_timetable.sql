@@ -174,11 +174,11 @@ select
   cg.shift,
   cg.capacity,
   count(distinct cp.id) filter (where cp.status = 'ACTIVE') as active_student_count,
-  max(t.id) filter (
+  (array_agg(t.id order by cgl.starts_on desc, cgl.id desc) filter (
     where cgl.active
       and cgl.starts_on <= current_date
       and (cgl.ends_on is null or cgl.ends_on >= current_date)
-  ) as director_teacher_id,
+  ))[1] as director_teacher_id,
   max(p.full_name) filter (
     where cgl.active
       and cgl.starts_on <= current_date
