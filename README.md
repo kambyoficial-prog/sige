@@ -29,6 +29,8 @@ SIGE is an operational school-management platform. Phase one targets Ensino Secu
 - `docs/architecture/39-frontend-foundation-closeout.md`: F0 implementation decisions and verification gate.
 - `docs/architecture/40-authentication-access-implementation.md`: F1 authentication/access implementation.
 - `docs/architecture/41-operational-primitives.md`: F2 operational frontend primitives.
+- `docs/architecture/42-people-admission-and-enrollment.md`: F3 people, admission and enrollment architecture.
+- `docs/architecture/43-academic-structure-operational-ui.md`: F4 academic structure and class operations.
 
 ## Development
 
