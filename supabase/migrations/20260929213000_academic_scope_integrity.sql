@@ -208,8 +208,6 @@ begin
         and scp.course_offering_id=(
           select a.course_offering_id from public.assessments a where a.id=new.assessment_id
         )
-        and scp.starts_on <= current_date
-        and (scp.ends_on is null or scp.ends_on >= current_date)
     ) then
       raise exception 'ASSESSMENT_RESULT_STUDENT_COURSE_CONTEXT_MISMATCH';
     end if;
