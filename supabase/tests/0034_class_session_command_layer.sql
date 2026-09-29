@@ -96,7 +96,7 @@ select ok(
 );
 
 select ok(
-  position("entry_status <> 'ACTIVE'" in pg_get_functiondef(
+  position('entry_status <> ''ACTIVE''' in pg_get_functiondef(
     'public.open_class_session(uuid,date,text,text,text,text)'::regprocedure
   )) > 0,
   'session opening requires an active schedule'
