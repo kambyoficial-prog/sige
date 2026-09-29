@@ -94,7 +94,7 @@ begin
 
   update public.student_course_participations scp
      set status = 'ENDED',
-         ends_on = coalesce(scp.ends_on, p_close_on)
+         ends_on = least(coalesce(scp.ends_on, p_close_on), p_close_on)
    where scp.status = 'ACTIVE'
      and scp.course_offering_id in (
        select co.id
@@ -104,7 +104,7 @@ begin
 
   update public.teacher_assignments ta
      set active = false,
-         ends_on = coalesce(ta.ends_on, p_close_on)
+         ends_on = least(coalesce(ta.ends_on, p_close_on), p_close_on)
    where ta.active
      and ta.course_offering_id in (
        select co.id
@@ -114,7 +114,7 @@ begin
 
   update public.class_placements cp
      set status = 'ENDED',
-         ends_on = coalesce(cp.ends_on, p_close_on)
+         ends_on = least(coalesce(cp.ends_on, p_close_on), p_close_on)
    where cp.status = 'ACTIVE'
      and cp.enrollment_id in (
        select e.id
@@ -124,7 +124,7 @@ begin
 
   update public.schedule_entries
      set status = 'ENDED',
-         valid_until = coalesce(valid_until, p_close_on),
+         valid_until = least(coalesce(valid_until, p_close_on), p_close_on),
          updated_at = now()
    where academic_year_id = p_academic_year_id
      and status in ('DRAFT','ACTIVE');
