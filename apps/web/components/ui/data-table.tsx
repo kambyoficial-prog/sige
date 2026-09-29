@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { flexRender, tableFeatures, useTable, type ColumnDef } from "@tanstack/react-table";
+import { flexRender, tableFeatures, useTable, type ColumnDef, type RowData } from "@tanstack/react-table";
 import { EmptyState } from "@/components/ui/empty-state";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export const dataTableFeatures = tableFeatures({});
 export type DataTableFeatures = typeof dataTableFeatures;
 
-export function DataTable<TData extends Record<string, any>>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   loading = false,
