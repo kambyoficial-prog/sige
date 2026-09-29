@@ -38,7 +38,9 @@ type ViewName =
   | "timetable_slot_usage"
   | "student_financial_balances"
   | "academic_year_history"
-  | "assessment_period_history";
+  | "assessment_period_history"
+  | "assessment_gradebook"
+  | "academic_result_pauta";
 
 export async function queryView<T extends object>(
   view: ViewName,
@@ -293,3 +295,10 @@ export const getClassSessionRoster = (classSessionId: string) =>
   queryView<ClassSessionRoster>("class_session_roster", {
     class_session_id: classSessionId,
   });
+
+
+export const getAssessmentGradebook = (filters: Record<string, string | number | boolean | null> = {}) =>
+  queryView<import("@sige/contracts").AssessmentGradebookRow>("assessment_gradebook", filters);
+
+export const getAcademicResultPauta = (filters: Record<string, string | number | boolean | null> = {}) =>
+  queryView<import("@sige/contracts").AcademicResultPauta>("academic_result_pauta", filters);
