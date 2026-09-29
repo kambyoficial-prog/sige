@@ -85,6 +85,21 @@ export interface TimetableEntry {
   room_code: string | null; room_name: string | null;
   valid_from: string; valid_until: string | null; status: string;
 }
+export interface TeacherTimetableEntry {
+  id: UUID; school_id: UUID; academic_year_id: UUID; teacher_id: UUID; teacher_name: string;
+  day_of_week: number; period_ordinal: number; period_code: string; period_name: string;
+  starts_at: string; ends_at: string; class_group_id: UUID; section_code: string | null;
+  class_name: string | null; course_offering_id: UUID; subject_code: string; subject_name: string;
+  room_id: UUID | null; room_code: string | null; room_name: string | null;
+  valid_from: string; valid_until: string | null; status: string;
+}
+export interface StudentTimetableEntry {
+  enrollment_id: UUID; student_id: UUID; schedule_entry_id: UUID; day_of_week: number;
+  period_ordinal: number; period_code: string; period_name: string; starts_at: string; ends_at: string;
+  class_group_id: UUID; course_offering_id: UUID; subject_code: string; subject_name: string;
+  teacher_id: UUID; teacher_name: string; room_id: UUID | null; room_code: string | null;
+  room_name: string | null; valid_from: string; valid_until: string | null; status: string;
+}
 export interface TeacherWorkloadSummary {
   teacher_id: UUID; academic_year_id: UUID; scheduled_periods: number; assigned_offerings: number;
 }
