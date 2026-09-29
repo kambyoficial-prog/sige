@@ -8,7 +8,7 @@ const enrollmentSchema = z.object({
   studentId: z.string().uuid(),
   academicYearId: z.string().uuid(),
   gradeLevelId: z.string().uuid(),
-  entryType: z.enum(["INITIAL","TRANSFER_IN","REENTRY","RENEWAL"]),
+  entryType: z.enum(["INITIAL","TRANSFER_IN","REENTRY"]),
   enrolledOn: z.string().min(10),
 });
 
