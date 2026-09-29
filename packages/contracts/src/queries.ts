@@ -37,6 +37,13 @@ export interface TeacherDirectory {
   full_name: string; first_name: string | null; last_name: string | null;
   phone: string | null; email: string | null;
 }
+export interface TeacherProfile extends TeacherDirectory {
+  assignments: Array<{
+    course_offering_id: UUID; class_group_id: UUID; class_name: string | null;
+    subject_id: UUID; subject_name: string; subject_code: string;
+    starts_on: string; ends_on: string | null;
+  }>;
+}
 export interface GuardianDirectory {
   id: UUID; school_id: UUID; person_id: UUID; full_name: string;
   relationship: string | null; occupation: string | null; identity_number: string | null;
@@ -81,7 +88,7 @@ export interface StudentFinancialBalance {
 }
 export type SigeQueryName =
   | "student_directory" | "student_profile" | "enrollment_directory" | "course_offering_directory"
-  | "teacher_directory" | "guardian_directory" | "class_group_directory"
+  | "teacher_directory" | "teacher_profile" | "guardian_directory" | "class_group_directory"
   | "class_group_overview" | "class_group_students" | "class_group_teachers"
   | "class_timetable" | "teacher_timetable" | "student_timetable"
   | "teacher_workload_summary" | "timetable_slot_usage" | "student_financial_balances"
