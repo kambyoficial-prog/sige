@@ -5,7 +5,7 @@
 
 ## Separação de conceitos
 
-Matrícula anual e colocação numa turma são estados diferentes:
+Matrícula é um episódio temporal; colocação numa turma é uma relação temporal diferente:
 
 `Student -> StudentEnrollment -> ClassPlacement`
 
@@ -25,10 +25,10 @@ Pré-condições:
 - ano letivo pertence à mesma escola;
 - ano letivo está OPEN;
 - classe está ativa;
-- não existe matrícula para aquele aluno naquele ano.
+- não existe episódio activo sobreposto para aquele aluno naquele ano.
 
 Efeitos:
-- cria uma única matrícula anual;
+- cria um novo episódio de matrícula com sequência própria;
 - estado inicial ACTIVE;
 - registra auditoria;
 - registra resultado de idempotência.
