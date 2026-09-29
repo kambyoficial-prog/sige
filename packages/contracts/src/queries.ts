@@ -130,3 +130,60 @@ export type SigeQueryName =
   | "teacher_workload_summary" | "timetable_slot_usage" | "class_session_directory"
   | "class_session_roster" | "student_financial_balances"
   | "academic_year_history" | "assessment_period_history";
+
+
+export interface AssessmentGradebookRow {
+  assessment_id: string;
+  course_offering_id: string;
+  assessment_period_id: string;
+  definition_id: string | null;
+  type: "ACS" | "ACP" | "AT" | "EXAM" | "RECOVERY" | "OTHER";
+  title: string;
+  assessment_date: string | null;
+  max_score: number;
+  assessment_status: string;
+  student_id: string;
+  student_number: string;
+  student_name: string;
+  class_group_id: string;
+  class_name: string | null;
+  subject_id: string;
+  subject_name: string;
+  assessment_result_id: string | null;
+  raw_score: number | null;
+  normalized_score: number | null;
+  result_status: string | null;
+  comment: string | null;
+  entered_at: string | null;
+  result_published_at: string | null;
+}
+
+export interface AcademicResultPauta {
+  academic_result_id: string;
+  school_id: string;
+  academic_year_id: string;
+  academic_year_label: string;
+  student_id: string;
+  student_number: string;
+  student_name: string;
+  class_group_id: string;
+  class_name: string | null;
+  grade_code: string;
+  grade_name: string;
+  course_offering_id: string;
+  subject_code: string;
+  subject_name: string;
+  assessment_period_id: string | null;
+  assessment_period_code: string | null;
+  assessment_period_name: string | null;
+  assessment_period_ordinal: number | null;
+  result_type: string;
+  status: string;
+  rule_version: string;
+  value: number | null;
+  display_value: number | null;
+  classification: string | null;
+  calculated_at: string;
+  homologated_at: string | null;
+  published_at: string | null;
+}
