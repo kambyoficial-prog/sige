@@ -12,7 +12,7 @@ export type CommandInput<T extends object = Record<string, never>> =
 
 export type EnrollmentEntryType = "INITIAL" | "TRANSFER_IN" | "REENTRY";
 export type PaymentMethod = "CASH" | "BANK_TRANSFER" | "MOBILE_MONEY" | "CARD" | "OTHER";
-export type AssessmentType = "ACS" | "AT" | "EXAM" | "OTHER";
+export type AssessmentType = "ACS" | "ACP" | "AT" | "EXAM" | "RECOVERY" | "OTHER";
 export type AssessmentResultStatus =
   | "MISSING"
   | "ENTERED"
@@ -90,6 +90,19 @@ export interface ConfirmPaymentInput extends IdempotentCommand { paymentId: UUID
 export interface AllocatePaymentInput extends IdempotentCommand { paymentId: UUID; chargeId: UUID; amount: number; }
 export interface ReversePaymentInput extends IdempotentCommand { paymentId: UUID; reason: string; }
 export interface IssueReceiptInput extends IdempotentCommand { paymentId: UUID; receiptNumber: string; }
+
+export interface CreateAssessmentDefinitionInput extends IdempotentCommand {
+  courseOfferingId: UUID;
+  assessmentPeriodId: UUID;
+  code: string;
+  name: string;
+  type: AssessmentType;
+  ordinal: number;
+  required?: boolean;
+  countsInMacs?: boolean;
+  maxScore?: number;
+  weight?: number;
+}
 
 export interface CreateAssessmentInput extends IdempotentCommand {
   courseOfferingId: UUID;
@@ -204,7 +217,7 @@ export type SigeCommandInputMap = {
   allocate_payment: AllocatePaymentInput;
   reverse_payment: ReversePaymentInput;
   issue_receipt: IssueReceiptInput;
-  create_assessment: CreateAssessmentInput;
+  create_assessment_definition: CreateAssessmentDefinitionInput;\n  create_assessment: CreateAssessmentInput;
   save_assessment_result: SaveAssessmentResultInput;
   publish_assessment: PublishAssessmentInput;
   correct_published_result: CorrectPublishedResultInput;
