@@ -22,7 +22,7 @@ create or replace function public.record_payment(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -140,7 +140,7 @@ create or replace function public.confirm_payment(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
@@ -253,7 +253,7 @@ create or replace function public.allocate_payment(
 returns jsonb
 language plpgsql
 security definer
-set search_path = public, auth, pg_temp
+set search_path = ''
 as $$
 declare
   actor uuid := (select auth.uid());
