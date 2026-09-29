@@ -426,6 +426,29 @@ using (
 revoke insert, update, delete on public.assessment_result_history from authenticated;
 grant select on public.assessment_result_history to authenticated;
 
+-- Tables created after the original authorization migration need explicit
+-- Data API grants. RLS still decides which rows are visible/modifiable.
+grant select, insert, update on public.fee_types to authenticated;
+grant select, insert, update on public.fee_plans to authenticated;
+grant select, insert, update on public.fee_plan_items to authenticated;
+grant select, insert, update on public.student_services to authenticated;
+grant select, insert, update on public.transport_services to authenticated;
+grant select, insert, update on public.charges to authenticated;
+grant select, insert, update on public.payments to authenticated;
+grant select, insert, update on public.payment_allocations to authenticated;
+grant select, insert, update on public.charge_adjustments to authenticated;
+grant select, insert, update on public.payment_reversals to authenticated;
+grant select, insert, update on public.receipts to authenticated;
+
+grant select, insert, update on public.school_calendar_days to authenticated;
+grant select, insert, update on public.rooms to authenticated;
+grant select, insert, update on public.schedule_periods to authenticated;
+grant select, insert, update on public.schedule_entries to authenticated;
+grant select, insert, update on public.class_sessions to authenticated;
+grant select, insert, update on public.attendance_records to authenticated;
+
+grant select on public.audit_events to authenticated;
+
 create or replace function private.capture_published_result_revision()
 returns trigger
 language plpgsql
