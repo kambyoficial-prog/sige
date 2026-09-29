@@ -44,6 +44,7 @@ begin
   if not exists (
     select 1
     from public.academic_results ar
+    join public.assessment_periods ap on ap.id = ar.assessment_period_id
     where ar.id in (
       p_first_trimester_result_id,
       p_second_trimester_result_id,
@@ -56,7 +57,7 @@ begin
        and bool_and(ar.academic_year_id = academic_year_id)
        and bool_and(ar.result_type = 'TRIMESTER')
        and bool_and(ar.status = 'PUBLISHED')
-       and count(distinct ar.assessment_period_id) = 3
+       and array_agg(distinct ap.ordinal order by ap.ordinal) = array[1,2,3]
   ) then
     raise exception 'THREE_PUBLISHED_TRIMESTER_RESULTS_REQUIRED';
   end if;
