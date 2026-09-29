@@ -67,7 +67,7 @@ export default async function GradesPage({
         <div className="flex items-center justify-between rounded-xl border bg-muted/20 px-4 py-3 text-sm">
           <div>
             <div className="font-medium">{selectedOffering.subject_name}</div>
-            <div className="text-muted-foreground">{selectedOffering.class_name} · {years.find((y) => y.id === selectedOffering.academic_year_id)?.label ?? "Ano letivo"}</div>
+            <div className="text-muted-foreground">{classes.find((c) => c.id === selectedOffering.class_group_id)?.name ?? classes.find((c) => c.id === selectedOffering.class_group_id)?.section_code ?? "Turma"} · {years.find((y) => y.id === selectedOffering.academic_year_id)?.label ?? "Ano letivo"}</div>
           </div>
           <div className="text-right text-xs text-muted-foreground">Notas são lançadas individualmente e publicadas por avaliação.</div>
         </div>
