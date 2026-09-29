@@ -354,6 +354,7 @@ grant execute on function public.assign_class_group_director(uuid,uuid,date,date
 
 revoke insert, update, delete on public.class_group_leadership from authenticated;
 revoke insert, update, delete on public.teacher_workload_targets from authenticated;
+grant select, insert, update on public.teacher_workload_targets to authenticated;
 
 create policy class_group_leadership_manage
 on public.class_group_leadership
