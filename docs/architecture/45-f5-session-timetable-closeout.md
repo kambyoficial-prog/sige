@@ -132,7 +132,7 @@ Os nomes de RPC e o mapeamento frontend → database permanecem centralizados.
 
 Este bloco foi verificado estruturalmente contra o repositório e as definições SQL existentes.
 
-Ainda não é legítimo afirmar que a suíte PostgreSQL passou, porque o ambiente atual não possui uma conexão autorizada ao projeto Supabase real do SIGE.
+A suíte pgTAP do repositório não foi executada no remoto porque o projeto não possui pgTAP instalado. Em seu lugar, os invariantes e a existência/autorização da fronteira F5 foram verificados por SQL estrutural diretamente no PostgreSQL real do SIGE.
 
 Também não foi declarado sucesso de `pnpm typecheck`, `pnpm lint` ou `pnpm build` porque não existe execução CI observável para estes commits nesta sessão.
 
