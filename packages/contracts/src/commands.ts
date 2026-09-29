@@ -10,7 +10,7 @@ export type IdempotentCommand = {
 export type CommandInput<T extends object = Record<string, never>> =
   T & IdempotentCommand;
 
-export type EnrollmentEntryType = "INITIAL" | "TRANSFER_IN" | "REENTRY" | "RENEWAL";
+export type EnrollmentEntryType = "INITIAL" | "TRANSFER_IN" | "REENTRY";
 export type PaymentMethod = "CASH" | "BANK_TRANSFER" | "MOBILE_MONEY" | "CARD" | "OTHER";
 export type AssessmentType = "ACS" | "AT" | "EXAM" | "OTHER";
 export type AssessmentResultStatus =
