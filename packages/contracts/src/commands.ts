@@ -77,6 +77,16 @@ export interface PlaceStudentInClassInput extends IdempotentCommand {
   reason?: string;
 }
 
+
+export interface CreateFeeTypeInput extends IdempotentCommand { schoolId: UUID; code: string; name: string; }
+export interface CreateFeePlanInput extends IdempotentCommand { schoolId: UUID; academicYearId: UUID; code: string; name: string; }
+export interface AddFeePlanItemInput extends IdempotentCommand { feePlanId: UUID; feeTypeId: UUID; amount: number; dueDay?: number; sequenceNo?: number; }
+export interface CreateTransportServiceInput extends IdempotentCommand { schoolId: UUID; code: string; name: string; route?: string; stop?: string; amount?: number; }
+export interface AssignStudentTransportInput extends IdempotentCommand { studentId: UUID; academicYearId: UUID; transportServiceId: UUID; startsOn?: ISODate; endsOn?: ISODate; }
+export interface CreateChargeInput extends IdempotentCommand { studentId: UUID; academicYearId: UUID; amount: number; dueOn: ISODate; feeTypeId?: UUID; description?: string; }
+export type ChargeAdjustmentType = "DISCOUNT" | "WAIVER" | "REVERSAL" | "SURCHARGE" | "CORRECTION";
+export interface AdjustChargeInput extends IdempotentCommand { chargeId: UUID; type: ChargeAdjustmentType; amount: number; reason: string; }
+
 export interface RecordPaymentInput extends IdempotentCommand {
   studentId: UUID;
   amount: number;
@@ -229,6 +239,13 @@ export type SigeCommandInputMap = {
   assign_class_group_director: AssignClassGroupDirectorInput;
   enroll_student: EnrollStudentInput;
   place_student_in_class: PlaceStudentInClassInput;
+  create_fee_type: CreateFeeTypeInput;
+  create_fee_plan: CreateFeePlanInput;
+  add_fee_plan_item: AddFeePlanItemInput;
+  create_transport_service: CreateTransportServiceInput;
+  assign_student_transport: AssignStudentTransportInput;
+  create_charge: CreateChargeInput;
+  adjust_charge: AdjustChargeInput;
   record_payment: RecordPaymentInput;
   confirm_payment: ConfirmPaymentInput;
   allocate_payment: AllocatePaymentInput;
