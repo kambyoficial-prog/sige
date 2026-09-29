@@ -1,3 +1,5 @@
+import type { UUID } from "./commands";
+
 export interface AcademicYearHistory {
   id: UUID; school_id: UUID; code: string; name: string; status: string;
   starts_on: string; ends_on: string; closed_at: string | null;
