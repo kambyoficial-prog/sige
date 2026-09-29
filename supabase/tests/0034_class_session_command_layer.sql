@@ -1,5 +1,5 @@
 -- SIGE F5 — class session command boundary
-select plan(14);
+select plan(17);
 
 select has_function('public', 'open_class_session', array['uuid','date','text','text','text','text']);
 select has_function('public', 'close_class_session', array['uuid','text','text','text']);
@@ -108,5 +108,9 @@ select ok(
   )) > 0,
   'attendance cannot target a student outside the class'
 );
+
+select ok(exists(select 1 from pg_policy where polname = 'teacher_students_own_classes_read' and polrelid = 'public.students'::regclass),'teacher student roster policy exists');
+select ok(exists(select 1 from pg_policy where polname = 'teacher_enrollments_own_classes_read' and polrelid = 'public.student_enrollments'::regclass),'teacher enrollment roster policy exists');
+select ok(exists(select 1 from pg_policy where polname = 'teacher_people_own_classes_read' and polrelid = 'public.people'::regclass),'teacher people roster policy exists');
 
 select * from finish();
