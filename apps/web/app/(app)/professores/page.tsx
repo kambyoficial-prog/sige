@@ -1,4 +1,5 @@
 import Link from "next/link";
+import Link from "next/link";
 import type { ColumnDef } from "@tanstack/react-table";
 import type { TeacherDirectory } from "@sige/contracts";
 import { DataTable, type DataTableFeatures } from "@/components/ui/data-table";
@@ -10,7 +11,7 @@ export default async function TeachersPage({searchParams}:{searchParams:Promise<
   const params=await searchParams; const search=params.q?.trim()??""; const rows=await searchTeacherDirectory(search);
   const columns:ColumnDef<DataTableFeatures,TeacherDirectory,unknown>[]=[
     {accessorKey:"employee_code",header:"Código"},
-    {accessorKey:"full_name",header:"Professor",cell:({row})=><a className="font-medium hover:underline" href={`/professores/${row.original.id}`}>{row.original.full_name}</a>},
+    {accessorKey:"full_name",header:"Professor",cell:({row})=><Link className="font-medium hover:underline" href={`/professores/${row.original.id}`}>{row.original.full_name}</Link>},
     {accessorKey:"phone",header:"Telefone",cell:({getValue})=>getValue<string>()||"—"},
     {accessorKey:"email",header:"Email",cell:({getValue})=>getValue<string>()||"—"},
     {accessorKey:"status",header:"Estado"},
