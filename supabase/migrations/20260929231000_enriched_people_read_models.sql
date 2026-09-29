@@ -18,7 +18,6 @@ select
   p.birth_date,
   p.phone,
   p.email,
-  p.address,
   current_enrollment.id as enrollment_id,
   current_enrollment.academic_year_id,
   current_enrollment.academic_year_label,
@@ -28,7 +27,9 @@ select
   current_enrollment.enrolled_on,
   current_class.class_group_id,
   current_class.class_name,
-  current_class.section_code
+  current_class.section_code,
+  p.address,
+  current_enrollment.academic_year_label
 from public.students s
 join public.people p on p.id = s.person_id
 left join lateral (
