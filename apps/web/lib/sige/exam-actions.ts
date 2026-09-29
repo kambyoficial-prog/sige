@@ -7,7 +7,7 @@ import { normalizeSigeError } from "@sige/contracts";
 const sessionSchema = z.object({
   academicYearId: z.string().uuid(),
   gradeLevelId: z.string().uuid(),
-  epoch: z.coerce.number().int().min(1).max(2),
+  epoch: z.coerce.number().int().min(1).max(2).transform((value) => value as 1 | 2),
   startsOn: z.string(),
   endsOn: z.string(),
 });
