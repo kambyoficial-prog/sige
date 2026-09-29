@@ -120,7 +120,7 @@ export const getFinancePayments = () =>
   queryView<Record<string, unknown>>("finance_payment_directory", {});
 
 export const getFinancialBalances = (academicYearId?: string) =>
-  queryView<StudentFinancialBalance>("student_financial_balances", academicYearId ? { academic_year_id: academicYearId } : {});
+  queryView<Record<string, unknown>>("finance_balance_directory", academicYearId ? { academic_year_id: academicYearId } : {});
 
 export const getStudentFinancialBalance = (
   studentId: string,
