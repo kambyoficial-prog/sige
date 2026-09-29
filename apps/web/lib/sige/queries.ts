@@ -255,3 +255,19 @@ export async function getCourseOfferings(classGroupId: string) {
     class_group_id: classGroupId,
   });
 }
+
+
+export async function getStudentEnrollmentHistory(studentId: string) {
+  const { supabase } = await requireAuthenticatedServerClient();
+  try {
+    const { data, error } = await supabase
+      .from("enrollment_directory")
+      .select("*")
+      .eq("student_id", studentId)
+      .order("enrolled_on", { ascending: false });
+    if (error) throw error;
+    return (data ?? []) as import("@sige/contracts").EnrollmentDirectory[];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
