@@ -147,6 +147,23 @@ create index if not exists teacher_assignments_offering_idx
 create index if not exists student_course_participations_student_idx
   on public.student_course_participations (student_id, course_offering_id, status);
 
+alter table public.class_placements
+  add constraint class_placements_enrollment_no_overlap
+  exclude using gist (
+    (enrollment_id) with =,
+    daterange(starts_on, coalesce(ends_on + 1, '9999-12-31'::date), '[)') with &&
+  )
+  where (status = 'ACTIVE');
+
+alter table public.student_course_participations
+  add constraint student_course_participations_no_overlap
+  exclude using gist (
+    (student_id) with =,
+    (course_offering_id) with =,
+    daterange(starts_on, coalesce(ends_on + 1, '9999-12-31'::date), '[)') with &&
+  )
+  where (status = 'ACTIVE');
+
 create index if not exists class_placements_group_idx
   on public.class_placements (class_group_id, status, starts_on);
 
