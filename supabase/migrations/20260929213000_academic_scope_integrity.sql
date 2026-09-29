@@ -15,6 +15,7 @@ declare
   year_id uuid;
   grade_id uuid;
   offering_year uuid;
+  offering_class_group uuid;
   offering_school uuid;
   class_year uuid;
   class_school uuid;
