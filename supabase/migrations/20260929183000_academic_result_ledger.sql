@@ -126,10 +126,7 @@ begin
   if period_year is null then raise exception 'ASSESSMENT_PERIOD_NOT_FOUND'; end if;
   if period_year <> academic_year_id then raise exception 'ASSESSMENT_YEAR_MISMATCH'; end if;
 
-  if not (
-    (select private.has_permission('assessment.manage', school_id))
-    or (select private.has_permission('assessment.manage', school_id))
-  ) then
+  if not (select private.has_permission('assessment.manage', school_id)) then
     raise exception 'FORBIDDEN';
   end if;
 
