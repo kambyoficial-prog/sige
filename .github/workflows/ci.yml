@@ -6,6 +6,9 @@ on:
   pull_request:
     branches: [main]
 
+permissions:
+  contents: write
+
 concurrency:
   group: sige-ci-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
@@ -17,6 +20,11 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+
+      - name: Detect lockfile state
+        id: lockfile
+        shell: bash
+        run: echo "missing=$([ -f pnpm-lock.yaml ] && echo false || echo true)" >> "$GITHUB_OUTPUT"
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
@@ -32,6 +40,17 @@ jobs:
         run: |
           pnpm approve-builds --all
           pnpm install --no-frozen-lockfile
+
+      - name: Persist generated lockfile
+        if: steps.lockfile.outputs.missing == 'true' && github.ref == 'refs/heads/main'
+        shell: bash
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add pnpm-lock.yaml
+          git diff --cached --quiet && exit 0
+          git commit -m "chore(deps): add pnpm lockfile"
+          git push
 
       - name: Lint
         run: pnpm lint
