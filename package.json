@@ -3,7 +3,9 @@
   "private": true,
   "version": "0.1.0",
   "packageManager": "pnpm@12.6.0",
-  "engines": { "node": ">=20.9.0" },
+  "engines": {
+    "node": ">=22.14.0"
+  },
   "scripts": {
     "dev": "turbo run dev --parallel",
     "build": "turbo run build",
