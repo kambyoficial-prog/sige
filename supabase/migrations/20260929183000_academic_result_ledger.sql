@@ -152,22 +152,22 @@ begin
 
   select count(*) filter (
            where a.type = 'ACS'
-             and ar.status = 'ENTERED'
+             and ar.status = 'PUBLISHED'
              and ar.normalized_score is not null
          ),
          avg(ar.normalized_score) filter (
            where a.type = 'ACS'
-             and ar.status = 'ENTERED'
+             and ar.status = 'PUBLISHED'
              and ar.normalized_score is not null
          ),
          count(*) filter (
            where a.type = 'AT'
-             and ar.status = 'ENTERED'
+             and ar.status = 'PUBLISHED'
              and ar.normalized_score is not null
          ),
          max(ar.normalized_score) filter (
            where a.type = 'AT'
-             and ar.status = 'ENTERED'
+             and ar.status = 'PUBLISHED'
              and ar.normalized_score is not null
          )
     into acs_count, macs, at_count, at_value
