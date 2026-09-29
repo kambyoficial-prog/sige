@@ -20,14 +20,13 @@ select
   p.email,
   current_enrollment.id as enrollment_id,
   current_enrollment.academic_year_id,
-  current_enrollment.academic_year_label,
   current_enrollment.grade_level_id,
-  current_enrollment.grade_level_name,
   current_enrollment.enrollment_status,
   current_enrollment.enrolled_on,
   current_class.class_group_id,
   current_class.class_name,
   current_class.section_code,
+  current_enrollment.grade_level_name,
   p.address,
   current_enrollment.academic_year_label
 from public.students s
