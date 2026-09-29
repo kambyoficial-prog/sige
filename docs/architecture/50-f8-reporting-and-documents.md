@@ -43,6 +43,12 @@ Financial totals are calculated in separate charge/payment aggregations. A direc
 
 The report therefore follows the same invariant as `student_financial_balances`: charges are aggregated independently from payment allocations.
 
+## Export boundary
+
+The operational reporting surface now exposes a server-side CSV export route. It is private/no-store and reads only through the same RLS-protected reporting projections. The export does not recalculate business metrics in the browser.
+
+PDF/Excel-native rendering remains a document-rendering sub-block; CSV is the first interoperable export format and is not represented as a fake PDF/XLS file.
+
 ## Temporal semantics
 
 Every annual report is scoped by `academic_year_id`. Current demographic counts remain current-student projections; annual enrollment metrics are year-scoped.
