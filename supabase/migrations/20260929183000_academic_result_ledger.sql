@@ -232,7 +232,7 @@ begin
   insert into public.academic_results (
     school_id, academic_year_id, student_id, course_offering_id,
     assessment_period_id, result_type, status, rule_version,
-    value, display_value, classification, input_snapshot, calculated_by
+    value, display_value, classification, input_snapshot, calculated_by, supersedes_result_id
   )
   values (
     school_id, academic_year_id, p_student_id, p_course_offering_id,
@@ -245,7 +245,7 @@ begin
       when round(mt) >= 10 then 'SUFICIENTE'
       else 'NAO_SUFICIENTE'
     end,
-    snapshot, actor
+    snapshot, actor, old_result_id
   )
   returning id into result_id;
 
