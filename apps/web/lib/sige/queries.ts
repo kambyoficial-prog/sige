@@ -9,6 +9,8 @@ import {
   type StudentFinancialBalance,
   type TeacherWorkloadSummary,
   type TimetableEntry,
+  type ClassSessionDirectory,
+  type ClassSessionRoster,
   normalizeSigeError,
 } from "@sige/contracts";
 
@@ -28,6 +30,8 @@ type ViewName =
   | "class_timetable"
   | "teacher_timetable"
   | "student_timetable"
+  | "class_session_directory"
+  | "class_session_roster"
   | "teacher_workload_summary"
   | "timetable_slot_usage"
   | "student_financial_balances"
@@ -278,3 +282,12 @@ export async function getTeacherProfile(teacherId: string) {
     id: teacherId,
   });
 }
+
+
+export const getClassSessionDirectory = (filters: Record<string, string | number | boolean | null> = {}) =>
+  queryView<ClassSessionDirectory>("class_session_directory", filters);
+
+export const getClassSessionRoster = (classSessionId: string) =>
+  queryView<ClassSessionRoster>("class_session_roster", {
+    class_session_id: classSessionId,
+  });
