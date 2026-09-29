@@ -39,7 +39,7 @@ export const navigationSections: NavigationSection[] = [
     label: "Operações",
     items: [
       { label: "Horários", href: "/horarios", permission: "operations.read" },
-      { label: "Livro de ponto", href: "/livro-de-ponto", permission: "attendance.own.manage" },
+      { label: "Livro de ponto", href: "/livro-de-ponto", permission: "operations.read" },
     ],
   },
   {
