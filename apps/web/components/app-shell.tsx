@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { ChevronRight, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 
 import { navigationSections } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
@@ -77,12 +77,27 @@ export function AppShell({
         </div>
       </aside>
 
-      <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
-        <Button variant="ghost" size="icon" aria-label="Abrir navegação">
-          <Menu aria-hidden="true" />
-        </Button>
-        <p className="text-sm font-semibold tracking-tight">{schoolName}</p>
-        <ThemeToggle />
+      <header className="sticky top-0 z-30 border-b border-border bg-background/95 px-4 backdrop-blur lg:hidden">
+        <div className="flex h-14 items-center justify-between">
+          <details className="relative">
+            <summary className="flex size-9 cursor-pointer list-none items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring">
+              <Menu aria-hidden="true" />
+              <span className="sr-only">Abrir navegação</span>
+            </summary>
+            <div className="absolute left-0 top-11 z-40 w-[min(20rem,calc(100vw-2rem))] rounded-lg border border-border bg-popover p-2 text-popover-foreground shadow-xl">
+              {visibleSections.map((section) => (
+                <div key={section.label} className="px-1 py-2">
+                  <p className="px-2 pb-1 text-[10px] font-medium uppercase tracking-[0.08em] text-muted-foreground">{section.label}</p>
+                  {section.items.map((item) => (
+                    <Link key={item.href} href={item.href} className="block rounded-md px-2 py-2 text-sm hover:bg-accent">{item.label}</Link>
+                  ))}
+                </div>
+              ))}
+            </div>
+          </details>
+          <p className="text-sm font-semibold tracking-tight">{schoolName}</p>
+          <ThemeToggle />
+        </div>
       </header>
 
       <main className="min-h-svh lg:pl-64">
