@@ -20,7 +20,6 @@ revoke delete on public.assessment_periods from authenticated;
 revoke delete on public.assessments from authenticated;
 revoke delete on public.assessment_results from authenticated;
 revoke delete on public.grade_rule_versions from authenticated;
-revoke delete on public.academic_results from authenticated;
 revoke delete on public.charges from authenticated;
 revoke delete on public.payments from authenticated;
 revoke delete on public.payment_allocations from authenticated;
