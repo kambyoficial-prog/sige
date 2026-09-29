@@ -214,6 +214,39 @@ create table public.subjects (
   unique (school_id, code)
 );
 
+create table public.education_levels (
+  id uuid primary key default gen_random_uuid(),
+  code text not null unique,
+  name text not null,
+  ordinal integer not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now()
+);
+
+create table public.academic_cycles (
+  id uuid primary key default gen_random_uuid(),
+  education_level_id uuid not null references public.education_levels(id) on delete restrict,
+  code text not null,
+  name text not null,
+  ordinal integer not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  unique (education_level_id, code),
+  unique (education_level_id, ordinal)
+);
+
+create table public.grade_levels (
+  id uuid primary key default gen_random_uuid(),
+  academic_cycle_id uuid not null references public.academic_cycles(id) on delete restrict,
+  code text not null,
+  name text not null,
+  ordinal integer not null,
+  active boolean not null default true,
+  created_at timestamptz not null default now(),
+  unique (academic_cycle_id, code),
+  unique (academic_cycle_id, ordinal)
+);
+
 create table public.curriculum_subjects (
   id uuid primary key default gen_random_uuid(),
   school_id uuid not null references public.schools(id) on delete restrict,
@@ -634,6 +667,9 @@ alter table public.student_course_participations enable row level security;
 alter table public.assessment_periods enable row level security;
 alter table public.assessments enable row level security;
 alter table public.assessment_results enable row level security;
+alter table public.education_levels enable row level security;
+alter table public.academic_cycles enable row level security;
+alter table public.grade_levels enable row level security;
 alter table public.grade_rule_versions enable row level security;
 alter table public.fee_types enable row level security;
 alter table public.fee_plans enable row level security;
@@ -646,6 +682,10 @@ alter table public.payments enable row level security;
 alter table public.payment_allocations enable row level security;
 alter table public.payment_reversals enable row level security;
 alter table public.receipts enable row level security;
+
+create policy education_levels_read on public.education_levels for select to authenticated using (true);
+create policy academic_cycles_read on public.academic_cycles for select to authenticated using (true);
+create policy grade_levels_read on public.grade_levels for select to authenticated using (true);
 
 create policy people_read on public.people for select to authenticated using (true);
 create policy roles_read on public.roles for select to authenticated using (true);
