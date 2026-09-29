@@ -57,7 +57,7 @@ begin
   for update;
 
   if school_id is null then raise exception 'SCHEDULE_ENTRY_NOT_FOUND'; end if;
-  if entry_status not in ('DRAFT','ACTIVE') then raise exception 'SCHEDULE_ENTRY_NOT_OPENABLE'; end if;
+  if entry_status <> 'ACTIVE' then raise exception 'SCHEDULE_ENTRY_NOT_OPENABLE'; end if;
   if p_session_date < year_start or p_session_date > year_end then
     raise exception 'SESSION_DATE_OUTSIDE_ACADEMIC_YEAR';
   end if;
