@@ -8,6 +8,8 @@ const allowed = new Set([
   "report_class_capacity",
   "report_finance_summary",
   "report_academic_outcomes",
+  "report_enrollment_exits",
+  "report_class_transfers",
 ]);
 
 function csv(rows: Record<string, unknown>[]) {
