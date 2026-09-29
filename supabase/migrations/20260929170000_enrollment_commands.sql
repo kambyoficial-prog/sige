@@ -328,6 +328,8 @@ declare
   class_year uuid;
   class_grade uuid;
   class_status public.class_group_status;
+  year_start date;
+  year_end date;
   capacity integer;
   occupied integer;
   placement_id uuid;
@@ -371,6 +373,17 @@ begin
 
   if class_status not in ('OPEN','ACTIVE') then
     raise exception 'CLASS_GROUP_NOT_OPEN';
+  end if;
+
+  select ay.starts_on, ay.ends_on
+    into year_start, year_end
+  from public.academic_years ay
+  where ay.id = enrollment_year;
+
+  if p_starts_on < year_start
+     or p_starts_on > year_end
+     or (p_ends_on is not null and (p_ends_on < p_starts_on or p_ends_on > year_end)) then
+    raise exception 'PLACEMENT_DATE_OUTSIDE_ACADEMIC_YEAR';
   end if;
 
   if not (select private.has_permission('enrollment.manage', enrollment_school)) then
