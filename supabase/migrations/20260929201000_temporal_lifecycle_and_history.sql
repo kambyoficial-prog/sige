@@ -144,7 +144,7 @@ begin
   perform private.assert_academic_year_mutable(year_id);
   if tg_op = 'DELETE' then return old; else return new; end if;
 end;
-$;
+$$;
 
 drop trigger if exists trg_guard_closed_year_assessments on public.assessments;
 create trigger trg_guard_closed_year_assessments
@@ -166,7 +166,7 @@ begin
   perform private.assert_academic_year_mutable(year_id);
   if tg_op = 'DELETE' then return old; else return new; end if;
 end;
-$;
+$$;
 
 drop trigger if exists trg_guard_closed_year_assessment_results on public.assessment_results;
 create trigger trg_guard_closed_year_assessment_results
@@ -182,7 +182,7 @@ begin
   perform private.assert_academic_year_mutable(coalesce(new.academic_year_id,old.academic_year_id));
   if tg_op = 'DELETE' then return old; else return new; end if;
 end;
-$;
+$$;
 
 drop trigger if exists trg_guard_closed_year_academic_results on public.academic_results;
 create trigger trg_guard_closed_year_academic_results
