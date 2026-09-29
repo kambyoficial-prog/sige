@@ -426,6 +426,10 @@ using (
 revoke insert, update, delete on public.assessment_result_history from authenticated;
 grant select on public.assessment_result_history to authenticated;
 
+-- Future public tables must not become reachable merely because a migration
+-- created them. Each migration must grant only what its RLS contract needs.
+alter default privileges in schema public revoke all on tables from anon, authenticated;
+
 -- Tables created after the original authorization migration need explicit
 -- Data API grants. RLS still decides which rows are visible/modifiable.
 grant select, insert, update on public.fee_types to authenticated;
