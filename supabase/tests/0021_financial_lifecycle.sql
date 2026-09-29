@@ -13,6 +13,10 @@ select ok(exists(select 1 from pg_trigger where tgname='trg_validate_payment_rev
 select ok(position('PAYMENT_NOT_REVERSIBLE' in pg_get_functiondef('public.reverse_payment(uuid,text,text,text)'::regprocedure)) > 0,'reversal validates payment state');
 select ok(position('status = ''REVERSED''' in pg_get_functiondef('public.reverse_payment(uuid,text,text,text)'::regprocedure)) > 0,'reversal changes payment state');
 select ok(position('RECEIPT_REQUIRES_CONFIRMED_PAYMENT' in pg_get_functiondef('public.issue_receipt(uuid,text,text,text)'::regprocedure)) > 0,'receipt requires confirmed payment');
-select ok(position('academic_year_id' in pg_get_tabledef('public.charges'::regclass)) > 0,'charges are year-bound');
+select ok(exists(
+  select 1
+  from information_schema.columns
+  where table_schema='public' and table_name='charges' and column_name='academic_year_id'
+),'charges are year-bound');
 select * from finish();
 rollback;
