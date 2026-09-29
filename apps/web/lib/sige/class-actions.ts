@@ -10,7 +10,7 @@ const createClassSchema=z.object({
   sectionCode:z.string().trim().min(1).max(20),
   pathwayId:z.string().uuid().optional().or(z.literal("")),
   shift:z.enum(["MORNING","AFTERNOON","EVENING","FULL_DAY"]).optional().or(z.literal("")),
-  capacity:z.coerce.number().int().positive().optional(),
+  capacity:z.preprocess((value)=>value===""||value===undefined?undefined:value,z.coerce.number().int().positive().optional()),
   name:z.string().trim().max(100).optional(),
 });
 const generateSchema=z.object({classGroupId:z.string().uuid()});
