@@ -278,13 +278,13 @@ begin
 
   update public.class_group_leadership
      set active = false,
-         ends_on = least(
-           coalesce(ends_on, p_starts_on - 1),
-           p_starts_on - 1
-         )
+         ends_on = case
+           when starts_on < p_starts_on then p_starts_on - 1
+           else ends_on
+         end
    where class_group_id = p_class_group_id
      and active
-     and starts_on < p_starts_on
+     and starts_on <= p_starts_on
      and (ends_on is null or ends_on >= p_starts_on);
 
   insert into public.class_group_leadership (
