@@ -67,3 +67,8 @@ Testes correspondentes: `0021_financial_lifecycle.sql`, `0022_closed_year_write_
 ## Frontend
 
 - `37-frontend-product-architecture-and-design-system.md` — benchmark, frontend architecture, information architecture, design-system baseline, interaction/error policy and implementation phases.
+
+
+## Frontend
+
+- [37 — Frontend product architecture and design system](./37-frontend-product-architecture-and-design-system.md) — benchmark, information architecture, design system, interaction/error policy, responsive strategy and implementation phases.
