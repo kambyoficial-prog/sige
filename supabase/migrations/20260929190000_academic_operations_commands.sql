@@ -165,7 +165,7 @@ begin
   for update;
 
   if school_id is null then raise exception 'ACADEMIC_YEAR_NOT_FOUND'; end if;
-  if year_status <> 'OPEN' then raise exception 'ACADEMIC_YEAR_NOT_OPEN'; end if;
+  if year_status not in ('DRAFT','OPEN') then raise exception 'ACADEMIC_YEAR_NOT_EDITABLE'; end if;
 
   if not (select private.has_permission('operations.manage', school_id)) then
     raise exception 'FORBIDDEN';
@@ -503,7 +503,8 @@ begin
   end if;
 
   for cs in
-    select cs.id, cs.subject_id
+    select distinct on (cs.subject_id)
+      cs.id, cs.subject_id
     from public.curriculum_subjects cs
     where cs.school_id = school_id
       and cs.academic_year_id = year_id
@@ -513,7 +514,7 @@ begin
         cs.pathway_id is null
         or cs.pathway_id = pathway_id
       )
-    order by cs.pathway_id nulls first, cs.id
+    order by cs.subject_id, (cs.pathway_id is null), cs.id
   loop
     if not exists (
       select 1
