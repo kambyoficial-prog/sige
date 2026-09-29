@@ -1,6 +1,4 @@
 import { ThemeToggle } from "@/components/theme-toggle";
-import { Button } from "@/components/ui/button";
-
 export default function Home() {
   return (
     <main className="min-h-svh bg-background px-6 py-8 text-foreground sm:px-10 lg:px-16">
@@ -23,10 +21,6 @@ export default function Home() {
               A interface operacional do SIGE está a ser construída sobre os contratos académicos,
               financeiros e de autorização já definidos no backend.
             </p>
-            <div className="mt-8 flex flex-wrap gap-3">
-              <Button>Entrar no sistema</Button>
-              <Button variant="outline">Ver estado da plataforma</Button>
-            </div>
             <p className="mt-5 text-xs text-muted-foreground">
               O acesso será ligado à autenticação real na fase F1. Esta página não utiliza dados fictícios.
             </p>
