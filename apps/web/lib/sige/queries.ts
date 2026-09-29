@@ -187,3 +187,63 @@ export async function searchGuardianDirectory(search = "") {
     throw normalizeSigeError(error);
   }
 }
+
+
+export async function getAcademicYearOptions() {
+  const { supabase } = await requireAuthenticatedServerClient();
+  try {
+    const { data, error } = await supabase
+      .from("academic_years")
+      .select("id,label,status,starts_on,ends_on")
+      .order("starts_on", { ascending: false });
+    if (error) throw error;
+    return data ?? [];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
+
+export async function getGradeLevelOptions() {
+  const { supabase } = await requireAuthenticatedServerClient();
+  try {
+    const { data, error } = await supabase
+      .from("grade_levels")
+      .select("id,name,code,ordinal,academic_cycle_id")
+      .eq("active", true)
+      .order("ordinal", { ascending: true });
+    if (error) throw error;
+    return data ?? [];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
+
+export async function getEnrollment(enrollmentId: string) {
+  const { supabase } = await requireAuthenticatedServerClient();
+  try {
+    const { data, error } = await supabase
+      .from("enrollment_directory")
+      .select("*")
+      .eq("id", enrollmentId)
+      .maybeSingle();
+    if (error) throw error;
+    return data as import("@sige/contracts").EnrollmentDirectory | null;
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
+
+export async function getClassGroup(classGroupId: string) {
+  const { supabase } = await requireAuthenticatedServerClient();
+  try {
+    const { data, error } = await supabase
+      .from("class_group_directory")
+      .select("*")
+      .eq("id", classGroupId)
+      .maybeSingle();
+    if (error) throw error;
+    return data as import("@sige/contracts").ClassGroupDirectory | null;
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
