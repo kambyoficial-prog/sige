@@ -10,15 +10,15 @@ security definer
 set search_path = ''
 as $sige$
 declare
-  teacher_id uuid;
+  v_teacher_id uuid;
   conflicting_entry uuid;
 begin
   select ta.teacher_id
-    into teacher_id
+    into v_teacher_id
   from public.teacher_assignments ta
   where ta.id = new.teacher_assignment_id;
 
-  if teacher_id is null then
+  if v_teacher_id is null then
     raise exception 'TEACHER_ASSIGNMENT_NOT_FOUND';
   end if;
 
@@ -40,7 +40,7 @@ begin
   where se.id <> coalesce(new.id, '00000000-0000-0000-0000-000000000000'::uuid)
     and se.school_id = new.school_id
     and se.status in ('DRAFT','ACTIVE')
-    and ta.teacher_id = teacher_id
+    and ta.teacher_id = v_teacher_id
     and se.day_of_week = new.day_of_week
     and se.period_id = new.period_id
     and daterange(
