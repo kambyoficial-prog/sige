@@ -72,8 +72,10 @@ export interface ClassGroupStudent {
   school_number: string; status: string;
 }
 export interface ClassGroupTeacher {
-  class_group_id: UUID; teacher_id: UUID; teacher_name: string;
-  subject_id: UUID | null; course_offering_id: UUID | null;
+  class_group_id: UUID; course_offering_id: UUID; academic_year_id: UUID;
+  subject_id: UUID | null; subject_name: string;
+  teacher_assignment_id: UUID; teacher_id: UUID; teacher_name: string;
+  starts_on: string; ends_on: string | null; active: boolean;
 }
 export interface TimetableEntry {
   id: UUID; school_id: UUID; academic_year_id: UUID; class_group_id: UUID;
