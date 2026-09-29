@@ -34,11 +34,18 @@ create table public.curriculum_choice_groups (
   max_selections integer not null default 1,
   active boolean not null default true,
   created_at timestamptz not null default now(),
-  unique (academic_year_id, grade_level_id, coalesce(pathway_id, '00000000-0000-0000-0000-000000000000'::uuid), code),
   constraint curriculum_choice_min_ck check (min_selections >= 0),
   constraint curriculum_choice_max_ck check (max_selections >= min_selections),
   constraint curriculum_choice_code_ck check (length(trim(code)) >= 1)
 );
+
+create unique index if not exists curriculum_choice_groups_context_code_uidx
+  on public.curriculum_choice_groups (
+    academic_year_id,
+    grade_level_id,
+    coalesce(pathway_id, '00000000-0000-0000-0000-000000000000'::uuid),
+    code
+  );
 
 alter table public.curriculum_subjects
   drop constraint if exists curriculum_subjects_academic_year_id_grade_level_id_subject_id_key;
