@@ -61,7 +61,6 @@ export function errorMessage(code: SigeErrorCode | "UNKNOWN") {
     COURSE_OFFERING_CURRICULUM_CONTEXT_MISMATCH: "A oferta não corresponde ao currículo da classe.",
     COURSE_OFFERING_SUBJECT_MISMATCH: "A disciplina da oferta não corresponde à configuração curricular.",
     ACADEMIC_YEAR_NOT_FOUND: "O ano letivo não foi encontrado.",
-    ACADEMIC_YEAR_EDITABLE: "O ano letivo está disponível para alteração.",
     SECTION_CODE_REQUIRED: "Indique o código da secção da turma.",
     INVALID_CLASS_CAPACITY: "A capacidade indicada para a turma não é válida.",
     CLASS_GROUP_NOT_EDITABLE: "A turma não pode ser alterada no estado atual.",
