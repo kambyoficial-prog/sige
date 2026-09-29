@@ -27,7 +27,7 @@ SIGE is an operational school-management platform. Phase one targets Ensino Secu
 
 ## Development
 
-Requirements: Node.js 20.9+ and pnpm.
+Requirements: Node.js 22.14+ and pnpm.
 
 ```bash
 pnpm install
