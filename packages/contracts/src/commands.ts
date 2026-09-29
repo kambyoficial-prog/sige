@@ -175,6 +175,17 @@ export interface CreateScheduleEntryInput extends IdempotentCommand {
 export interface SetScheduleEntryStatusInput extends IdempotentCommand {
   scheduleEntryId: UUID; status: ScheduleEntryStatus; reason?: string;
 }
+export type AttendanceStatus = "PRESENT" | "ABSENT" | "EXCUSED" | "LATE";
+export interface OpenClassSessionInput extends IdempotentCommand {
+  scheduleEntryId: UUID; sessionDate: ISODate; topic?: string; notes?: string;
+}
+export interface CloseClassSessionInput extends IdempotentCommand {
+  classSessionId: UUID; reason?: string;
+}
+export interface RecordSessionAttendanceInput extends IdempotentCommand {
+  classSessionId: UUID; studentId: UUID; status: AttendanceStatus;
+  minutesLate?: number; reason?: string;
+}
 
 export interface ConfigureCurriculumSubjectInput extends IdempotentCommand {
   academicYearId: UUID; gradeLevelId: UUID; subjectId: UUID; pathwayId?: UUID;
@@ -218,6 +229,9 @@ export type SigeCommandInputMap = {
   upsert_school_calendar_day: UpsertSchoolCalendarDayInput;
   create_schedule_entry: CreateScheduleEntryInput;
   set_schedule_entry_status: SetScheduleEntryStatusInput;
+  open_class_session: OpenClassSessionInput;
+  close_class_session: CloseClassSessionInput;
+  record_session_attendance: RecordSessionAttendanceInput;
 };
 
 export type CommandName = keyof SigeCommandInputMap;
