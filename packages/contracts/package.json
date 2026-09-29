@@ -1,0 +1,12 @@
+{
+  "name": "@sige/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./commands": "./src/commands.ts",
+    "./errors": "./src/errors.ts",
+    "./queries": "./src/queries.ts"
+  }
+}
