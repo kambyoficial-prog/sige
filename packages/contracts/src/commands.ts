@@ -251,7 +251,8 @@ export type SigeCommandInputMap = {
   allocate_payment: AllocatePaymentInput;
   reverse_payment: ReversePaymentInput;
   issue_receipt: IssueReceiptInput;
-  create_assessment_definition: CreateAssessmentDefinitionInput;\n  create_assessment: CreateAssessmentInput;
+  create_assessment_definition: CreateAssessmentDefinitionInput;
+  create_assessment: CreateAssessmentInput;
   save_assessment_result: SaveAssessmentResultInput;
   publish_assessment: PublishAssessmentInput;
   correct_published_result: CorrectPublishedResultInput;
