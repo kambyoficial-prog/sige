@@ -49,3 +49,4 @@ export function mean(values: readonly number[]): number | null {
 
 export * from './assessment.js';
 export * from './commands.js';
+export * from './results.js';
