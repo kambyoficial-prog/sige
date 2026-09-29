@@ -1,3 +1,4 @@
+export { getCurrentAccessContext } from "./access";
 export { executeCommand } from "./commands";
 export {
   getAcademicYearHistory,
