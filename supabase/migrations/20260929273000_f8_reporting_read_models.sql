@@ -18,3 +18,8 @@ drop view if exists public.report_academic_outcomes;
 create view public.report_academic_outcomes with(security_invoker=true) as
 select ar.academic_year_id,ar.school_id,ar.result_type,count(*)::bigint result_count,count(*) filter(where ar.display_value>=10)::bigint approved_count,count(*) filter(where ar.display_value<10)::bigint failed_count,round(avg(ar.value),2) average_value from public.academic_results ar where ar.status='PUBLISHED' group by ar.academic_year_id,ar.school_id,ar.result_type;
 grant select on public.report_student_demographics,public.report_enrollment_status,public.report_enrollment_grade,public.report_class_capacity,public.report_finance_summary,public.report_academic_outcomes to authenticated;
+drop view if exists public.report_enrollment_exits;
+create view public.report_enrollment_exits with(security_invoker=true) as select se.academic_year_id,ay.school_id,se.status,se.exit_reason,count(*)::bigint event_count from public.student_enrollments se join public.academic_years ay on ay.id=se.academic_year_id where se.exited_on is not null or se.status::text not in ('ACTIVE','ENROLLED') group by se.academic_year_id,ay.school_id,se.status,se.exit_reason;
+drop view if exists public.report_class_transfers;
+create view public.report_class_transfers with(security_invoker=true) as select cg.academic_year_id,cg.school_id,cp.reason,count(*)::bigint transfer_count from public.class_placements cp join public.class_groups cg on cg.id=cp.class_group_id where cp.reason is not null and cp.reason ilike '%transfer%' group by cg.academic_year_id,cg.school_id,cp.reason;
+grant select on public.report_enrollment_exits,public.report_class_transfers to authenticated;
