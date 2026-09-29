@@ -40,9 +40,9 @@ const RPC_NAMES: Record<CommandName, string> = {
   configure_curriculum_subject: "configure_curriculum_subject",
 };
 
-function toRpcArgs(
-  name: CommandName,
-  input: SigeCommandInputMap[CommandName],
+function toRpcArgs<Name extends CommandName>(
+  name: Name,
+  input: SigeCommandInputMap[Name],
 ): RpcArgs {
   const i = input as Record<string, unknown>;
 
