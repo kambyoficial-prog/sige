@@ -16,13 +16,13 @@ export function DataTable<TData extends RowData>({
   emptyTitle = "Sem registos",
   emptyDescription = "Não existem registos para apresentar.",
 }: {
-  columns: ColumnDef<TData, unknown>[];
+  columns: unknown[];
   data: TData[];
   loading?: boolean;
   emptyTitle?: string;
   emptyDescription?: string;
 }) {
-  const table = useTable({ features: dataTableFeatures, data, columns });
+  const table = useTable<DataTableFeatures, TData>({ features: dataTableFeatures, data, columns: columns as never });
 
   if (loading) {
     return (
