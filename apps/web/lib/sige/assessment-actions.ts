@@ -17,6 +17,7 @@ export async function saveAssessmentResultAction(input: unknown) {
     const value = saveSchema.parse(input);
     return await executeCommand("save_assessment_result", {
       ...value,
+      comment: value.comment ?? undefined,
       idempotencyKey: crypto.randomUUID(),
     });
   } catch (error) {
