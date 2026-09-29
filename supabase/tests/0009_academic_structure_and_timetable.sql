@@ -1,6 +1,6 @@
 begin;
 
-select plan(20);
+select plan(24);
 
 select ok(
   exists (
@@ -155,6 +155,25 @@ select ok(
     where conname = 'schedule_room_no_overlap'
   ),
   'room schedule overlap remains a hard database constraint'
+);
+
+select ok(
+  exists (
+    select 1 from pg_proc
+    where proname = 'assign_class_group_director'
+  ),
+  'class director assignment is a controlled command'
+);
+
+select ok(
+  not exists (
+    select 1 from information_schema.role_table_grants
+    where table_schema = 'public'
+      and table_name = 'class_group_leadership'
+      and grantee = 'authenticated'
+      and privilege_type in ('INSERT','UPDATE','DELETE')
+  ),
+  'class director history cannot be directly mutated by authenticated clients'
 );
 
 select ok(
