@@ -72,3 +72,8 @@ Testes correspondentes: `0021_financial_lifecycle.sql`, `0022_closed_year_write_
 ## Frontend
 
 - [37 — Frontend product architecture and design system](./37-frontend-product-architecture-and-design-system.md) — benchmark, information architecture, design system, interaction/error policy, responsive strategy and implementation phases.
+- [39 — Frontend foundation closeout](./39-frontend-foundation-closeout.md)
+- [40 — Authentication and access implementation](./40-authentication-access-implementation.md)
+- [41 — Operational primitives](./41-operational-primitives.md)
+- [42 — People, admission and enrollment](./42-people-admission-and-enrollment.md)
+- [43 — Academic structure and operational UI](./43-academic-structure-operational-ui.md)
