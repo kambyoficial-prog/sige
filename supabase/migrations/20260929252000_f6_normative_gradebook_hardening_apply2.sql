@@ -860,7 +860,7 @@ select
   a.assessment_date,
   a.max_score,
   a.status as assessment_status,
-  a.published_at as assessment_published_at,
+  ar.published_at as assessment_published_at,
   scp.student_id,
   ar.id as assessment_result_id,
   ar.raw_score,
