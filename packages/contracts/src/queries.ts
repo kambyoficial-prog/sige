@@ -88,6 +88,21 @@ export interface TimetableEntry {
 export interface TeacherWorkloadSummary {
   teacher_id: UUID; academic_year_id: UUID; scheduled_periods: number; assigned_offerings: number;
 }
+export interface ClassSessionDirectory {
+  id: UUID; school_id: UUID; academic_year_id: UUID; session_date: string; status: string;
+  topic: string | null; notes: string | null; schedule_entry_id: UUID; teacher_id: UUID;
+  teacher_name: string; course_offering_id: UUID; subject_code: string; subject_name: string;
+  class_group_id: UUID; section_code: string; class_name: string | null;
+  period_ordinal: number; period_code: string; period_name: string;
+  starts_at: string; ends_at: string; room_id: UUID | null; room_code: string | null;
+  room_name: string | null; attendance_count: number;
+}
+export interface ClassSessionRoster {
+  class_session_id: UUID; session_date: string; session_status: string;
+  class_group_id: UUID; enrollment_id: UUID; student_id: UUID; school_number: string;
+  student_name: string; attendance_record_id: UUID | null; attendance_status: string | null;
+  minutes_late: number | null; reason: string | null; recorded_at: string | null;
+}
 export interface StudentFinancialBalance {
   school_id: UUID; student_id: UUID; academic_year_id?: UUID;
   charged_amount: number; paid_amount: number; balance_amount: number;
@@ -97,5 +112,6 @@ export type SigeQueryName =
   | "teacher_directory" | "teacher_profile" | "guardian_directory" | "class_group_directory"
   | "class_group_overview" | "class_group_students" | "class_group_teachers"
   | "class_timetable" | "teacher_timetable" | "student_timetable"
-  | "teacher_workload_summary" | "timetable_slot_usage" | "student_financial_balances"
+  | "teacher_workload_summary" | "timetable_slot_usage" | "class_session_directory"
+  | "class_session_roster" | "student_financial_balances"
   | "academic_year_history" | "assessment_period_history";
