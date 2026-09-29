@@ -271,3 +271,10 @@ export async function getStudentEnrollmentHistory(studentId: string) {
     throw normalizeSigeError(error);
   }
 }
+
+
+export async function getTeacherProfile(teacherId: string) {
+  return queryView<import("@sige/contracts").TeacherProfile>("teacher_profile", {
+    id: teacherId,
+  });
+}
