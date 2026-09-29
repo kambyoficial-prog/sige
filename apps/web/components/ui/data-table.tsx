@@ -16,7 +16,7 @@ export function DataTable<TData extends RowData>({
   emptyTitle = "Sem registos",
   emptyDescription = "Não existem registos para apresentar.",
 }: {
-  columns: ColumnDef<DataTableFeatures, TData, unknown>[];
+  columns: ColumnDef<TData, unknown>[];
   data: TData[];
   loading?: boolean;
   emptyTitle?: string;
