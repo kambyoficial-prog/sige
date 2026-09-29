@@ -142,9 +142,9 @@ begin
     where co.id=new.course_offering_id;
   end if;
   perform private.assert_academic_year_mutable(year_id);
-  return coalesce(new,old);
+  if tg_op = 'DELETE' then return old; else return new; end if;
 end;
-$$;
+$;
 
 drop trigger if exists trg_guard_closed_year_assessments on public.assessments;
 create trigger trg_guard_closed_year_assessments
@@ -164,9 +164,9 @@ begin
   join public.course_offerings co on co.id=a.course_offering_id
   where a.id=coalesce(new.assessment_id,old.assessment_id);
   perform private.assert_academic_year_mutable(year_id);
-  return coalesce(new,old);
+  if tg_op = 'DELETE' then return old; else return new; end if;
 end;
-$$;
+$;
 
 drop trigger if exists trg_guard_closed_year_assessment_results on public.assessment_results;
 create trigger trg_guard_closed_year_assessment_results
@@ -180,9 +180,9 @@ set search_path = ''
 as $$
 begin
   perform private.assert_academic_year_mutable(coalesce(new.academic_year_id,old.academic_year_id));
-  return coalesce(new,old);
+  if tg_op = 'DELETE' then return old; else return new; end if;
 end;
-$$;
+$;
 
 drop trigger if exists trg_guard_closed_year_academic_results on public.academic_results;
 create trigger trg_guard_closed_year_academic_results
@@ -190,7 +190,7 @@ before insert or update or delete on public.academic_results
 for each row execute function private.guard_closed_year_academic_results();
 
 -- Historical read models. They expose the whole timeline without reopening it.
-create or replace view public.academic_year_history as
+create or replace view public.academic_year_history with (security_invoker = true) as
 select
   ay.id,
   ay.school_id,
@@ -202,7 +202,7 @@ select
   ay.closed_by
 from public.academic_years ay;
 
-create or replace view public.assessment_period_history as
+create or replace view public.assessment_period_history with (security_invoker = true) as
 select
   ap.id,
   ap.academic_year_id,
