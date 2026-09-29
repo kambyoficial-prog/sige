@@ -143,6 +143,16 @@ begin
     raise exception 'OPEN_ASSESSMENTS_REMAIN';
   end if;
 
+  if exists (
+    select 1
+    from public.assessment_periods ap
+    where ap.academic_year_id = p_academic_year_id
+      and ap.active
+      and ap.status <> 'CLOSED'
+  ) then
+    raise exception 'OPEN_ASSESSMENT_PERIODS_REMAIN';
+  end if;
+
   select count(*)
     into pending_enrollments
   from public.student_enrollments e
