@@ -1,6 +1,6 @@
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 async function view<T>(name:string, params:Record<string,string|undefined>={}) {
-  const supabase=await createClient(); let q=supabase.from(name).select("*");
+  const { supabase }=await requireAuthenticatedServerClient(); let q=supabase.from(name).select("*");
   for(const [k,v] of Object.entries(params)) if(v) q=q.eq(k,v);
   const {data,error}=await q; if(error) throw error; return (data??[]) as T[];
 }
