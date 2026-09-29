@@ -26,8 +26,8 @@ No placeholder data may masquerade as production data.
 | F0 | Design-system/runtime foundation | tokens, theme, primitives, shell foundation, accessibility baseline | web compiles + visual verification |
 | F1 | Authentication & access context | login, callback, session boundary, capability-derived shell | real auth contract + protected routes | Implemented; runtime auth verification pending SIGE Supabase |
 | F2 | Operational primitives | tables, filters, pagination, forms, dialogs, errors, empty/loading states | reusable patterns proven on real queries | Implemented baseline; runtime verification pending |
-| F3 | Pessoas & matrícula | students, teachers, guardians, enrollment lifecycle | real commands/queries + no duplicate workflows |
-| F4 | Estrutura pedagógica | classes, subjects/offers, curriculum, teacher assignments | class workflows use real backend contracts |
+| F3 | Pessoas & matrícula | students, teachers, guardians, enrollment lifecycle | real commands/queries + no duplicate workflows | Implemented in code; runtime DB verification pending |
+| F4 | Estrutura pedagógica | classes, subjects/offers, curriculum, teacher assignments | class workflows use real backend contracts | Implemented in code; runtime DB verification pending |
 | F5 | Horários & operações | timetable, calendar, class sessions, livro de ponto | conflict-aware workflow + responsive verification |
 | F6 | Avaliação & pautas | gradebook, publication, results, reports | deterministic results + period/year state |
 | F7 | Financeiro | obligations, payments, allocations, receipts, balances, transport | year-scoped financial lifecycle |
@@ -94,6 +94,8 @@ Status: implemented baseline; runtime verification pending CI/browser environmen
 
 ## F3 — Pessoas & matrícula
 
+Status: implemented in code; runtime verification pending authorized SIGE database.
+
 Canonical surfaces:
 - student directory;
 - student profile;
@@ -106,6 +108,8 @@ Canonical surfaces:
 The student profile is contextual and read-oriented. Editing occurs through focused operations.
 
 ## F4 — Estrutura pedagógica
+
+Status: implemented in code; runtime verification pending authorized SIGE database.
 
 - class groups;
 - curriculum/subject configuration;
