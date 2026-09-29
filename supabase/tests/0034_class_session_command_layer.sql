@@ -1,5 +1,5 @@
 -- SIGE F5 — class session command boundary
-select plan(17);
+select plan(18);
 
 select has_function('public', 'open_class_session', array['uuid','date','text','text','text','text']);
 select has_function('public', 'close_class_session', array['uuid','text','text','text']);
@@ -93,6 +93,13 @@ select ok(
     'public.open_class_session(uuid,date,text,text,text,text)'::regprocedure
   )) > 0,
   'session opening checks authorization'
+);
+
+select ok(
+  position("entry_status <> 'ACTIVE'" in pg_get_functiondef(
+    'public.open_class_session(uuid,date,text,text,text,text)'::regprocedure
+  )) > 0,
+  'session opening requires an active schedule'
 );
 
 select ok(
