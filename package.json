@@ -1,0 +1,14 @@
+{
+  "name": "sige",
+  "private": true,
+  "version": "0.1.0",
+  "packageManager": "pnpm@10.17.1",
+  "engines": { "node": ">=20.9.0" },
+  "scripts": {
+    "dev": "pnpm --filter @sige/web dev",
+    "build": "pnpm --filter @sige/web build",
+    "lint": "pnpm --filter @sige/web lint",
+    "typecheck": "pnpm --filter @sige/web typecheck",
+    "test": "pnpm --filter @sige/domain test"
+  }
+}
