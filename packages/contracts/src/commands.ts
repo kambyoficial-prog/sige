@@ -53,6 +53,14 @@ export interface CreateGuardianInput extends IdempotentCommand {
   livesWithStudent?: boolean;
 }
 
+export interface AssignClassGroupDirectorInput extends IdempotentCommand {
+  classGroupId: UUID;
+  teacherId: UUID;
+  startsOn: ISODate;
+  endsOn?: ISODate;
+  reason?: string;
+}
+
 export interface EnrollStudentInput extends IdempotentCommand {
   studentId: UUID;
   academicYearId: UUID;
@@ -157,6 +165,7 @@ export interface ConfigureCurriculumSubjectInput extends IdempotentCommand {
 export type SigeCommandInputMap = {
   register_student: RegisterStudentInput;
   create_guardian: CreateGuardianInput;
+  assign_class_group_director: AssignClassGroupDirectorInput;
   enroll_student: EnrollStudentInput;
   place_student_in_class: PlaceStudentInClassInput;
   record_payment: RecordPaymentInput;
