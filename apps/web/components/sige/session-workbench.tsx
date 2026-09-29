@@ -81,11 +81,12 @@ export function SessionWorkbench({
       return;
     }
 
+    const minutesLate = minutes;
     const result = await recordSessionAttendanceAction({
       classSessionId: selectedSession.id,
       studentId,
       status,
-      ...(status === "LATE" ? { minutesLate: minutes as number } : {}),
+      ...(status === "LATE" ? { minutesLate: minutesLate as number } : {}),
     });
 
     if (!result.ok) {
