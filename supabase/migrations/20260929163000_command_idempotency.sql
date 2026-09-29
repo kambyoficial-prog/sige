@@ -1,5 +1,7 @@
 -- SIGE 0015 — Command idempotency infrastructure
 --
+create schema if not exists private;
+
 -- This table is deliberately private. It is not a Data API surface.
 -- Critical public commands will use it inside their own transaction.
 
