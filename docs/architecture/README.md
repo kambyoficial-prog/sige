@@ -44,3 +44,4 @@ Transformar o modelo lógico já documentado em contratos PostgreSQL: enums, tab
 - [30 — Integridade de escopo acadêmico](./30-academic-scope-integrity.md)
 - [31 — Integridade financeira por escola e ano](./31-financial-scope-and-year.md)
 - [32 — Segurança de funções privilegiadas](./32-privileged-function-security.md)
+- [33 — Hardening do lifecycle de matrícula](./33-enrollment-lifecycle-hardening.md)
