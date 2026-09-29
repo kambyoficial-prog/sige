@@ -1,6 +1,6 @@
 begin;
 
-select plan(24);
+select plan(22);
 
 select ok(
   exists (
