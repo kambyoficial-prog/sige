@@ -34,6 +34,11 @@ export function errorMessage(code: SigeErrorCode | "UNKNOWN") {
     PAYMENT_ALLOCATION_EXCEEDS_CHARGE: "O valor atribuído ultrapassa o valor da obrigação.",
     RECEIPT_PAYMENT_NOT_CONFIRMED: "Só é possível emitir recibo para pagamentos confirmados.",
     PAYMENT_ALREADY_REVERSED: "Este pagamento já foi estornado.",
+    SCHOOL_NOT_FOUND: "A escola selecionada não está disponível.",
+    STUDENT_NOT_FOUND: "O aluno solicitado não foi encontrado.",
+    STUDENT_SCHOOL_NUMBER_ALREADY_EXISTS: "O número do aluno já está atribuído a outro aluno.",
+    NATIONAL_ID_ALREADY_EXISTS: "O documento de identificação já está associado a outro registo.",
+    GUARDIAN_IDENTITY_NUMBER_ALREADY_EXISTS: "O documento do encarregado já está associado a outro registo.",
     UNKNOWN: "Não foi possível concluir a operação. Tente novamente ou contacte a administração.",
   };
   return messages[code];
