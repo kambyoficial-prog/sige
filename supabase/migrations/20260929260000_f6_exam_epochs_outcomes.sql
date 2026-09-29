@@ -264,12 +264,15 @@ begin
   command_state:=private.begin_command('calculate_final_result',school_id,p_idempotency_key,p_request_hash);
   if coalesce((command_state->>'replayed')::boolean,false) then return command_state->'result'; end if;
 
-  nf := case
-    when not parallelism then (nd + ne)/2
-    when grade_code = '10' then (3*nd + ne)/4
-    when grade_code = '12' then (2*nd + ne)/3
-    else raise exception 'FINAL_FORMULA_NOT_CONFIGURED'
-  end;
+  if not parallelism then
+    nf := (nd + ne)/2;
+  elsif grade_code = '10' then
+    nf := (3*nd + ne)/4;
+  elsif grade_code = '12' then
+    nf := (2*nd + ne)/3;
+  else
+    raise exception 'FINAL_FORMULA_NOT_CONFIGURED';
+  end if;
 
   snapshot:=jsonb_build_object(
     'rule_version_id',rule_id,'rule_version',rule_code,'grade_code',grade_code,
