@@ -56,6 +56,7 @@ begin
        and bool_and(ar.academic_year_id = academic_year_id)
        and bool_and(ar.result_type = 'TRIMESTER')
        and bool_and(ar.status = 'PUBLISHED')
+       and count(distinct ar.assessment_period_id) = 3
   ) then
     raise exception 'THREE_PUBLISHED_TRIMESTER_RESULTS_REQUIRED';
   end if;
@@ -100,6 +101,10 @@ begin
     ),
     'mfd', mfd
   );
+
+  if exists (select 1 from public.academic_results where student_id = p_student_id and course_offering_id = p_course_offering_id and result_type = 'FREQUENCY' and status = 'PUBLISHED') then
+    raise exception 'PUBLISHED_RESULT_REQUIRES_CORRECTION';
+  end if;
 
   select id into old_result_id
   from public.academic_results
@@ -251,6 +256,10 @@ begin
     'ne', ne,
     'nf', nf
   );
+
+  if exists (select 1 from public.academic_results where student_id = p_student_id and course_offering_id = p_course_offering_id and result_type = 'FINAL' and status = 'PUBLISHED') then
+    raise exception 'PUBLISHED_RESULT_REQUIRES_CORRECTION';
+  end if;
 
   select id into old_result_id
   from public.academic_results
