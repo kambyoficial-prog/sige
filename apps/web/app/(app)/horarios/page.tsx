@@ -22,7 +22,7 @@ export default async function TimetablesPage({
         description="Distribuição semanal das aulas por turma, período, docente e sala."
       />
 
-      {!selected ? (
+      <div className="flex flex-wrap items-center gap-2">\n        <Link href="/horarios" className="rounded-lg border border-foreground bg-foreground px-3 py-2 text-sm text-background">Por turma</Link>\n        <Link href="/horarios/professor" className="rounded-lg border border-border bg-card px-3 py-2 text-sm hover:bg-muted">Por professor</Link>\n        <Link href="/horarios/aluno" className="rounded-lg border border-border bg-card px-3 py-2 text-sm hover:bg-muted">Por aluno</Link>\n      </div>\n\n      {!selected ? (
         <div className="rounded-xl border border-border bg-card p-8 text-sm text-muted-foreground">
           Ainda não existem turmas disponíveis para montar um horário.
         </div>
