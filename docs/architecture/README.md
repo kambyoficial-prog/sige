@@ -45,3 +45,14 @@ Transformar o modelo lógico já documentado em contratos PostgreSQL: enums, tab
 - [31 — Integridade financeira por escola e ano](./31-financial-scope-and-year.md)
 - [32 — Segurança de funções privilegiadas](./32-privileged-function-security.md)
 - [33 — Hardening do lifecycle de matrícula](./33-enrollment-lifecycle-hardening.md)
+
+
+## Bloco de hardening operacional — setembro 2026
+
+- `20260929220000_financial_configuration_integrity.sql` — integridade de configuração financeira e contexto anual.
+- `20260929221000_payment_reversal_and_receipts.sql` — reversão de pagamentos e emissão de recibos por comandos transacionais.
+- `20260929222000_closed_year_write_barrier.sql` — barreira de escrita para dados operacionais de anos fechados.
+- `20260929223000_atomic_year_close.sql` — finalização operacional atómica no fecho do ano.
+- `20260929224000_one_open_year_per_school.sql` — no máximo um ano letivo OPEN por escola.
+
+Testes correspondentes: `0021_financial_lifecycle.sql`, `0022_closed_year_write_barrier.sql` e `0023_academic_lifecycle.sql`.
