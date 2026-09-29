@@ -41,6 +41,11 @@ const RPC_NAMES: Record<CommandName, string> = {
   assign_teacher_to_offering: "assign_teacher_to_offering",
   transfer_student_class: "transfer_student_class",
   configure_curriculum_subject: "configure_curriculum_subject",
+  create_room: "create_room",
+  create_schedule_period: "create_schedule_period",
+  upsert_school_calendar_day: "upsert_school_calendar_day",
+  create_schedule_entry: "create_schedule_entry",
+  set_schedule_entry_status: "set_schedule_entry_status",
 };
 
 function toRpcArgs<Name extends CommandName>(
@@ -242,6 +247,29 @@ function toRpcArgs<Name extends CommandName>(
       p_transfer_on: i.transferOn,
       p_reason: i.reason,
       ...common,
+    },
+    create_room: {
+      p_school_id: i.schoolId, p_code: i.code, p_name: i.name,
+      p_capacity: i.capacity ?? null, ...common,
+    },
+    create_schedule_period: {
+      p_school_id: i.schoolId, p_code: i.code, p_name: i.name,
+      p_ordinal: i.ordinal, p_starts_at: i.startsAt, p_ends_at: i.endsAt, ...common,
+    },
+    upsert_school_calendar_day: {
+      p_academic_year_id: i.academicYearId, p_school_date: i.schoolDate,
+      p_instructional: i.instructional ?? true, p_label: i.label ?? null, ...common,
+    },
+    create_schedule_entry: {
+      p_academic_year_id: i.academicYearId, p_class_group_id: i.classGroupId,
+      p_course_offering_id: i.courseOfferingId, p_teacher_assignment_id: i.teacherAssignmentId,
+      p_teacher_id: i.teacherId, p_room_id: i.roomId ?? null, p_period_id: i.periodId,
+      p_day_of_week: i.dayOfWeek, p_valid_from: i.validFrom, p_valid_until: i.validUntil ?? null,
+      p_notes: i.notes ?? null, ...common,
+    },
+    set_schedule_entry_status: {
+      p_schedule_entry_id: i.scheduleEntryId, p_status: i.status,
+      p_reason: i.reason ?? null, ...common,
     },
     configure_curriculum_subject: {
       p_academic_year_id: i.academicYearId,
