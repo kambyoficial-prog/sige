@@ -62,3 +62,8 @@ Testes correspondentes: `0021_financial_lifecycle.sql`, `0022_closed_year_write_
 - `35-backend-application-contract.md` — contrato da camada aplicacional server-side e fronteira com o frontend.
 
 - `36-backend-closeout.md` — encerramento da implementação do backend e gates de verificação operacional.
+
+
+## Frontend
+
+- `37-frontend-product-architecture-and-design-system.md` — benchmark, frontend architecture, information architecture, design-system baseline, interaction/error policy and implementation phases.
