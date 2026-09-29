@@ -11,3 +11,5 @@ export const getReportEnrollmentGrade=(academicYearId?:string)=>view<ReportRow>(
 export const getReportClassCapacity=(academicYearId?:string)=>view<ReportRow>("report_class_capacity",{academic_year_id:academicYearId});
 export const getReportFinanceSummary=(academicYearId?:string)=>view<ReportRow>("report_finance_summary",{academic_year_id:academicYearId});
 export const getReportAcademicOutcomes=(academicYearId?:string)=>view<ReportRow>("report_academic_outcomes",{academic_year_id:academicYearId});
+export const getReportEnrollmentExits=(academicYearId?:string)=>view<ReportRow>("report_enrollment_exits",{academic_year_id:academicYearId});
+export const getReportClassTransfers=(academicYearId?:string)=>view<ReportRow>("report_class_transfers",{academic_year_id:academicYearId});
