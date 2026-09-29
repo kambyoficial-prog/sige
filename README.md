@@ -26,6 +26,7 @@ SIGE is an operational school-management platform. Phase one targets Ensino Secu
 - `docs/`: architecture and decisions.
 - `docs/architecture/37-frontend-product-architecture-and-design-system.md`: frontend product/design baseline.
 - `docs/architecture/38-implementation-roadmap.md`: full execution roadmap and release gates.
+- `docs/architecture/39-frontend-foundation-closeout.md`: F0 implementation decisions and verification gate.
 
 ## Development
 
