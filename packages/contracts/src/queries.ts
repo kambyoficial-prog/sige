@@ -42,6 +42,12 @@ export interface GuardianDirectory {
   relationship: string | null; occupation: string | null; identity_number: string | null;
   address: string | null; phone: string | null; student_count: number;
 }
+export interface CourseOfferingDirectory {
+  id: UUID; school_id: UUID; academic_year_id: UUID; academic_year_label: string;
+  class_group_id: UUID; subject_id: UUID; subject_name: string; subject_code: string;
+  curriculum_subject_id: UUID | null; status: string; teacher_id: UUID | null;
+  teacher_name: string | null; teacher_starts_on: string | null; teacher_ends_on: string | null;
+}
 export interface ClassGroupDirectory {
   id: UUID; school_id: UUID; academic_year_id: UUID; academic_year_label: string;
   grade_level_id: UUID; grade_level_name: string; academic_cycle_name: string;
@@ -74,7 +80,7 @@ export interface StudentFinancialBalance {
   charged_amount: number; paid_amount: number; balance_amount: number;
 }
 export type SigeQueryName =
-  | "student_directory" | "student_profile" | "enrollment_directory"
+  | "student_directory" | "student_profile" | "enrollment_directory" | "course_offering_directory"
   | "teacher_directory" | "guardian_directory" | "class_group_directory"
   | "class_group_overview" | "class_group_students" | "class_group_teachers"
   | "class_timetable" | "teacher_timetable" | "student_timetable"
