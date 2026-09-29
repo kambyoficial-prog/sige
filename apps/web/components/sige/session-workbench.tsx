@@ -85,7 +85,7 @@ export function SessionWorkbench({
       classSessionId: selectedSession.id,
       studentId,
       status,
-      ...(status === "LATE" ? { minutesLate: minutes } : {}),
+      ...(status === "LATE" ? { minutesLate: minutes as number } : {}),
     });
 
     if (!result.ok) {
