@@ -21,6 +21,22 @@ create policy finance_read_student_services on public.student_services for selec
 drop policy if exists finance_read_charge_adjustments on public.charge_adjustments;
 create policy finance_read_charge_adjustments on public.charge_adjustments for select to authenticated using(exists(select 1 from public.charges c where c.id=charge_id and (private.has_permission('finance.read',c.school_id) or private.has_permission('finance.manage',c.school_id))));
 
+
+drop policy if exists finance_read_fee_types on public.fee_types;
+create policy finance_read_fee_types on public.fee_types for select to authenticated using(private.has_permission('finance.read',school_id) or private.has_permission('finance.manage',school_id));
+drop policy if exists finance_read_fee_plans on public.fee_plans;
+create policy finance_read_fee_plans on public.fee_plans for select to authenticated using(private.has_permission('finance.read',school_id) or private.has_permission('finance.manage',school_id));
+drop policy if exists finance_read_transport_services on public.transport_services;
+create policy finance_read_transport_services on public.transport_services for select to authenticated using(private.has_permission('finance.read',school_id) or private.has_permission('finance.manage',school_id));
+drop policy if exists finance_read_charges on public.charges;
+create policy finance_read_charges on public.charges for select to authenticated using(private.has_permission('finance.read',school_id) or private.has_permission('finance.manage',school_id));
+drop policy if exists finance_read_fee_plan_items on public.fee_plan_items;
+create policy finance_read_fee_plan_items on public.fee_plan_items for select to authenticated using(exists(select 1 from public.fee_plans fp where fp.id=fee_plan_id and (private.has_permission('finance.read',fp.school_id) or private.has_permission('finance.manage',fp.school_id))));
+drop policy if exists finance_read_student_services on public.student_services;
+create policy finance_read_student_services on public.student_services for select to authenticated using(exists(select 1 from public.students s where s.id=student_id and (private.has_permission('finance.read',s.school_id) or private.has_permission('finance.manage',s.school_id))));
+drop policy if exists finance_read_charge_adjustments on public.charge_adjustments;
+create policy finance_read_charge_adjustments on public.charge_adjustments for select to authenticated using(exists(select 1 from public.charges c where c.id=charge_id and (private.has_permission('finance.read',c.school_id) or private.has_permission('finance.manage',c.school_id))));
+
 create or replace function public.create_fee_type(p_school_id uuid,p_code text,p_name text,p_idempotency_key text default null,p_request_hash text default null) returns jsonb language plpgsql security definer set search_path='' as $$
 declare actor uuid:=(select auth.uid()); id uuid; result jsonb; state jsonb; begin
 if actor is null then raise exception 'AUTH_REQUIRED'; end if; if not private.has_permission('finance.manage',p_school_id) then raise exception 'FORBIDDEN'; end if;
@@ -69,7 +85,7 @@ if school_id is null then raise exception 'STUDENT_NOT_FOUND'; end if; if ys is 
 if p_fee_type_id is not null then select school_id into fs from public.fee_types where id=p_fee_type_id; if fs is null or fs<>school_id then raise exception 'CHARGE_FEE_TYPE_SCHOOL_MISMATCH'; end if; end if;
 if not private.has_permission('finance.manage',school_id) then raise exception 'FORBIDDEN'; end if; if p_idempotency_key is null then raise exception 'IDEMPOTENCY_KEY_REQUIRED'; end if;
 state:=private.begin_command('create_charge',school_id,p_idempotency_key,p_request_hash); if coalesce((state->>'replayed')::boolean,false) then return state->'result'; end if;
-insert into public.charges(school_id,student_id,fee_type_id,amount,due_on,description,academic_year_id) values(school_id,p_student_id,p_fee_type_id,p_amount,nullif(p_due_on,'infinity'),nullif(trim(p_description),''),p_academic_year_id) returning id into id;
+insert into public.charges(school_id,student_id,fee_type_id,amount,due_on,description,academic_year_id) values(school_id,p_student_id,p_fee_type_id,p_amount,p_due_on,nullif(trim(p_description),''),p_academic_year_id) returning id into id;
 result=jsonb_build_object('charge_id',id); perform private.complete_command('create_charge',school_id,p_idempotency_key,result); return result; end $$;
 
 create or replace function public.adjust_charge(p_charge_id uuid,p_type public.charge_adjustment_type,p_amount numeric,p_reason text,p_idempotency_key text default null,p_request_hash text default null) returns jsonb language plpgsql security definer set search_path='' as $$
