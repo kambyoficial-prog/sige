@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 export const dataTableFeatures = tableFeatures({});
 export type DataTableFeatures = typeof dataTableFeatures;
 
-export function DataTable<TData extends Record<string, unknown>>({
+export function DataTable<TData extends Record<string, any>>({
   columns,
   data,
   loading = false,
