@@ -10,7 +10,7 @@ export type IdempotentCommand = {
 export type CommandInput<T extends object = Record<string, never>> =
   T & IdempotentCommand;
 
-export type EnrollmentEntryType = "INITIAL" | "TRANSFER" | "REENTRY" | "RENEWAL";
+export type EnrollmentEntryType = "INITIAL" | "TRANSFER_IN" | "REENTRY" | "RENEWAL";
 export type PaymentMethod = "CASH" | "BANK_TRANSFER" | "MOBILE_MONEY" | "CARD" | "OTHER";
 export type AssessmentType = "ACS" | "AT" | "EXAM" | "OTHER";
 export type AssessmentResultStatus =
@@ -21,6 +21,37 @@ export type AssessmentResultStatus =
   | "INVALIDATED"
   | "PUBLISHED";
 export type CurriculumSelectionMode = "REQUIRED" | "OPTIONAL" | "CHOICE";
+
+export interface RegisterStudentInput extends IdempotentCommand {
+  schoolId: UUID;
+  schoolNumber: string;
+  fullName: string;
+  firstName?: string;
+  lastName?: string;
+  gender?: string;
+  birthDate?: ISODate;
+  nationalId?: string;
+  phone?: string;
+  email?: string;
+  address?: string;
+  admissionDate?: ISODate;
+}
+
+export interface CreateGuardianInput extends IdempotentCommand {
+  schoolId: UUID;
+  studentId: UUID;
+  fullName: string;
+  relationship?: string;
+  occupation?: string;
+  identityNumber?: string;
+  address?: string;
+  phone?: string;
+  gender?: string;
+  birthDate?: ISODate;
+  nationalId?: string;
+  isPrimary?: boolean;
+  livesWithStudent?: boolean;
+}
 
 export interface EnrollStudentInput extends IdempotentCommand {
   studentId: UUID;
@@ -47,25 +78,10 @@ export interface RecordPaymentInput extends IdempotentCommand {
   notes?: string;
 }
 
-export interface ConfirmPaymentInput extends IdempotentCommand {
-  paymentId: UUID;
-}
-
-export interface AllocatePaymentInput extends IdempotentCommand {
-  paymentId: UUID;
-  chargeId: UUID;
-  amount: number;
-}
-
-export interface ReversePaymentInput extends IdempotentCommand {
-  paymentId: UUID;
-  reason: string;
-}
-
-export interface IssueReceiptInput extends IdempotentCommand {
-  paymentId: UUID;
-  receiptNumber: string;
-}
+export interface ConfirmPaymentInput extends IdempotentCommand { paymentId: UUID; }
+export interface AllocatePaymentInput extends IdempotentCommand { paymentId: UUID; chargeId: UUID; amount: number; }
+export interface ReversePaymentInput extends IdempotentCommand { paymentId: UUID; reason: string; }
+export interface IssueReceiptInput extends IdempotentCommand { paymentId: UUID; receiptNumber: string; }
 
 export interface CreateAssessmentInput extends IdempotentCommand {
   courseOfferingId: UUID;
@@ -85,10 +101,7 @@ export interface SaveAssessmentResultInput extends IdempotentCommand {
   comment?: string;
 }
 
-export interface PublishAssessmentInput extends IdempotentCommand {
-  assessmentId: UUID;
-}
-
+export interface PublishAssessmentInput extends IdempotentCommand { assessmentId: UUID; }
 export interface CorrectPublishedResultInput extends IdempotentCommand {
   assessmentResultId: UUID;
   rawScore: number;
@@ -96,114 +109,54 @@ export interface CorrectPublishedResultInput extends IdempotentCommand {
   comment?: string;
   reason: string;
 }
-
 export interface CalculateTrimesterResultInput extends IdempotentCommand {
-  courseOfferingId: UUID;
-  studentId: UUID;
-  assessmentPeriodId: UUID;
+  courseOfferingId: UUID; studentId: UUID; assessmentPeriodId: UUID;
 }
-
-export interface HomologateAcademicResultInput extends IdempotentCommand {
-  academicResultId: UUID;
-}
-
-export interface PublishAcademicResultInput extends IdempotentCommand {
-  academicResultId: UUID;
-}
-
+export interface HomologateAcademicResultInput extends IdempotentCommand { academicResultId: UUID; }
+export interface PublishAcademicResultInput extends IdempotentCommand { academicResultId: UUID; }
 export interface CalculateFrequencyResultInput extends IdempotentCommand {
-  courseOfferingId: UUID;
-  studentId: UUID;
-  firstTrimesterResultId: UUID;
-  secondTrimesterResultId: UUID;
-  thirdTrimesterResultId: UUID;
+  courseOfferingId: UUID; studentId: UUID;
+  firstTrimesterResultId: UUID; secondTrimesterResultId: UUID; thirdTrimesterResultId: UUID;
 }
-
 export interface CalculateFinalResultInput extends IdempotentCommand {
-  courseOfferingId: UUID;
-  studentId: UUID;
-  frequencyResultId: UUID;
-  examAssessmentResultId: UUID;
+  courseOfferingId: UUID; studentId: UUID;
+  frequencyResultId: UUID; examAssessmentResultId: UUID;
 }
-
-export interface OpenAcademicYearInput extends IdempotentCommand {
-  academicYearId: UUID;
-}
-
+export interface OpenAcademicYearInput extends IdempotentCommand { academicYearId: UUID; }
 export interface CloseAcademicYearInput extends IdempotentCommand {
-  academicYearId: UUID;
-  closeOn?: ISODate;
-  reason?: string;
+  academicYearId: UUID; closeOn?: ISODate; reason?: string;
 }
-
-export interface InitializeAssessmentPeriodsInput extends IdempotentCommand {
-  academicYearId: UUID;
-}
-
+export interface InitializeAssessmentPeriodsInput extends IdempotentCommand { academicYearId: UUID; }
 export interface CloseAssessmentPeriodInput extends IdempotentCommand {
-  assessmentPeriodId: UUID;
-  closeOn?: ISODate;
-  reason?: string;
+  assessmentPeriodId: UUID; closeOn?: ISODate; reason?: string;
 }
-
 export interface CreateClassGroupInput extends IdempotentCommand {
-  academicYearId: UUID;
-  gradeLevelId: UUID;
-  sectionCode: string;
-  pathwayId?: UUID;
-  shift?: string;
-  capacity?: number;
-  name?: string;
+  academicYearId: UUID; gradeLevelId: UUID; sectionCode: string;
+  pathwayId?: UUID; shift?: string; capacity?: number; name?: string;
 }
-
 export interface UpdateClassGroupInput extends IdempotentCommand {
-  classGroupId: UUID;
-  sectionCode?: string;
-  pathwayId?: UUID;
-  shift?: string;
-  capacity?: number;
-  name?: string;
+  classGroupId: UUID; sectionCode?: string; pathwayId?: UUID;
+  shift?: string; capacity?: number; name?: string;
 }
-
 export interface CloseClassGroupInput extends IdempotentCommand {
-  classGroupId: UUID;
-  closedOn?: ISODate;
-  reason?: string;
+  classGroupId: UUID; closedOn?: ISODate; reason?: string;
 }
-
-export interface GenerateClassOfferingsInput extends IdempotentCommand {
-  classGroupId: UUID;
-}
-
+export interface GenerateClassOfferingsInput extends IdempotentCommand { classGroupId: UUID; }
 export interface AssignTeacherToOfferingInput extends IdempotentCommand {
-  courseOfferingId: UUID;
-  teacherId: UUID;
-  startsOn: ISODate;
-  endsOn?: ISODate;
+  courseOfferingId: UUID; teacherId: UUID; startsOn: ISODate; endsOn?: ISODate;
 }
-
 export interface TransferStudentClassInput extends IdempotentCommand {
-  enrollmentId: UUID;
-  targetClassGroupId: UUID;
-  transferOn: ISODate;
-  reason: string;
+  enrollmentId: UUID; targetClassGroupId: UUID; transferOn: ISODate; reason: string;
 }
-
 export interface ConfigureCurriculumSubjectInput extends IdempotentCommand {
-  academicYearId: UUID;
-  gradeLevelId: UUID;
-  subjectId: UUID;
-  pathwayId?: UUID;
-  curriculumAreaId?: UUID;
-  selectionMode?: CurriculumSelectionMode;
-  choiceGroupId?: UUID;
-  weeklyPeriods?: number;
-  ordinal?: number;
+  academicYearId: UUID; gradeLevelId: UUID; subjectId: UUID; pathwayId?: UUID;
+  curriculumAreaId?: UUID; selectionMode?: CurriculumSelectionMode;
+  choiceGroupId?: UUID; weeklyPeriods?: number; ordinal?: number;
 }
-
-export interface CalculateCommandInput extends IdempotentCommand {}
 
 export type SigeCommandInputMap = {
+  register_student: RegisterStudentInput;
+  create_guardian: CreateGuardianInput;
   enroll_student: EnrollStudentInput;
   place_student_in_class: PlaceStudentInClassInput;
   record_payment: RecordPaymentInput;
