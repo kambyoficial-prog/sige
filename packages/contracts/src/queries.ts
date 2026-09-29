@@ -79,7 +79,7 @@ export interface StudentFinancialBalance {
   academic_year_id?: UUID;
   charged_amount: number;
   paid_amount: number;
-  balance: number;
+  balance_amount: number;
 }
 
 export type SigeQueryName =
