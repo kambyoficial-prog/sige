@@ -1,4 +1,5 @@
-import { describe, expect, it } from "vitest";
+import assert from "node:assert/strict";
+import { describe, it } from "node:test";
 import {
   calculateFinal,
   calculateFrequency,
@@ -18,9 +19,9 @@ describe("Mozambique secondary assessment rules 2022", () => {
       at: { score: 15, status: "ENTERED" },
     });
 
-    expect(result.macs).toBeCloseTo(15.3333333333);
-    expect(result.mt).toBeCloseTo((2 * (46 / 3) + 15) / 3);
-    expect(result.complete).toBe(true);
+    assert.ok(Math.abs((result.macs ?? 0) - (15.3333333333)) < 1e-9);
+    assert.ok(Math.abs((result.mt ?? 0) - ((2 * (46 / 3) + 15) / 3)) < 1e-9);
+    assert.equal(result.complete, true);
   });
 
   it("supports more than the minimum number of ACS without fixed columns", () => {
@@ -34,8 +35,8 @@ describe("Mozambique secondary assessment rules 2022", () => {
       at: { score: 18, status: "ENTERED" },
     });
 
-    expect(result.macs).toBe(13);
-    expect(result.mt).toBeCloseTo(44 / 3);
+    assert.equal(result.macs, 13);
+    assert.ok(Math.abs((result.mt ?? 0) - (44 / 3)) < 1e-9);
   });
 
   it("does not publish a trimester result when the regulatory minimum is incomplete", () => {
@@ -45,7 +46,7 @@ describe("Mozambique secondary assessment rules 2022", () => {
     });
 
     expect(result.complete).toBe(false);
-    expect(result.mt).toBeNull();
+    assert.equal(result.mt, null);
   });
 
   it("calculates MFD only when all three trimesters are complete", () => {
@@ -73,25 +74,25 @@ describe("Mozambique secondary assessment rules 2022", () => {
       },
     ]);
 
-    expect(result.complete).toBe(true);
-    expect(result.mfd).toBeCloseTo(14);
+    assert.equal(result.complete, true);
+    assert.ok(Math.abs((result.mfd ?? 0) - (14)) < 1e-9);
   });
 
   it("calculates final grade with the examination weight required by 2022 rules", () => {
     const result = calculateFinal(15, 12);
-    expect(result.nf).toBeCloseTo(14);
+    assert.ok(Math.abs(result.nf - (14)) < 1e-9);
   });
 
   it("rounds official presentation to whole values", () => {
-    expect(roundMozambiqueOfficialScore(9.5)).toBe(10);
-    expect(roundMozambiqueOfficialScore(9.4)).toBe(9);
+    assert.equal(roundMozambiqueOfficialScore(9.5), 10);
+    assert.equal(roundMozambiqueOfficialScore(9.4), 9);
   });
 
   it("uses the official qualitative bands", () => {
-    expect(classifyMozambiqueSecondary2022(19)).toBe("EXCELENTE");
-    expect(classifyMozambiqueSecondary2022(17)).toBe("MUITO_BOM");
-    expect(classifyMozambiqueSecondary2022(14)).toBe("BOM");
-    expect(classifyMozambiqueSecondary2022(10)).toBe("SUFICIENTE");
-    expect(classifyMozambiqueSecondary2022(9)).toBe("NAO_SUFICIENTE");
+    assert.equal(classifyMozambiqueSecondary2022(19), "EXCELENTE");
+    assert.equal(classifyMozambiqueSecondary2022(17), "MUITO_BOM");
+    assert.equal(classifyMozambiqueSecondary2022(14), "BOM");
+    assert.equal(classifyMozambiqueSecondary2022(10), "SUFICIENTE");
+    assert.equal(classifyMozambiqueSecondary2022(9), "NAO_SUFICIENTE");
   });
 });
