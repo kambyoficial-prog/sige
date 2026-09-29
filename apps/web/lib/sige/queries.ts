@@ -113,6 +113,15 @@ export const getTeacherWorkload = (academicYearId: string) =>
     academic_year_id: academicYearId,
   });
 
+export const getFinanceCharges = (academicYearId?: string) =>
+  queryView<Record<string, unknown>>("finance_charge_directory", academicYearId ? { academic_year_id: academicYearId } : {});
+
+export const getFinancePayments = () =>
+  queryView<Record<string, unknown>>("finance_payment_directory", {});
+
+export const getFinancialBalances = (academicYearId?: string) =>
+  queryView<StudentFinancialBalance>("student_financial_balances", academicYearId ? { academic_year_id: academicYearId } : {});
+
 export const getStudentFinancialBalance = (
   studentId: string,
   academicYearId: string,
