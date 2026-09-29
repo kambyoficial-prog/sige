@@ -15,6 +15,7 @@ import {
 import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 
 type ViewName =
+  | "course_offering_directory"
   | "student_directory"
   | "student_profile"
   | "enrollment_directory"
@@ -246,4 +247,11 @@ export async function getClassGroup(classGroupId: string) {
   } catch (error) {
     throw normalizeSigeError(error);
   }
+}
+
+
+export async function getCourseOfferings(classGroupId: string) {
+  return queryView<import("@sige/contracts").CourseOfferingDirectory>("course_offering_directory", {
+    class_group_id: classGroupId,
+  });
 }
