@@ -123,13 +123,39 @@ begin
 
   if tg_table_name = 'student_course_participations' then
     select co.school_id, co.academic_year_id, co.class_group_id
-      into offering_school, offering_year, new.class_group_id
+      into offering_school, offering_year, offering_class_group
     from public.course_offerings co
     where co.id=new.course_offering_id;
     select s.school_id into student_school from public.students s where s.id=new.student_id;
     if offering_school is null or student_school is null or offering_school <> student_school then
       raise exception 'COURSE_PARTICIPATION_SCHOOL_MISMATCH';
     end if;
+
+    if not exists (
+      select 1
+      from public.student_enrollments e
+      where e.student_id = new.student_id
+        and e.academic_year_id = offering_year
+        and e.status in ('ACTIVE','TRANSFERRED_IN')
+    ) then
+      raise exception 'COURSE_PARTICIPATION_ENROLLMENT_CONTEXT_MISMATCH';
+    end if;
+
+    if not exists (
+      select 1
+      from public.class_placements cp
+      where cp.enrollment_id in (
+        select e.id from public.student_enrollments e
+        where e.student_id = new.student_id
+          and e.academic_year_id = offering_year
+      )
+        and cp.class_group_id = offering_class_group
+        and cp.starts_on <= new.starts_on
+        and (cp.ends_on is null or cp.ends_on >= new.starts_on)
+    ) then
+      raise exception 'COURSE_PARTICIPATION_CLASS_CONTEXT_MISMATCH';
+    end if;
+
     return new;
   end if;
 
@@ -163,13 +189,29 @@ begin
 
   if tg_table_name = 'assessment_results' then
     select co.school_id, co.academic_year_id into offering_school, offering_year
-    from public.assessment_results ar
-    join public.assessments a on a.id=ar.assessment_id
+    from public.assessments a
     join public.course_offerings co on co.id=a.course_offering_id
-    where ar.id=new.id;
-    select s.school_id into student_school from public.students s where s.id=new.student_id;
-    if student_school is not null and offering_school is not null and student_school <> offering_school then
+    where a.id=new.assessment_id;
+
+    select s.school_id into student_school
+    from public.students s
+    where s.id=new.student_id;
+
+    if student_school is null or offering_school is null or student_school <> offering_school then
       raise exception 'ASSESSMENT_RESULT_STUDENT_SCHOOL_MISMATCH';
+    end if;
+
+    if not exists (
+      select 1
+      from public.student_course_participations scp
+      where scp.student_id=new.student_id
+        and scp.course_offering_id=(
+          select a.course_offering_id from public.assessments a where a.id=new.assessment_id
+        )
+        and scp.starts_on <= current_date
+        and (scp.ends_on is null or scp.ends_on >= current_date)
+    ) then
+      raise exception 'ASSESSMENT_RESULT_STUDENT_COURSE_CONTEXT_MISMATCH';
     end if;
     return new;
   end if;
