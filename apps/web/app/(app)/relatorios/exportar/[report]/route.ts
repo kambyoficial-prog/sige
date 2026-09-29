@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase/server";
+import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 
 const allowed = new Set([
   "report_student_demographics",
@@ -23,7 +23,7 @@ export async function GET(request: NextRequest, context: { params: Promise<{ rep
   const { report } = await context.params;
   if (!allowed.has(report)) return new NextResponse("REPORT_NOT_FOUND", { status: 404 });
   const academicYearId = request.nextUrl.searchParams.get("academic_year_id");
-  const supabase = await createClient();
+  const { supabase } = await requireAuthenticatedServerClient();
   let query = supabase.from(report).select("*");
   if (academicYearId && report !== "report_student_demographics") query = query.eq("academic_year_id", academicYearId);
   const { data, error } = await query;
