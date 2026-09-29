@@ -1,0 +1,20 @@
+-- F6 closeout structural and normative assertions.
+select ok(exists(select 1 from public.grade_rule_versions where code='MZ-ESG-RGA-2019'),'2019 ESG rule is installed');
+select ok((select definition#>'{examination,terminal_classes}' from public.grade_rule_versions where code='MZ-ESG-RGA-2019') @> '[10,12]'::jsonb,'terminal classes are 10 and 12');
+select ok((select definition#>'{final_coefficients,with_parallelism,10}' from public.grade_rule_versions where code='MZ-ESG-RGA-2019') @> '{"ncd_weight":3,"exam_weight":1,"divisor":4}'::jsonb,'10th final formula is 3:1 over 4');
+select ok((select definition#>'{final_coefficients,with_parallelism,12}' from public.grade_rule_versions where code='MZ-ESG-RGA-2019') @> '{"ncd_weight":2,"exam_weight":1,"divisor":3}'::jsonb,'12th final formula is 2:1 over 3');
+select ok((select definition#>'{trimester_formula}' from public.grade_rule_versions where code='MZ-ESG-RGA-2019') @> '{"macs_weight":2,"at_weight":1,"divisor":3}'::jsonb,'trimester formula is versioned');
+select ok(exists(select 1 from public.exam_sessions),'exam sessions table exists');
+select ok(exists(select 1 from public.exam_registrations),'exam registrations table exists');
+select ok(exists(select 1 from public.exam_reviews),'exam review table exists');
+select ok(exists(select 1 from public.cycle_outcomes),'cycle outcomes table exists');
+select ok(exists(select 1 from pg_proc where proname='register_exam_candidate'),'exam registration command exists');
+select ok(exists(select 1 from pg_proc where proname='request_exam_review'),'exam review command exists');
+select ok(exists(select 1 from pg_proc where proname='decide_exam_review'),'exam review decision command exists');
+select ok(exists(select 1 from pg_proc where proname='calculate_cycle_outcome'),'cycle outcome command exists');
+select ok(position('final_coefficients' in pg_get_functiondef('public.calculate_final_result(uuid,uuid,uuid,uuid,text,text)'::regprocedure))>0,'final engine consumes versioned coefficients');
+select ok(position('trimester_formula' in pg_get_functiondef('public.calculate_trimester_result(uuid,uuid,uuid,text,text)'::regprocedure))>0,'trimester engine consumes versioned coefficients');
+select ok(position('FIRST_EPOCH_SUPERSEDED_BY_SECOND_EPOCH' in pg_get_functiondef('public.calculate_final_result(uuid,uuid,uuid,uuid,text,text)'::regprocedure))>0,'second epoch supersedes first epoch');
+select ok(not has_table_privilege('authenticated','public.exam_sessions','INSERT'),'exam sessions deny direct insert');
+select ok(not has_table_privilege('authenticated','public.exam_registrations','INSERT'),'exam registrations deny direct insert');
+select ok(not has_table_privilege('authenticated','public.cycle_outcomes','INSERT'),'cycle outcomes deny direct insert');
