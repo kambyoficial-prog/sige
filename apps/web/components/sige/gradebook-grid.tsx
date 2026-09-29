@@ -90,7 +90,6 @@ export function GradebookGrid({ rows }: { rows: AssessmentGradebookRow[] }) {
                           disabled={row.assessment_status !== "OPEN" || pending}
                           value={current}
                           onChange={(e) => setDrafts((d) => ({ ...d, [key(row.student_id, row.assessment_id)]: e.target.value }))}
-                          onBlur={() => save(row)}
                           inputMode="decimal"
                           className="h-9 w-20 rounded-md border bg-background px-2 text-center outline-none focus:ring-2 focus:ring-ring"
                         />
