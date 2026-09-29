@@ -27,8 +27,9 @@ export function GradebookGrid({ rows }: { rows: AssessmentGradebookRow[] }) {
     const value = drafts[key(row.student_id, row.assessment_id)];
     if (value === undefined) return;
 
-    const parsed = value.trim() === "" ? null : Number(value);
-    if (parsed !== null && !Number.isFinite(parsed)) {
+    if (value.trim() === "") return;
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) {
       setError("Introduza uma nota numérica válida.");
       return;
     }
@@ -40,7 +41,7 @@ export function GradebookGrid({ rows }: { rows: AssessmentGradebookRow[] }) {
           assessmentId: row.assessment_id,
           studentId: row.student_id,
           rawScore: parsed,
-          status: parsed === null ? "EXCUSED" : "ENTERED",
+          status: "ENTERED",
         });
         window.location.reload();
       } catch (e) {
