@@ -51,6 +51,8 @@ No placeholder data may masquerade as production data.
 
 ## F0 — Design-system/runtime foundation
 
+Status: implemented baseline; runtime verification remains pending in CI-capable environment.
+
 Deliver:
 - Tailwind CSS v4 + shadcn/ui foundation;
 - semantic light/dark tokens;
@@ -65,6 +67,8 @@ Deliver:
 Explicitly do not build fake dashboards, fake records, fake authentication, charts without data contracts, a global client store or a second component system.
 
 ## F1 — Authentication & access
+
+Status: next execution block.
 
 - real Supabase Auth sign-in;
 - callback/session handling;
