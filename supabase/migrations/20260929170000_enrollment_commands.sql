@@ -133,7 +133,10 @@ declare
   student_school uuid;
   year_school uuid;
   year_status public.academic_year_status;
+  year_start date;
+  year_end date;
   enrollment_id uuid;
+  enrollment_sequence integer;
   result jsonb;
   command_state jsonb;
 begin
@@ -151,8 +154,8 @@ begin
     raise exception 'STUDENT_NOT_FOUND';
   end if;
 
-  select ay.school_id, ay.status
-    into year_school, year_status
+  select ay.school_id, ay.status, ay.starts_on, ay.ends_on
+    into year_school, year_status, year_start, year_end
   from public.academic_years ay
   where ay.id = p_academic_year_id
   for share;
@@ -167,6 +170,10 @@ begin
 
   if year_status <> 'OPEN' then
     raise exception 'ACADEMIC_YEAR_NOT_OPEN';
+  end if;
+
+  if p_enrolled_on < year_start or p_enrolled_on > year_end then
+    raise exception 'ENROLLMENT_DATE_OUTSIDE_ACADEMIC_YEAR';
   end if;
 
   if not (select private.has_permission('enrollment.manage', student_school)) then
@@ -193,9 +200,18 @@ begin
     from public.student_enrollments e
     where e.student_id = p_student_id
       and e.academic_year_id = p_academic_year_id
+      and e.status in ('PENDING','ACTIVE','TRANSFERRED_IN')
+      and e.enrolled_on <= p_enrolled_on
+      and (e.exited_on is null or e.exited_on >= p_enrolled_on)
   ) then
-    raise exception 'ENROLLMENT_ALREADY_EXISTS';
+    raise exception 'ACTIVE_ENROLLMENT_ALREADY_EXISTS';
   end if;
+
+  select coalesce(max(e.enrollment_sequence), 0) + 1
+    into enrollment_sequence
+  from public.student_enrollments e
+  where e.student_id = p_student_id
+    and e.academic_year_id = p_academic_year_id;
 
   if not exists (
     select 1
@@ -228,7 +244,8 @@ begin
     grade_level_id,
     status,
     entry_type,
-    enrolled_on
+    enrolled_on,
+    enrollment_sequence
   )
   values (
     p_student_id,
@@ -236,7 +253,8 @@ begin
     p_grade_level_id,
     'ACTIVE',
     p_entry_type,
-    p_enrolled_on
+    p_enrolled_on,
+    enrollment_sequence
   )
   returning id into enrollment_id;
 
@@ -261,7 +279,8 @@ begin
       'academic_year_id', p_academic_year_id,
       'grade_level_id', p_grade_level_id,
       'entry_type', p_entry_type,
-      'enrolled_on', p_enrolled_on
+      'enrolled_on', p_enrolled_on,
+      'enrollment_sequence', enrollment_sequence
     )
   );
 
@@ -270,6 +289,7 @@ begin
     'student_id', p_student_id,
     'academic_year_id', p_academic_year_id,
     'grade_level_id', p_grade_level_id,
+    'enrollment_sequence', enrollment_sequence,
     'status', 'ACTIVE'
   );
 
