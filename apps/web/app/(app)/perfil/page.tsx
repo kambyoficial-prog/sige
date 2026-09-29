@@ -9,7 +9,7 @@ type MembershipRow = { school_id: string; school_name: string; school_code: stri
 export default async function ProfilePage() {
   const access = await getCurrentAccessContext();
   const rows: MembershipRow[] = access.memberships.map(m => ({ school_id: m.school_id, school_name: m.school_name, school_code: m.school_code, roles: m.roles.map(r => r.name).join(", "), permissions: m.permissions.length }));
-  const columns: ColumnDef<MembershipRow>[] = [
+  const columns: ColumnDef<MembershipRow, unknown>[] = [
     { accessorKey: "school_name", header: "Escola" },
     { accessorKey: "school_code", header: "Código" },
     { accessorKey: "roles", header: "Funções" },
