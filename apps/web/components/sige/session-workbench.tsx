@@ -136,8 +136,10 @@ export function SessionWorkbench({
                       <span className="rounded-md bg-muted px-2.5 py-1 text-xs font-medium">
                         {existing.status === "OPEN" ? "Aberta" : existing.status === "CLOSED" ? "Fechada" : existing.status}
                       </span>
-                    ) : (
+                    ) : entry.status === "ACTIVE" ? (
                       <ActionButton onClick={() => openSession(entry.id)}>Abrir sessão</ActionButton>
+                    ) : (
+                      <span className="text-xs text-muted-foreground">Horário em rascunho</span>
                     )}
                   </div>
                 </div>
