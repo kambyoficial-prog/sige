@@ -1,0 +1,40 @@
+import type { SigeErrorCode } from "@sige/contracts";
+
+export function errorMessage(code: SigeErrorCode | "UNKNOWN") {
+  const messages: Record<SigeErrorCode | "UNKNOWN", string> = {
+    AUTH_REQUIRED: "A sua sessão terminou. Entre novamente no SIGE.",
+    FORBIDDEN: "A sua conta não tem permissão para executar esta operação.",
+    NOT_FOUND: "O registo solicitado não foi encontrado.",
+    INVALID_ARGUMENT: "Os dados enviados não são válidos.",
+    IDEMPOTENCY_KEY_REQUIRED: "Não foi possível identificar esta operação com segurança.",
+    REQUEST_HASH_MISMATCH: "A operação foi enviada novamente com dados diferentes.",
+    ACADEMIC_YEAR_CLOSED: "O ano letivo está fechado e não aceita esta alteração.",
+    ACADEMIC_YEAR_NOT_OPEN: "O ano letivo ainda não está aberto para esta operação.",
+    ASSESSMENT_RESULTS_INCOMPLETE: "Os resultados necessários ainda não estão completos.",
+    RESULT_IS_NOT_PUBLISHED: "O resultado ainda não foi publicado.",
+    PUBLISHED_RESULT_REQUIRES_CORRECTION: "O resultado publicado precisa de uma correção formal.",
+    PUBLISHED_RESULT_REQUIRES_CORRECTION_COMMAND: "Use a operação de correção para alterar este resultado.",
+    CORRECTION_REASON_REQUIRED: "Indique o motivo da correção.",
+    PEDAGOGICAL_PARALLELISM_NOT_CONFIGURED: "A configuração pedagógica necessária ainda não está definida.",
+    FINAL_EXAM_ONLY_ALLOWED_FOR_9_AND_12: "O exame final aplica-se apenas às classes previstas no regime em vigor.",
+    THREE_PUBLISHED_TRIMESTER_RESULTS_REQUIRED: "É necessário publicar os três resultados trimestrais.",
+    TRIMESTER_RESULT_INCOMPLETE: "O resultado trimestral está incompleto.",
+    FREQUENCY_RESULT_INCOMPLETE: "O resultado de frequência está incompleto.",
+    PUBLISHED_FREQUENCY_RESULT_REQUIRED: "É necessário publicar o resultado de frequência.",
+    PUBLISHED_EXAM_RESULT_REQUIRED: "É necessário publicar o resultado do exame.",
+    EXAM_RESULT_NOT_FOUND: "O resultado do exame não foi encontrado.",
+    ASSESSMENT_RESULT_IS_NOT_EXAM: "O resultado selecionado não corresponde a um exame.",
+    SCHEDULE_TEACHER_CONFLICT: "Existe um conflito de horário para o professor.",
+    TEACHER_ASSIGNMENT_CONTEXT_MISMATCH: "A atribuição do professor não corresponde ao contexto da turma.",
+    COURSE_OFFERING_NOT_FOUND: "A disciplina da turma não foi encontrada.",
+    ASSESSMENT_PERIOD_NOT_FOUND: "O período de avaliação não foi encontrado.",
+    STUDENT_NOT_COURSE_PARTICIPANT: "O aluno não está inscrito nesta disciplina.",
+    FINANCIAL_SCOPE_VIOLATION: "A operação financeira não corresponde ao ano letivo ou escola selecionados.",
+    PAYMENT_ALLOCATION_EXCEEDS_PAYMENT: "O valor atribuído ultrapassa o valor do pagamento.",
+    PAYMENT_ALLOCATION_EXCEEDS_CHARGE: "O valor atribuído ultrapassa o valor da obrigação.",
+    RECEIPT_PAYMENT_NOT_CONFIRMED: "Só é possível emitir recibo para pagamentos confirmados.",
+    PAYMENT_ALREADY_REVERSED: "Este pagamento já foi estornado.",
+    UNKNOWN: "Não foi possível concluir a operação. Tente novamente ou contacte a administração.",
+  };
+  return messages[code];
+}
