@@ -272,7 +272,7 @@ begin
   )
   on conflict (
     academic_year_id, grade_level_id, subject_id,
-    coalesce(pathway_id, '00000000-0000-0000-0000-000000000000'::uuid)
+    (coalesce(pathway_id, '00000000-0000-0000-0000-000000000000'::uuid))
   )
   do update set
     curriculum_area_id = excluded.curriculum_area_id,
@@ -343,6 +343,8 @@ using (
   private.has_permission('operations.read', school_id)
   or private.has_permission('operations.manage', school_id)
 );
+
+drop policy if exists curriculum_subjects_read on public.curriculum_subjects;
 
 create policy curriculum_subjects_read
 on public.curriculum_subjects
