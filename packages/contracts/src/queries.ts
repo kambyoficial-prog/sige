@@ -76,8 +76,14 @@ export interface ClassGroupTeacher {
   subject_id: UUID | null; course_offering_id: UUID | null;
 }
 export interface TimetableEntry {
-  id: UUID; school_id: UUID; academic_year_id: UUID; class_group_id: UUID; period_id: UUID;
-  day_of_week: number; valid_from: string; valid_until: string | null; status: string;
+  id: UUID; school_id: UUID; academic_year_id: UUID; class_group_id: UUID;
+  section_code: string | null; class_name: string | null; grade_level_id: UUID;
+  period_id: UUID; period_ordinal: number; period_code: string; period_name: string;
+  starts_at: string; ends_at: string; day_of_week: number;
+  course_offering_id: UUID; subject_id: UUID; subject_code: string; subject_name: string;
+  teacher_id: UUID; teacher_name: string; room_id: UUID | null;
+  room_code: string | null; room_name: string | null;
+  valid_from: string; valid_until: string | null; status: string;
 }
 export interface TeacherWorkloadSummary {
   teacher_id: UUID; academic_year_id: UUID; scheduled_periods: number; assigned_offerings: number;
