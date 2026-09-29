@@ -56,3 +56,5 @@ Transformar o modelo lógico já documentado em contratos PostgreSQL: enums, tab
 - `20260929224000_one_open_year_per_school.sql` — no máximo um ano letivo OPEN por escola.
 
 Testes correspondentes: `0021_financial_lifecycle.sql`, `0022_closed_year_write_barrier.sql` e `0023_academic_lifecycle.sql`.
+
+- `34-domain-hardening-closeout.md` — encerramento do hardening do núcleo académico, financeiro e operacional.
