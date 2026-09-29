@@ -27,3 +27,9 @@ Operações com impacto histórico usam estados e relações temporais. Matrícu
 ## Próxima camada
 
 Transformar o modelo lógico já documentado em contratos PostgreSQL: enums, tabelas, constraints, índices, RLS e testes de autorização. Isso será preparado no repositório antes de qualquer aplicação a um projeto Supabase remoto.
+
+
+## Bloco académico e operação
+
+- [21 — Estrutura académica, turmas, grupos e horários](./21-academic-structure-and-timetable.md)
+- [22 — Planeamento e distribuição de horários](./22-timetable-distribution-engine.md)
