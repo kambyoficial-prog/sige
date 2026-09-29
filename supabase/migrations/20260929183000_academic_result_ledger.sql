@@ -143,7 +143,7 @@ begin
 
   if not participant then raise exception 'STUDENT_NOT_COURSE_PARTICIPANT'; end if;
 
-  command_state := public.private_begin_command(
+  command_state := private.begin_command(
     'calculate_trimester_result', school_id, p_idempotency_key, p_request_hash
   );
   if coalesce((command_state->>'replayed')::boolean, false) then
@@ -266,7 +266,7 @@ begin
     'rule_version', 'MZ-ES-2022-06-30'
   );
 
-  perform public.private_complete_command(
+  perform private.complete_command(
     'calculate_trimester_result', school_id, p_idempotency_key, result
   );
 
@@ -310,7 +310,7 @@ begin
     raise exception 'FORBIDDEN';
   end if;
 
-  command_state := public.private_begin_command(
+  command_state := private.begin_command(
     'homologate_academic_result', school_id, p_idempotency_key, p_request_hash
   );
   if coalesce((command_state->>'replayed')::boolean, false) then
@@ -336,7 +336,7 @@ begin
     'status', 'HOMOLOGATED'
   );
 
-  perform public.private_complete_command(
+  perform private.complete_command(
     'homologate_academic_result', school_id, p_idempotency_key, result
   );
 
@@ -380,7 +380,7 @@ begin
     raise exception 'FORBIDDEN';
   end if;
 
-  command_state := public.private_begin_command(
+  command_state := private.begin_command(
     'publish_academic_result', school_id, p_idempotency_key, p_request_hash
   );
   if coalesce((command_state->>'replayed')::boolean, false) then
@@ -406,7 +406,7 @@ begin
     'status', 'PUBLISHED'
   );
 
-  perform public.private_complete_command(
+  perform private.complete_command(
     'publish_academic_result', school_id, p_idempotency_key, result
   );
 
