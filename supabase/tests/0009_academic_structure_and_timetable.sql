@@ -1,6 +1,6 @@
 begin;
 
-select plan(22);
+select plan(24);
 
 select ok(
   exists (
@@ -60,6 +60,20 @@ select ok(
     where conname = 'class_group_leadership_no_overlap'
   ),
   'a class cannot have overlapping active directors'
+);\n\nselect ok(
+  exists (
+    select 1 from pg_constraint
+    where conname = 'class_placements_enrollment_no_overlap'
+  ),
+  'a student enrollment cannot have overlapping active class placements'
+);
+
+select ok(
+  exists (
+    select 1 from pg_constraint
+    where conname = 'student_course_participations_no_overlap'
+  ),
+  'a student cannot have overlapping active participation in the same offering'
 );
 
 select ok(
