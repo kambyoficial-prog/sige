@@ -39,3 +39,8 @@ Transformar o modelo lógico já documentado em contratos PostgreSQL: enums, tab
 - [25 — Regras de avaliação e motor](./25-assessment-rules-and-engine.md)
 - [26 — Ciclo temporal, fecho e histórico](./26-temporal-lifecycle-and-history.md)
 - [27 — Hardening temporal das operações](./27-temporal-operations-hardening.md)
+
+- [28–29 — Hardening do lifecycle e avaliação](./28-29-lifecycle-and-assessment-hardening.md)
+- [30 — Integridade de escopo acadêmico](./30-academic-scope-integrity.md)
+- [31 — Integridade financeira por escola e ano](./31-financial-scope-and-year.md)
+- [32 — Segurança de funções privilegiadas](./32-privileged-function-security.md)
