@@ -7,6 +7,9 @@
 alter table public.charges
   add column if not exists academic_year_id uuid references public.academic_years(id) on delete restrict;
 
+alter table public.charges
+  alter column academic_year_id set not null;
+
 create index if not exists charges_student_year_idx
   on public.charges (student_id, academic_year_id, status);
 
