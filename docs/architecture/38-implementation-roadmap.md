@@ -123,6 +123,8 @@ A/B/C-style labels remain configurable section/pathway data, never hardcoded bus
 
 ## F5 — Operações
 
+Status: command/domain layer implemented; operational UI and browser/database verification remain.
+
 - timetable grid;
 - teacher and student timetables;
 - teacher/room conflict feedback;
