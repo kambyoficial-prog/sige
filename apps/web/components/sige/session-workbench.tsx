@@ -75,18 +75,34 @@ export function SessionWorkbench({
     status: "PRESENT" | "ABSENT" | "EXCUSED" | "LATE",
   ) {
     if (!selectedSession) return;
-    const minutes = status === "LATE" ? Number(lateMinutes[studentId] ?? "") : undefined;
-    if (status === "LATE" && (!Number.isInteger(minutes) || minutes < 1)) {
-      setError("Indique os minutos de atraso antes de registar.");
+
+    if (status === "LATE") {
+      const minutesLate = Number(lateMinutes[studentId] ?? "");
+      if (!Number.isInteger(minutesLate) || minutesLate < 1) {
+        setError("Indique os minutos de atraso antes de registar.");
+        return;
+      }
+
+      const result = await recordSessionAttendanceAction({
+        classSessionId: selectedSession.id,
+        studentId,
+        status,
+        minutesLate,
+      });
+
+      if (!result.ok) {
+        setError(result.code);
+        return;
+      }
+      setError(null);
+      router.refresh();
       return;
     }
 
-    const minutesLate = minutes;
     const result = await recordSessionAttendanceAction({
       classSessionId: selectedSession.id,
       studentId,
       status,
-      ...(status === "LATE" ? { minutesLate: minutesLate as number } : {}),
     });
 
     if (!result.ok) {
