@@ -46,6 +46,9 @@ const RPC_NAMES: Record<CommandName, string> = {
   upsert_school_calendar_day: "upsert_school_calendar_day",
   create_schedule_entry: "create_schedule_entry",
   set_schedule_entry_status: "set_schedule_entry_status",
+  open_class_session: "open_class_session",
+  close_class_session: "close_class_session",
+  record_session_attendance: "record_session_attendance",
 };
 
 function toRpcArgs<Name extends CommandName>(
@@ -270,6 +273,26 @@ function toRpcArgs<Name extends CommandName>(
     set_schedule_entry_status: {
       p_schedule_entry_id: i.scheduleEntryId, p_status: i.status,
       p_reason: i.reason ?? null, ...common,
+    },
+    open_class_session: {
+      p_schedule_entry_id: i.scheduleEntryId,
+      p_session_date: i.sessionDate,
+      p_topic: i.topic ?? null,
+      p_notes: i.notes ?? null,
+      ...common,
+    },
+    close_class_session: {
+      p_class_session_id: i.classSessionId,
+      p_reason: i.reason ?? null,
+      ...common,
+    },
+    record_session_attendance: {
+      p_class_session_id: i.classSessionId,
+      p_student_id: i.studentId,
+      p_status: i.status,
+      p_minutes_late: i.minutesLate ?? null,
+      p_reason: i.reason ?? null,
+      ...common,
     },
     configure_curriculum_subject: {
       p_academic_year_id: i.academicYearId,
