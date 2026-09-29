@@ -172,7 +172,7 @@ returns trigger
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $sige$
 declare
   grade_cycle uuid;
   pathway_cycle uuid;
@@ -208,7 +208,7 @@ begin
 
   return new;
 end;
-$;
+$sige$;
 
 drop trigger if exists trg_validate_class_group_academic_structure on public.class_groups;
 create trigger trg_validate_class_group_academic_structure
@@ -228,7 +228,7 @@ returns jsonb
 language plpgsql
 security definer
 set search_path = ''
-as $
+as $sige$
 declare
   actor uuid := (select auth.uid());
   school_id uuid;
@@ -363,7 +363,7 @@ begin
 
   return result;
 end;
-$;
+$sige$;
 
 revoke all on function private.validate_class_group_academic_structure() from public;
 revoke all on function public.assign_class_group_director(uuid,uuid,date,date,text,text,text) from public;
