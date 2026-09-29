@@ -5,18 +5,18 @@ import { cn } from "@/lib/utils";
 export function Pagination({
   page,
   totalPages,
+  queryString = "",
   className,
 }: {
   page: number;
   totalPages: number;
+  queryString?: string;
   className?: string;
 }) {
   if (totalPages <= 1) return null;
 
   const href = (next: number) => {
-    const params = new URLSearchParams(
-      typeof window === "undefined" ? "" : window.location.search,
-    );
+    const params = new URLSearchParams(queryString);
     params.set("page", String(next));
     return `?${params.toString()}`;
   };
