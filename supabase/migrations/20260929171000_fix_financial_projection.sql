@@ -9,7 +9,7 @@ returns numeric(12,2)
 language sql
 stable
 security definer
-set search_path = public, pg_temp
+set search_path = ''
 as $$
   select greatest(
     0::numeric,
@@ -80,7 +80,7 @@ group by ct.school_id, ct.student_id;
 create or replace function private.validate_payment_allocation()
 returns trigger
 language plpgsql
-set search_path = public, pg_temp
+set search_path = ''
 as $$
 declare
   payment_total numeric(12,2);
