@@ -11,6 +11,8 @@ import {
   type TimetableEntry,
   type ClassSessionDirectory,
   type ClassSessionRoster,
+  type TeacherTimetableEntry,
+  type StudentTimetableEntry,
   normalizeSigeError,
 } from "@sige/contracts";
 
@@ -99,10 +101,10 @@ export const getClassTimetable = (classGroupId: string) =>
   queryView<TimetableEntry>("class_timetable", { class_group_id: classGroupId });
 
 export const getTeacherTimetable = (teacherId: string) =>
-  queryView<TimetableEntry>("teacher_timetable", { teacher_id: teacherId });
+  queryView<TeacherTimetableEntry>("teacher_timetable", { teacher_id: teacherId });
 
 export const getStudentTimetable = (studentId: string) =>
-  queryView<TimetableEntry>("student_timetable", { student_id: studentId });
+  queryView<StudentTimetableEntry>("student_timetable", { student_id: studentId });
 
 export const getTeacherWorkload = (academicYearId: string) =>
   queryView<TeacherWorkloadSummary>("teacher_workload_summary", {
