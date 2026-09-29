@@ -13,6 +13,7 @@ type RpcArgs = Record<string, unknown>;
 const RPC_NAMES: Record<CommandName, string> = {
   register_student: "register_student",
   create_guardian: "create_guardian",
+  assign_class_group_director: "assign_class_group_director",
   enroll_student: "enroll_student",
   place_student_in_class: "place_student_in_class",
   record_payment: "record_payment",
@@ -54,6 +55,14 @@ function toRpcArgs<Name extends CommandName>(
   };
 
   const map: Record<CommandName, RpcArgs> = {
+    assign_class_group_director: {
+      p_class_group_id: i.classGroupId,
+      p_teacher_id: i.teacherId,
+      p_starts_on: i.startsOn,
+      p_ends_on: i.endsOn ?? null,
+      p_reason: i.reason ?? null,
+      ...common,
+    },
     register_student: {
       p_school_id: i.schoolId,
       p_school_number: i.schoolNumber,
