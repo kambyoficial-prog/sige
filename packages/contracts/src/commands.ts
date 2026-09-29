@@ -206,7 +206,24 @@ export interface ConfigureCurriculumSubjectInput extends IdempotentCommand {
   choiceGroupId?: UUID; weeklyPeriods?: number; ordinal?: number;
 }
 
+
+export type CreateExamSessionInput = {
+  academicYearId: string; gradeLevelId: string; epoch: 1 | 2; startsOn: string; endsOn: string;
+  idempotencyKey: string; requestHash?: string | null;
+};
+export type SetExamSessionStatusInput = {
+  examSessionId: string; status: "OPEN" | "CLOSED" | "CANCELLED"; idempotencyKey: string; requestHash?: string | null;
+};
+export type RegisterExamCandidateInput = {
+  examSessionId: string; studentId: string; courseOfferingId: string;
+  eligibilityStatus: "PENDING" | "ELIGIBLE" | "INELIGIBLE" | "AUTHORIZED_ABSENCE" | "FRAUD_BLOCKED";
+  reason?: string | null; idempotencyKey: string; requestHash?: string | null;
+};
+
 export type SigeCommandInputMap = {
+  create_exam_session: CreateExamSessionInput;
+  set_exam_session_status: SetExamSessionStatusInput;
+  register_exam_candidate: RegisterExamCandidateInput;
   register_student: RegisterStudentInput;
   create_guardian: CreateGuardianInput;
   assign_class_group_director: AssignClassGroupDirectorInput;
