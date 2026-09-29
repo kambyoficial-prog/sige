@@ -1,95 +1,79 @@
-# Regras académicas — Ensino Secundário de Moçambique
+# Regras académicas — Ensino Secundário Geral de Moçambique
 
-## Fonte normativa
+## Fonte normativa validada
 
-A implementação do motor de resultados do SIGE usa como referência normativa o Regulamento de Avaliação do Ensino Secundário, aprovado em 2022 pelo Ministério da Educação e Desenvolvimento Humano.
+A regra normativa actualmente vinculada a novos anos lectivos no SIGE é o Diploma Ministerial n.º 7/2019, de 10 de Janeiro — Regulamento Geral de Avaliação do Ensino Primário, Alfabetização e Educação de Jovens e Adultos e Ensino Secundário Geral.
 
-A regra não é tratada como uma coleção de colunas fixas. O SIGE separa avaliação (evento), resultado do aluno, período de avaliação, regra de cálculo, resultado académico derivado e publicação/homologação.
+A Imprensa Nacional confirma que o diploma aprova o regulamento e revoga o Diploma Ministerial n.º 59/2015; entrou em vigor no ano lectivo de 2019. citeturn1search0
 
-## Regras confirmadas
+O catálogo da Imprensa Nacional também regista o Diploma Ministerial n.º 41/2022, mas este aprova o Plano de Estudo da 12.ª classe; não foi usado como fonte de fórmula de avaliação. citeturn5search4
 
-### Tipos
+## Regras ESG implementadas
 
-O regulamento de 2022 identifica Avaliação Contínua e Sistemática (ACS), Avaliação Trimestral (AT) e Exame.
+### Avaliações trimestrais
 
-O número mínimo de avaliações escritas por trimestre é 3: duas ACS e uma AT. O sistema, entretanto, aceita mais avaliações do que o mínimo regulamentar, sem criar colunas físicas acs1, acs2, acs3 etc.
+O artigo 49 estabelece para o Ensino Secundário Geral um mínimo de três avaliações escritas por trimestre: 2 ACS e 1 AT. A classificação trimestral deve considerar os resultados de ACS e AT. citeturn3search0
+
+O SIGE não transforma esse mínimo em colunas físicas. Pode haver 2, 3, 4 ou mais eventos ACS. O mínimo é uma regra de elegibilidade do cálculo, não um limite estrutural da base de dados.
 
 ### MACS
 
-MACS = soma(ACS) / número de ACS.
-
-O regulamento também reconhece avaliações práticas dentro da ACS. O domínio deve permitir vários eventos ACS sem confundir o instrumento pedagógico com uma coluna fixa.
+MACS é a média aritmética das ACS realizadas.
 
 ### Média Trimestral
 
-MT = (2 × MACS + AT) / 3
+MT = (2 × MACS + AT) / 3. citeturn3search0
 
 ### Média de Frequência por Disciplina
 
-MFD = (MT1 + MT2 + MT3) / 3
-
-### Nota por Disciplina / Nota do Ciclo
-
-A nota por disciplina é derivada da média de frequência por disciplina da última classe do ciclo; para disciplinas que terminam antes, usa-se a MFD da última classe em que a disciplina é lecionada.
-
-### Nota Final com exame
-
-Nas escolas abrangidas pela regra de paralelismo pedagógico:
-
-NF = (2 × ND + NE) / 3
-
-onde ND é a Nota por Disciplina e NE é a Nota do Exame.
+MFD = (MT1 + MT2 + MT3) / 3. citeturn3search0
 
 ### Escala
-
-A classificação quantitativa é de 0 a 20 valores:
 
 | Valores | Classificação |
 |---:|---|
 | 19–20 | Excelente |
 | 17–18 | Muito Bom |
 | 14–16 | Bom |
-| 10–13 | Suficiente |
-| 0–9 | Não Suficiente |
+| 10–13 | Satisfatório |
+| 0–9 | Não Satisfatório |
 
-As classificações trimestrais, anuais e finais são apresentadas arredondadas às unidades.
+O SIGE guarda o valor matemático e a apresentação arredondada separadamente.
 
-## Consequências para o SIGE
+### Exames
 
-### Não criar colunas ACS fixas
+O regulamento identifica as classes terminais de exame como 10.ª e 12.ª classes. O artigo 91 também descreve as disciplinas de exame e o regime de 1.ª/2.ª época. citeturn7search0
 
-Errado: acs1, acs2, acs3, acs4.
+Por isso o SIGE não trata a 9.ª classe como classe terminal de exame.
 
-Correto: AssessmentPeriod → Assessment → AssessmentResult.
+### Critérios de transição/aprovação
 
-Cada ACS é um evento independente.
+O regulamento separa cálculo de médias de elegibilidade/aprovação. Os artigos 79 e 80 definem condições de transição do 1.º e 2.º ciclos; os artigos 96 e 97 tratam critérios de aprovação nas classes de exame. citeturn4search0
 
-### Mínimo regulamentar ≠ limite estrutural
+Essas regras não devem ser escondidas dentro da fórmula de uma nota disciplinar.
 
-O motor permite 2 ACS + 1 AT, 3 ACS + 1 AT, 4 ACS + 1 AT ou mais avaliações quando a escola precisar.
+## Recuperação e 2.ª época
 
-A regra de publicação verifica o mínimo regulamentar; o modelo de dados não impõe o mínimo através do número de colunas.
+O SIGE suporta RECOVERY como tipo de avaliação/evento, mas não inventa uma fórmula universal de substituição da nota.
 
-### Rascunho ≠ resultado publicado
+A 2.ª época de exame também permanece como evento distinto. O regulamento determina, entre outras regras, que a nota obtida na 2.ª época anula automaticamente a nota da 1.ª época. citeturn7search0
 
-Durante o lançamento, resultados podem estar incompletos e médias derivadas podem permanecer nulas. Na publicação, o conjunto elegível precisa estar completo; o resultado fica congelado; uma correção posterior exige comando próprio, motivo e auditoria.
+A implementação definitiva dessas transições exige um modelo específico de exame/época e não deve ser simulada através de simples alteração da nota final.
 
-### Exame
+## Versionamento
 
-Exame não é apenas mais uma ACS. É um evento académico distinto, com ciclo próprio e participação própria.
+Cada ano lectivo referencia explicitamente grade_rule_version_id.
 
-### Recuperação
+Um resultado académico guarda o código da regra, snapshot dos inputs, valor matemático, valor apresentado, classificação, autor, timestamps e relação de supersessão quando há recálculo.
 
-O SIGE deve suportar recuperação/recurso como evento/contexto de avaliação, mas não deve inventar uma fórmula de substituição ou ponderação.
+A regra actualmente criada para novos anos é MZ-ESG-RGA-2019.
 
-Enquanto a regra normativa específica aplicável à escola não estiver confirmada, uma recuperação deve ser armazenada com tipo, data, resultado, contexto, motivo, relação com o resultado anterior e versão da regra aplicável.
+O antigo identificador MZ-ES-2022-06-30 foi mantido apenas como compatibilidade histórica para resultados já gravados; não é usado como fundamento normativo para novos cálculos.
 
-A fórmula de recuperação será adicionada somente depois de validada em fonte normativa ou decisão formal da escola.
+## Regra de engenharia
 
-## Regra de implementação
+Nunca criar acs1/acs2/acs3/acs4, fórmulas hardcoded no frontend, uma segunda fonte de verdade na pauta, ou uma recuperação que simplesmente substitua uma nota sem evento e auditoria.
 
-Cada cálculo publicado deve guardar ou referenciar a versão normativa que o produziu.
+O fluxo permanece:
 
-Para 2022: MZ-ES-2022-06-30.
-
-Isso permite que uma alteração normativa futura não reescreva silenciosamente pautas históricas.
+AssessmentDefinition → Assessment → AssessmentResult → AcademicResult → Homologation → Publication → Pauta.
