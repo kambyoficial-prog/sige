@@ -52,6 +52,6 @@ export const navigationSections: NavigationSection[] = [
   },
   {
     label: "Relatórios",
-    items: [{ label: "Relatórios", href: "/relatorios", permission: "reports.read" }],
+    items: [{ label: "Relatórios", href: "/relatorios" }],
   },
 ];
