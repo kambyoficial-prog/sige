@@ -133,9 +133,12 @@ begin
   select exists (
     select 1
     from public.student_course_participations scp
+    join public.assessment_periods ap on ap.id = p_assessment_period_id
     where scp.student_id = p_student_id
       and scp.course_offering_id = p_course_offering_id
-      and scp.status = 'ACTIVE'
+      and scp.starts_on <= coalesce(ap.ends_on, '9999-12-31'::date)
+      and (scp.ends_on is null or scp.ends_on >= coalesce(ap.starts_on, scp.starts_on))
+      and scp.status in ('ACTIVE','ENDED')
   ) into participant;
 
   if not participant then raise exception 'STUDENT_NOT_COURSE_PARTICIPANT'; end if;
