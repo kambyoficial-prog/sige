@@ -60,3 +60,5 @@ Testes correspondentes: `0021_financial_lifecycle.sql`, `0022_closed_year_write_
 - `34-domain-hardening-closeout.md` — encerramento do hardening do núcleo académico, financeiro e operacional.
 
 - `35-backend-application-contract.md` — contrato da camada aplicacional server-side e fronteira com o frontend.
+
+- `36-backend-closeout.md` — encerramento da implementação do backend e gates de verificação operacional.
