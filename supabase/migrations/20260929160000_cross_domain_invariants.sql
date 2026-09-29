@@ -424,6 +424,7 @@ using (
 );
 
 revoke insert, update, delete on public.assessment_result_history from authenticated;
+grant select on public.assessment_result_history to authenticated;
 
 create or replace function private.capture_published_result_revision()
 returns trigger
