@@ -20,6 +20,10 @@ import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 
 type ViewName =
   | "course_offering_directory"
+  | "finance_charge_directory"
+  | "finance_payment_directory"
+  | "finance_balance_directory"
+  | "teacher_profile"
   | "student_directory"
   | "student_profile"
   | "enrollment_directory"
