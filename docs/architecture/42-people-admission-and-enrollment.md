@@ -118,4 +118,4 @@ F3 é considerado implementado em código quando:
 - CTAs de escrita respeitam enrollment.manage;
 - nenhuma password ou credencial de aluno é inventada a partir de data de nascimento.
 
-Runtime continua dependente de uma instância PostgreSQL/Supabase autorizada do SIGE.
+Runtime database verification: completed against the authoritative SIGE Supabase project on 2026-09-30. Browser role smoke remains pending.
