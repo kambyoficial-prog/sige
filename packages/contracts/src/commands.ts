@@ -64,6 +64,7 @@ export interface EnrollStudentInput extends IdempotentCommand {
   studentId: UUID;
   academicYearId: UUID;
   gradeLevelId: UUID;
+  pathwayId?: UUID;
   entryType?: EnrollmentEntryType;
   enrolledOn?: ISODate;
 }
