@@ -15,7 +15,7 @@ declare
   period_id uuid;
   room_id uuid;
   day smallint;
-  ordinal integer;
+  v_period_ordinal integer;
 begin
   update public.academic_years
   set grade_rule_version_id=rule_id
@@ -138,8 +138,8 @@ begin
     join public.teacher_assignments ta on ta.course_offering_id=co.id and ta.active
     where co.academic_year_id=year_id
   loop
-    day=((r.class_n+r.n-2)%5)+1; ordinal=((r.n-1)%8)+1;
-    select id into period_id from public.schedule_periods where school_id=school and ordinal=ordinal limit 1;
+    day=((r.class_n+r.n-2)%5)+1; v_period_ordinal=((r.n-1)%8)+1;
+    select id into period_id from public.schedule_periods where school_id=school and ordinal=v_period_ordinal limit 1;
     select id into room_id from public.rooms where school_id=school order by code offset r.class_n-1 limit 1;
     insert into public.schedule_entries
       (school_id,academic_year_id,class_group_id,course_offering_id,teacher_assignment_id,teacher_id,room_id,period_id,day_of_week,valid_from,valid_until,status)
