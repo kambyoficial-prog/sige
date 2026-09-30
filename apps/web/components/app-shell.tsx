@@ -13,6 +13,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 type AppShellProps = {
   children: React.ReactNode;
   permissions?: ReadonlySet<string>;
+  roles?: ReadonlySet<string>;
   personName?: string;
   schoolName?: string;
   academicYearLabel?: string;
