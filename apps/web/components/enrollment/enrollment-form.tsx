@@ -16,7 +16,7 @@ const schema=z.object({
   studentId:z.string().uuid("Selecione o aluno."),
   academicYearId:z.string().uuid("Selecione o ano letivo."),
   gradeLevelId:z.string().uuid("Selecione a classe."),
-  pathwayId:z.string().uuid().optional(),
+  pathwayId:z.preprocess((value)=>value===""?undefined:value,z.string().uuid().optional()),
   entryType:z.enum(["INITIAL","TRANSFER_IN","REENTRY","RENEWAL"]),
   enrolledOn:z.string().min(10,"Indique a data."),
 });
