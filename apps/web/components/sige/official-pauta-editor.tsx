@@ -27,6 +27,14 @@ export type PautaSubject = {
   courseOfferingId: string | null;
   subjectCode: string;
   subjectName: string;
+  span: 1 | 3;
+};
+
+type PautaStudent = {
+  studentId: string;
+  studentNumber: string;
+  studentName: string;
+  gender: string | null;
 };
 
 type Props = {
@@ -36,6 +44,7 @@ type Props = {
   className: string;
   pathwayName: string | null;
   subjects: PautaSubject[];
+  students: PautaStudent[];
   rows: PautaRow[];
 };
 
@@ -58,19 +67,19 @@ export function OfficialPautaEditor(props: Props) {
   const [pending, startTransition] = useTransition();
 
   const students = useMemo(
-    () => [...new Map(props.rows.map((r) => [r.studentId, r])).values()].sort((a, b) => a.studentName.localeCompare(b.studentName)),
-    [props.rows],
+    () => [...props.students].sort((a, b) => a.studentName.localeCompare(b.studentName)),
+    [props.students],
   );
 
   const byKey = useMemo(
-    () => new Map(props.rows.map((r) => [`${r.studentId}:${r.courseOfferingId}`, r])),
+    () => new Map(props.rows.map((row) => [`${row.studentId}:${row.courseOfferingId}`, row])),
     [props.rows],
   );
 
   function save(row: PautaRow) {
     const key = `${row.studentId}:${row.courseOfferingId}`;
-    const value = drafts[key] ?? (row.examRawScore == null ? "" : String(row.examRawScore));
-    const parsed = Number(value);
+    const raw = drafts[key] ?? (row.examRawScore == null ? "" : String(row.examRawScore));
+    const parsed = Number(raw);
 
     if (!Number.isFinite(parsed) || parsed < 0 || parsed > (row.maxScore ?? 20)) {
       setError(`Nota inválida para ${row.studentName} — ${row.subjectName}.`);
@@ -115,12 +124,13 @@ export function OfficialPautaEditor(props: Props) {
       { label: "14 – 16,9", min: 14, max: 16.9 },
       { label: "17 – 20", min: 17, max: 20 },
     ];
+
     return buckets.map((bucket) => {
       let M = 0;
       let H = 0;
       for (const student of students) {
-        const row = props.rows.find((r) => r.studentId === student.studentId && r.finalValue != null);
-        if (!row || row.finalValue == null || row.finalValue < bucket.min || row.finalValue > bucket.max) continue;
+        const value = props.rows.find((row) => row.studentId === student.studentId)?.finalValue;
+        if (value == null || value < bucket.min || value > bucket.max) continue;
         if (normalizeGender(student.gender) === "M") M++;
         if (normalizeGender(student.gender) === "H") H++;
       }
@@ -161,25 +171,36 @@ export function OfficialPautaEditor(props: Props) {
                 <th rowSpan={2} className="border px-2 py-1">Género</th>
                 <th rowSpan={2} className="border px-2 py-1">Turma</th>
                 {props.subjects.map((subject) => (
-                  <th key={subject.subjectCode} colSpan={3} className="border px-1 py-1 text-center">{subject.subjectName}</th>
+                  <th key={subject.subjectCode} colSpan={subject.span} className="border px-1 py-1 text-center">
+                    {subject.subjectName}
+                  </th>
                 ))}
                 <th rowSpan={2} className="border px-2 py-1">Média</th>
                 <th colSpan={2} className="border px-2 py-1">RESULTADO FINAL</th>
               </tr>
               <tr>
-                {props.subjects.map((subject) => (
-                  <th key={subject.subjectCode} colSpan={3} className="border px-1 py-1">Frequênc. · 1ª/2ª ch · Média</th>
-                ))}
+                {props.subjects.map((subject) =>
+                  subject.span === 3 ? (
+                    <th key={subject.subjectCode} colSpan={3} className="border px-1 py-1">Frequênc. · 1ª/2ª ch · Média</th>
+                  ) : (
+                    <th key={subject.subjectCode} className="border px-1 py-1">Resultado</th>
+                  ),
+                )}
+                <th className="border px-1 py-1">Aprovado</th>
+                <th className="border px-1 py-1">Reprovado</th>
               </tr>
             </thead>
+
             <tbody>
               {students.map((student, index) => {
-                const studentRows = props.subjects.map((subject) =>
+                const subjectRows = props.subjects.map((subject) =>
                   subject.courseOfferingId ? byKey.get(`${student.studentId}:${subject.courseOfferingId}`) : undefined,
                 );
-                const finalValues = studentRows.map((r) => r?.finalValue).filter((v): v is number => v != null);
-                const global = finalValues.length ? Math.round(finalValues.reduce((a, b) => a + b, 0) / finalValues.length) : null;
-                const hasFailed = studentRows.some((r) => r?.finalValue != null && r.finalValue < 10);
+                const finalValues = subjectRows.map((row) => row?.finalValue).filter((value): value is number => value != null);
+                const global = finalValues.length
+                  ? Math.round(finalValues.reduce((sum, value) => sum + value, 0) / finalValues.length)
+                  : null;
+                const hasFailed = subjectRows.some((row) => row?.finalValue != null && row.finalValue < 10);
 
                 return (
                   <tr key={student.studentId}>
@@ -189,12 +210,15 @@ export function OfficialPautaEditor(props: Props) {
                     <td className="border px-2 py-1 text-center">{normalizeGender(student.gender)}</td>
                     <td className="border px-2 py-1 text-center">{props.className}</td>
 
-                    {studentRows.map((row, subjectIndex) => {
+                    {subjectRows.map((row, subjectIndex) => {
                       const subject = props.subjects[subjectIndex];
+
                       if (!row) {
-                        return (
-                          <td key={subject.subjectCode} colSpan={3} className="border px-1 py-1 text-center">—</td>
-                        );
+                        return <td key={subject.subjectCode} colSpan={subject.span} className="border px-1 py-1 text-center">—</td>;
+                      }
+
+                      if (subject.span === 1) {
+                        return <td key={subject.subjectCode} className="border px-1 py-1 text-center">{display(row.finalValue)}</td>;
                       }
 
                       const key = `${row.studentId}:${row.courseOfferingId}`;
@@ -211,18 +235,20 @@ export function OfficialPautaEditor(props: Props) {
                                 aria-label={`${student.studentName} — ${row.subjectName} — exame`}
                                 value={current}
                                 disabled={pending || !editable}
-                                onChange={(e) => setDrafts((d) => ({ ...d, [key]: e.target.value }))}
+                                onChange={(event) => setDrafts((state) => ({ ...state, [key]: event.target.value }))}
                                 inputMode="decimal"
                                 className="h-7 w-12 border border-black/30 bg-white text-center text-[10px] outline-none focus:ring-1 focus:ring-black disabled:bg-black/5"
                               />
                               {draft !== undefined ? (
-                                <Button size="sm" variant="ghost" className="h-6 px-1 text-[9px]" onClick={() => save(row)} disabled={pending}>Guardar</Button>
+                                <Button size="sm" variant="ghost" className="h-6 px-1 text-[9px]" onClick={() => save(row)} disabled={pending}>
+                                  Guardar
+                                </Button>
                               ) : null}
                               {row.examResultStatus === "PUBLISHED" ? (
                                 <input
                                   aria-label={`Motivo da correção — ${student.studentName} — ${row.subjectName}`}
                                   value={reasons[key] ?? ""}
-                                  onChange={(e) => setReasons((d) => ({ ...d, [key]: e.target.value }))}
+                                  onChange={(event) => setReasons((state) => ({ ...state, [key]: event.target.value }))}
                                   placeholder="Motivo"
                                   className="mt-1 h-6 w-full border border-black/20 px-1 text-[9px] print:hidden"
                                 />
@@ -235,9 +261,8 @@ export function OfficialPautaEditor(props: Props) {
                     })}
 
                     <td className="border px-2 py-1 text-center font-semibold">{display(global)}</td>
-                    <td className="border px-2 py-1 text-center font-semibold">
-                      {global == null ? "—" : hasFailed ? "Reprovado" : "Aprovado"}
-                    </td>
+                    <td className="border px-2 py-1 text-center font-semibold">{global != null && !hasFailed ? "X" : ""}</td>
+                    <td className="border px-2 py-1 text-center font-semibold">{global != null && hasFailed ? "X" : ""}</td>
                   </tr>
                 );
               })}
