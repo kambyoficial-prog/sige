@@ -13,7 +13,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
   const { id } = await params;
   const access = await getCurrentAccessContext();
   const canManage = access.memberships.some((m) => m.permissions.includes("enrollment.manage"));
-  const canManageAccess = access.memberships.some((m) => m.permissions.includes("student.access.manage"));
+  const canManageAccess = access.memberships.some((m) => m.permissions.includes("student.access.manage"));\n  const isSecretariat = access.memberships.some((m) => m.roles.some((role) => role.code === "SECRETARIAT"));
   const [profileRows, enrollmentRows, timetable] = await Promise.all([
     getStudentProfile(id),
     getStudentEnrollmentHistory(id),
@@ -25,7 +25,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
 
   return (
     <div className="space-y-8">
-      <PageHeader title={student.full_name} description={`N.º ${student.school_number}`} actions={<div className="flex gap-2">{canManage?<Link href={`/alunos/${student.id}/encarregados/novo`} className={cn(buttonVariants())}>Novo encarregado</Link>:null}<Link href="/matriculas" className={cn(buttonVariants({ variant: "outline" }))}>Ver matrículas</Link></div>} />
+      <PageHeader title={student.full_name} description={`N.º ${student.school_number}`} actions={<div className="flex flex-wrap gap-2">{canManage?<Link href={`/alunos/${student.id}/encarregados/novo`} className={cn(buttonVariants())}>Novo encarregado</Link>:null}{isSecretariat && canManage && history.length === 0 ? <Link href={`/matriculas/nova?studentId=${student.id}`} className={cn(buttonVariants({ variant: "outline" }))}>Iniciar matrícula</Link> : null}{!isSecretariat ? <Link href="/matriculas" className={cn(buttonVariants({ variant: "outline" }))}>Ver matrículas</Link> : null}</div>} />
       <section className="grid gap-4 md:grid-cols-3">
         <div className="rounded-lg border border-border bg-card p-5"><p className="text-xs text-muted-foreground">Estado</p><Badge className="mt-2" variant="secondary">{student.status}</Badge></div>
         <div className="rounded-lg border border-border bg-card p-5"><p className="text-xs text-muted-foreground">Turma atual</p><p className="mt-2 font-medium">{student.class_name ?? "Sem turma"}</p></div>
