@@ -75,9 +75,6 @@ export async function activateStudentAccessAction(input: unknown) {
         email,
         password,
         email_confirm: true,
-        user_metadata: {
-          sige_identity: "student",
-        },
       });
 
     if (authError || !auth.user) throw new Error("AUTH_USER_CREATE_FAILED");
