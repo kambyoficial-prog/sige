@@ -348,3 +348,35 @@ $$;
 
 revoke all on function public.get_receipt_document(uuid) from public;
 grant execute on function public.get_receipt_document(uuid) to authenticated;
+
+
+create or replace function public.get_finance_payment_workbench()
+returns jsonb language sql stable security definer set search_path=''
+as $$
+ select coalesce(jsonb_agg(row_to_json(x) order by x.created_at desc),'[]'::jsonb)
+ from (
+   select p.id,p.student_id,sd.school_number,sd.full_name as student_name,p.amount,p.method,p.status,p.paid_at,p.confirmed_at,
+          p.external_reference,p.notes,p.created_at,
+          coalesce((select sum(pa.amount) from public.payment_allocations pa where pa.payment_id=p.id),0) allocated_amount,
+          greatest(p.amount-coalesce((select sum(pa.amount) from public.payment_allocations pa where pa.payment_id=p.id),0),0) unallocated_amount,
+          (select r.id from public.receipts r where r.payment_id=p.id limit 1) receipt_id,
+          (select r.receipt_number from public.receipts r where r.payment_id=p.id limit 1) receipt_number,
+          (p.method <> 'CASH') as proof_required,
+          coalesce((select jsonb_agg(jsonb_build_object(
+            'id',pp.id,'original_filename',pp.original_filename,'content_type',pp.content_type,'byte_size',pp.byte_size,
+            'status',pp.status,'rejection_reason',pp.rejection_reason,'uploaded_at',pp.uploaded_at,'verified_at',pp.verified_at
+          ) order by pp.created_at desc) from public.payment_proofs pp where pp.payment_id=p.id),'[]'::jsonb) proofs,
+          coalesce((select jsonb_agg(jsonb_build_object(
+            'id',c.id,'description',c.description,'due_on',c.due_on,'amount',c.amount,
+            'allocated_amount',coalesce((select sum(pa2.amount) from public.payment_allocations pa2 where pa2.charge_id=c.id),0),
+            'remaining_amount',greatest(c.amount-coalesce((select sum(pa3.amount) from public.payment_allocations pa3 where pa3.charge_id=c.id),0),0)
+          ) order by c.due_on,c.created_at)
+          from public.charges c where c.student_id=p.student_id and c.status<>'CANCELLED'
+          and c.amount-coalesce((select sum(pa4.amount) from public.payment_allocations pa4 where pa4.charge_id=c.id),0)>0),'[]'::jsonb) charges
+   from public.payments p join public.student_directory sd on sd.id=p.student_id
+   where private.has_permission('finance.manage',p.school_id)
+ ) x;
+$$;
+
+revoke all on function public.get_finance_payment_workbench() from public;
+grant execute on function public.get_finance_payment_workbench() to authenticated;
