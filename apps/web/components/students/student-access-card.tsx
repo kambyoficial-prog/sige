@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { activateStudentAccessAction } from "@/lib/sige/student-access-actions";
 
-export function StudentAccessCard({ schoolId, studentId, schoolNumber }: { schoolId: string; studentId: string; schoolNumber: string }) {
+export function StudentAccessCard({ schoolId, studentId, schoolNumber, academicYearLabel }: { schoolId: string; studentId: string; schoolNumber: string; academicYearLabel: string | null }) {
   const [pending, setPending] = React.useState(false);
   const [credential, setCredential] = React.useState<string | null>(null);
 
@@ -39,7 +39,7 @@ export function StudentAccessCard({ schoolId, studentId, schoolNumber }: { schoo
           <p className="mt-1 text-sm text-muted-foreground">Credencial inicial para entrega ao aluno. A senha pode ser alterada pelo próprio aluno depois do acesso.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-border p-4"><p className="text-xs text-muted-foreground">Código</p><p className="mt-1 font-mono font-medium">{schoolNumber}.{new Date().getFullYear()}</p></div>
+          <div className="rounded-lg border border-border p-4"><p className="text-xs text-muted-foreground">Código</p><p className="mt-1 font-mono font-medium">{schoolNumber}.{academicYearLabel?.match(/\\d{4}/)?.[0] ?? new Date().getFullYear()}</p></div>
           <div className="rounded-lg border border-border p-4"><p className="text-xs text-muted-foreground">Palavra-passe temporária</p><p className="mt-1 font-mono font-medium break-all">{credential}</p></div>
         </div>
         <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={copyCredential}><Copy size={15} aria-hidden="true" /> Copiar senha</Button><Button variant="outline" onClick={() => window.print()}><Printer size={15} aria-hidden="true" /> Imprimir folha</Button></div>
