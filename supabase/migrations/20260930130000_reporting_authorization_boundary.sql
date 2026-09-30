@@ -62,10 +62,15 @@ begin
   elsif not exists (
     select 1
     from public.app_accounts aa
-    join public.memberships m on m.person_id=aa.person_id
+    join public.account_roles ar on ar.app_account_id=aa.id
+    join public.role_permissions rp on rp.role_id=ar.role_id
+    join public.permissions perm on perm.id=rp.permission_id
     where aa.auth_user_id=actor
       and aa.active
-      and (select private.has_permission('reports.read',m.school_id))
+      and ar.active
+      and (ar.starts_on is null or ar.starts_on <= current_date)
+      and (ar.ends_on is null or ar.ends_on >= current_date)
+      and perm.code='reports.read'
   ) then
     raise exception 'FORBIDDEN';
   end if;
