@@ -126,3 +126,35 @@ F3 é considerado implementado em código quando:
 - nenhuma password ou credencial de aluno é inventada a partir de data de nascimento.
 
 Runtime database verification: completed against the authoritative SIGE Supabase project on 2026-09-30. Browser role smoke remains pending.
+
+
+## Fluxo operacional de admissão
+
+A admissão não é uma página monolítica. O fluxo operacional é encadeado:
+
+1. **Identidade do aluno** — cria a pessoa/aluno e atribui o número escolar.
+2. **Identificação documental** — tipo + valor opcional.
+3. **Contacto e residência** — telefone, email opcional e residência.
+4. **Encarregado** — associação de uma ou mais relações familiares, com principal quando aplicável.
+5. **Transporte** — opcional e dependente do ano letivo; nunca é criado automaticamente.
+6. **Matrícula** — ano letivo, classe e tipo de entrada.
+7. **Turma** — colocação separada, sujeita às invariantes do servidor.
+8. **Credencial** — emissão separada da identidade/matrícula.
+9. **Entrega** — folha imprimível com código e senha inicial.
+10. **Primeiro acesso** — o aluno pode alterar a senha posteriormente.
+
+O frontend conduz a secretaria entre as etapas; cada comando continua sendo uma fronteira transacional própria no domínio.
+
+### Identificador escolar e credencial
+
+O número escolar não é documento civil nem senha. É atribuído pelo servidor e mantido no registo do aluno.
+
+A credencial apresentada ao aluno pode assumir o formato anual:
+
+`<número escolar>.<ano inicial do ano letivo>`
+
+Exemplo: `010361.2026`.
+
+O resolvedor de login aceita o formato anual e o número escolar puro, para compatibilidade. A senha inicial continua sendo um segredo emitido no momento da ativação; não é derivada da data de nascimento.
+
+A folha de acesso é uma representação de entrega, não uma nova entidade de identidade. A senha pode ser alterada pelo aluno depois da autenticação.
