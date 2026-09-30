@@ -459,3 +459,38 @@ comment on function private.student_has_offering_access(uuid) is 'Returns whethe
 comment on function private.student_has_class_access(uuid) is 'Returns whether the current student is actively placed in the class.';
 comment on function private.teacher_has_class_access(uuid) is 'Returns whether the current teacher teaches at least one active offering in the class.';
 comment on function private.can_read_student_record(uuid) is 'Central read boundary for student records: management, own student, or assigned teacher.';
+
+
+-- Final role-scope hardening for school-wide operation readers.
+
+drop policy if exists class_groups_read on public.class_groups;
+create policy class_groups_read on public.class_groups
+for select to authenticated
+using (
+  private.has_permission('operations.manage', school_id)
+  or private.has_permission('enrollment.read', school_id)
+  or private.has_permission('enrollment.manage', school_id)
+  or (
+    private.has_permission('operations.read', school_id)
+    and private.current_teacher_id() is null
+    and private.current_student_id() is null
+  )
+  or private.student_has_class_access(id)
+  or private.teacher_has_class_access(id)
+);
+
+drop policy if exists teachers_read on public.teachers;
+create policy teachers_read on public.teachers
+for select to authenticated
+using (
+  private.has_permission('teacher.manage', school_id)
+  or (
+    private.current_teacher_id() is null
+    and private.current_student_id() is null
+    and (
+      private.has_permission('operations.read', school_id)
+      or private.has_permission('assessment.read', school_id)
+    )
+  )
+  or id = private.current_teacher_id()
+);
