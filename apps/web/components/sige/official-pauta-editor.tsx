@@ -227,14 +227,14 @@ export function OfficialPautaEditor(props: Props) {
                     <td className="border px-2 py-1">{student.studentName}</td>
                     <td className="border px-2 py-1 text-center">{normalizeGender(student.gender)}</td>
                     <td className="border px-2 py-1 text-center">{props.className}</td>
-                    {studentRows.map((row) => {
+                    {studentRows.map((row, subjectIndex) => {
                       if (!row) {
-                        return <td key={subjects[studentRows.indexOf(row)]?.courseOfferingId ?? Math.random()} colSpan={3} className="border px-1 py-1 text-center">—</td>;
+                        return <td key={subjects[subjectIndex]?.courseOfferingId ?? `subject-${subjectIndex}`} colSpan={3} className="border px-1 py-1 text-center">—</td>;
                       }
                       const key = `${row.studentId}:${row.courseOfferingId}`;
                       const draft = drafts[key];
                       const current = draft ?? (row.examRawScore == null ? "" : String(row.examRawScore));
-                      const editable = row.assessmentStatus === "OPEN";
+                      const editable = row.assessmentStatus === "OPEN" || row.examResultStatus === "PUBLISHED";
                       return (
                         <td key={row.courseOfferingId} colSpan={3} className="border px-1 py-1">
                           <div className="grid grid-cols-3 items-center gap-1">
