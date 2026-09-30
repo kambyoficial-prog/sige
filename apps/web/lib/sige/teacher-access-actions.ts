@@ -57,6 +57,7 @@ export async function activateTeacherAccessAction(input:unknown){
     if(ue)return {ok:false as const,code:"PERSON_EMAIL_UPDATE_FAILED" as const};
   }
 
+  const originalEmail=person.email;
   let authUserId:string|undefined,accountId:string|undefined;
   try{
     const {data:invite,error:ie}=await admin.auth.admin.inviteUserByEmail(parsed.data.email);
@@ -90,6 +91,7 @@ export async function activateTeacherAccessAction(input:unknown){
   }catch(error){
     if(authUserId)await admin.auth.admin.deleteUser(authUserId).catch(()=>undefined);
     if(accountId)await admin.from("app_accounts").delete().eq("id",accountId);
+    if(!originalEmail)await admin.from("people").update({email:null}).eq("id",teacher.person_id);
     const code=error instanceof Error?error.message:"ACCOUNT_PROVISIONING_FAILED";
     return {ok:false as const,code};
   }
