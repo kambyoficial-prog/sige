@@ -164,7 +164,7 @@ export function OfficialPautaEditor(props: Props) {
                   <th key={subject.subjectCode} colSpan={3} className="border px-1 py-1 text-center">{subject.subjectName}</th>
                 ))}
                 <th rowSpan={2} className="border px-2 py-1">Média</th>
-                <th rowSpan={2} className="border px-2 py-1">Resultado Final</th>
+                <th colSpan={2} className="border px-2 py-1">RESULTADO FINAL</th>
               </tr>
               <tr>
                 {props.subjects.map((subject) => (
