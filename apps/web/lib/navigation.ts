@@ -21,22 +21,22 @@ export const navigationSections: NavigationSection[] = [
   {
     label: "Matrícula e inscrição",
     items: [
-      { label: "Matrículas", href: "/matriculas", permission: "enrollment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT"] },
-      { label: "Inscrições", href: "/inscricoes", permission: "enrollment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT"] },
+      { label: "Matrículas", href: "/matriculas", permission: "enrollment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION"] },
+      { label: "Inscrições", href: "/inscricoes", permission: "enrollment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION"] },
     ],
   },
   {
     label: "Pedagógico",
     items: [
-      { label: "Turmas", href: "/turmas", permission: "operations.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT", "TEACHER", "STUDENT"] },
-      { label: "Notas", href: "/notas", permission: "assessment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT", "TEACHER", "STUDENT"] },
-      { label: "Pautas", href: "/pautas", permission: "assessment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT", "TEACHER"] },
+      { label: "Notas", href: "/notas", permission: "assessment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "TEACHER", "STUDENT"] },
+      { label: "Pautas", href: "/pautas", permission: "assessment.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "TEACHER"] },
       { label: "Exames", href: "/exames", permission: "assessment.manage", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION"] },
     ],
   },
   {
     label: "Operações",
     items: [
+      { label: "Turmas", href: "/turmas", permission: "operations.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT", "TEACHER", "STUDENT"] },
       { label: "Horários", href: "/horarios", permission: "operations.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT", "TEACHER", "STUDENT"] },
       { label: "Livro de ponto", href: "/livro-de-ponto", permission: "operations.read", roles: ["DIRECTION", "SECRETARIAT", "TEACHER"] },
     ],
