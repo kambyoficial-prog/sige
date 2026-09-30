@@ -16,7 +16,7 @@ import { placeStudentAction } from "@/lib/sige/enrollment-actions";
 const schema=z.object({enrollmentId:z.string().uuid(),classGroupId:z.string().uuid("Selecione a turma."),startsOn:z.string().min(10),reason:z.string().max(240).optional()});
 type Values=z.infer<typeof schema>;
 
-export function PlacementForm({enrollmentId,studentId,classes}:{enrollmentId:string;studentId:string;classes:Array<{id:string;name:string|null;section_code:string;status:string;student_count:number;capacity:number|null}>}) {
+export function PlacementForm({enrollmentId,studentId,classes}:{enrollmentId:string;studentId:string;classes:Array<{id:string;name:string|null;section_code:string;status:string;student_count:number;capacity:number|null;pathway_id:string|null;pathway_name:string|null}>}) {
   const router=useRouter(); const [pending,startTransition]=useTransition();
   const form=useForm<Values>({resolver:zodResolver(schema),defaultValues:{enrollmentId,startsOn:new Date().toISOString().slice(0,10),classGroupId:""}});
   function submit(values:Values){startTransition(async()=>{const r=await placeStudentAction(values);if(!r.ok){toast.error(errorMessage(r.code as never));return;}toast.success("Aluno colocado na turma.");router.push(`/alunos/${studentId}?acesso=emitir`);});}
