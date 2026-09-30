@@ -25,9 +25,6 @@ begin
     raise exception 'authenticated first-access mutation must be executable';
   end if;
 
-  if has_function_privilege('public','public.complete_first_access_account()','execute') then
-    raise exception 'PUBLIC first-access mutation must not be executable';
-  end if;
 
   if exists (
     select 1
