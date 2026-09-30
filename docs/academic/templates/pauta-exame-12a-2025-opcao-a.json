@@ -1,0 +1,119 @@
+{
+  "document_type": "PAUTA_EXAME",
+  "reference_year": "2025",
+  "grade": "12",
+  "pathway": {
+    "code": "A",
+    "label": "OPÇÃO A"
+  },
+  "paper": {
+    "size": "A4",
+    "orientation": "landscape",
+    "pages": 1
+  },
+  "subject_order": [
+    [
+      "P",
+      "Português"
+    ],
+    [
+      "I",
+      "Inglês"
+    ],
+    [
+      "FIL",
+      "Filosofia"
+    ],
+    [
+      "MAT",
+      "Matemática"
+    ],
+    [
+      "FRA",
+      "Francês"
+    ],
+    [
+      "HIS",
+      "História"
+    ],
+    [
+      "GEO",
+      "Geografia"
+    ],
+    [
+      "TIC",
+      "Tecnologias de Informação e Comunicação"
+    ],
+    [
+      "NE",
+      "Noções de Empreendedorismo"
+    ],
+    [
+      "EF",
+      "Educação Física"
+    ]
+  ],
+  "subject_result_columns": [
+    "frequency",
+    "exam_1_or_2",
+    "final"
+  ],
+  "student_columns": [
+    "order_number",
+    "student_code",
+    "student_name",
+    "gender",
+    "origin_class"
+  ],
+  "final_columns": [
+    "approval",
+    "failure"
+  ],
+  "approval_area": [
+    "director_homologation",
+    "publication_date"
+  ],
+  "footer": [
+    "exam_council_signature",
+    "legend",
+    "observations",
+    "exam_council_president_signature"
+  ],
+  "special_marks": {
+    "c)": "COMPLETED",
+    "d)": "NOT_TAKING",
+    "Exc": "EXCLUDED",
+    "A": "ABSENT",
+    "F": "FRAUD"
+  },
+  "statistics": {
+    "grade_bands": [
+      "0-5.9",
+      "6-8.9",
+      "9-13.9",
+      "14-16.9",
+      "17-20"
+    ],
+    "sex_buckets": [
+      "M",
+      "H",
+      "HM"
+    ],
+    "summary": [
+      "PLANNED",
+      "ASSESSED",
+      "POSITIVE",
+      "POSITIVE_PERCENTAGE"
+    ],
+    "exam_bands": [
+      "0-9",
+      "10-13",
+      "14-20"
+    ],
+    "exam_epochs": [
+      "1",
+      "2"
+    ]
+  },
+  "notes": "Reference template only. Normative meaning of special classifications and current applicability must be confirmed with the school."
+}
