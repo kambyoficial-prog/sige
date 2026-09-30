@@ -336,7 +336,7 @@ export async function GET(request: NextRequest) {
           : 'COUNTIFS($D$' + firstDataRow + ':$D$' + lastDataRow + ',"' + gender + '",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',">=' + min + '",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',"<=' + max + '")';
 
         sheet.getCell(row, cols.first).value = { formula: firstFormula };
-        sheet.getCell(row, cols.second).value = { formula: "COUNTIFS(" + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=" + min + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=" + max + "\")" };
+        sheet.getCell(row, cols.second).value = { formula: gender === "HM" ? "COUNTIFS(" + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=" + min + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=" + max + "\")" : "COUNTIFS($D$" + firstDataRow + ":$D$" + lastDataRow + ",\"" + gender + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=" + min + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=" + max + "\")" };
         sheet.getCell(row, cols.total).value = { formula: sheet.getCell(row, cols.first).address + "+" + sheet.getCell(row, cols.second).address };
       }
 
@@ -383,7 +383,7 @@ export async function GET(request: NextRequest) {
 
         if (metric === "Previstos") {
           sheet.getCell(row, cols.first).value = { formula: frequencyFormula };
-          sheet.getCell(row, cols.second).value = { formula: secondEvaluatedFormula };
+          sheet.getCell(row, cols.second).value = { formula: "0" };
           sheet.getCell(row, cols.total).value = { formula: sheet.getCell(row, cols.first).address + "+" + sheet.getCell(row, cols.second).address };
         } else if (metric === "Avaliados") {
           sheet.getCell(row, cols.first).value = { formula: evaluatedFormula };
@@ -422,11 +422,11 @@ export async function GET(request: NextRequest) {
       ? 'COUNTA(D' + firstDataRow + ':D' + lastDataRow + ')'
       : 'COUNTIF(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '")' };
     sheet.getCell(summaryRow, 3).value = { formula: gender === "HM"
-      ? 'COUNT(${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ')'
-      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ',">=0")' };
+      ? 'COUNT(' + sheet.getColumn(averageColumn).letter + firstDataRow + ':' + sheet.getColumn(averageColumn).letter + lastDataRow + ')'
+      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",' + sheet.getColumn(averageColumn).letter + firstDataRow + ':' + sheet.getColumn(averageColumn).letter + lastDataRow + ',">=0")' };
     sheet.getCell(summaryRow, 4).value = { formula: gender === "HM"
-      ? 'COUNTIF(${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ',">=10")'
-      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ',">=10")' };
+      ? 'COUNTIF(' + sheet.getColumn(averageColumn).letter + firstDataRow + ':' + sheet.getColumn(averageColumn).letter + lastDataRow + ',">=10")'
+      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",' + sheet.getColumn(averageColumn).letter + firstDataRow + ':' + sheet.getColumn(averageColumn).letter + lastDataRow + ',">=10")' };
     sheet.getCell(summaryRow, 5).value = { formula: 'IFERROR(D' + summaryRow + '/C' + summaryRow + '*100,"")' };
     ["Inscritos", "Examinados", "Positivos", "% Positivos"].forEach((label, index) => {
       if (index === 0) sheet.getCell(summaryStart, index + 2).value = label;
