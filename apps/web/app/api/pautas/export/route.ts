@@ -78,7 +78,7 @@ export async function GET(request: NextRequest) {
       result,
     ]),
   );
-  const examRows = gradebook.filter((row) => row.type === "EXAM");
+  const examRows = gradebook.filter((row) => row.type === "EX${AVG_COLUMN}");
 
   const workbook = new ExcelJS.Workbook();
   workbook.creator = "SIGE";
@@ -104,7 +104,7 @@ export async function GET(request: NextRequest) {
   });
 
   sheet.mergeCells("A1:AO1");
-  sheet.getCell("A1").value = "REPÚBLICA DE MOÇAMBIQUE";
+  sheet.getCell("A1").value = "REPÚBLICA DE MOÇ${AVG_COLUMN}BIQUE";
   sheet.getCell("A1").font = { bold: true, size: 11 };
   sheet.getCell("A1").alignment = center;
 
@@ -127,7 +127,7 @@ export async function GET(request: NextRequest) {
   sheet.getCell("A5").alignment = center;
 
   sheet.mergeCells("A6:AO6");
-  sheet.getCell("A6").value = "PAUTA DE EXAME · " + year.label;
+  sheet.getCell("A6").value = "PAUTA DE EX${AVG_COLUMN}E · " + year.label;
   sheet.getCell("A6").font = { bold: true };
   sheet.getCell("A6").alignment = center;
 
@@ -176,6 +176,8 @@ export async function GET(request: NextRequest) {
   const averageColumn = column;
   const approvedColumn = column + 1;
   const failedColumn = column + 2;
+  const secondExamColumns = new Map(coreColumns.map((subject, index) => [subject.code, failedColumn + 1 + index]));
+  for (const hiddenColumn of secondExamColumns.values()) sheet.getColumn(hiddenColumn).hidden = true;
 
   sheet.mergeCells(headerRow, averageColumn, subHeaderRow, averageColumn);
   sheet.getCell(headerRow, averageColumn).value = "Média";
@@ -231,6 +233,8 @@ export async function GET(request: NextRequest) {
 
       sheet.getCell(rowNumber, subject.frequency).value = numberOrNull(frequencyResult?.display_value);
       sheet.getCell(rowNumber, subject.exam).value = exam.first ?? exam.second;
+      const secondExamColumn = secondExamColumns.get(subject.code);
+      if (secondExamColumn) sheet.getCell(rowNumber, secondExamColumn).value = exam.second;
 
       const frequencyAddress = sheet.getCell(rowNumber, subject.frequency).address;
       const examAddress = sheet.getCell(rowNumber, subject.exam).address;
@@ -271,7 +275,7 @@ export async function GET(request: NextRequest) {
 
   const mapStart = lastDataRow + 4;
   sheet.mergeCells(mapStart, 1, mapStart, failedColumn);
-  sheet.getCell(mapStart, 1).value = "MAPA DE APROVEITAMENTO PEDAGÓGICO";
+  sheet.getCell(mapStart, 1).value = "MAPA DE APROVEIT${AVG_COLUMN}ENTO PEDAGÓGICO";
   sheet.getCell(mapStart, 1).font = { bold: true, size: 10 };
   sheet.getCell(mapStart, 1).alignment = center;
 
@@ -322,6 +326,7 @@ export async function GET(request: NextRequest) {
       for (const subject of coreColumns) {
         const cols = mapSubjectColumns.get(subject.code)!;
         const examColumn = sheet.getColumn(subject.exam).letter;
+        const secondExamColumn = sheet.getColumn(secondExamColumns.get(subject.code)!).letter;
         const genderClause = gender === "HM"
           ? ""
           : '$D$' + firstDataRow + ':$D$' + lastDataRow + ',"' + gender + '",';
@@ -331,7 +336,7 @@ export async function GET(request: NextRequest) {
           : 'COUNTIFS($D$' + firstDataRow + ':$D$' + lastDataRow + ',"' + gender + '",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',">=' + min + '",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',"<=' + max + '")';
 
         sheet.getCell(row, cols.first).value = { formula: firstFormula };
-        sheet.getCell(row, cols.second).value = { formula: "0" };
+        sheet.getCell(row, cols.second).value = { formula: "COUNTIFS(" + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=" + min + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=" + max + "\")" };
         sheet.getCell(row, cols.total).value = { formula: sheet.getCell(row, cols.first).address + "+" + sheet.getCell(row, cols.second).address };
       }
 
@@ -356,6 +361,7 @@ export async function GET(request: NextRequest) {
         const cols = mapSubjectColumns.get(subject.code)!;
         const frequencyColumn = sheet.getColumn(subject.frequency).letter;
         const examColumn = sheet.getColumn(subject.exam).letter;
+        const secondExamColumn = sheet.getColumn(secondExamColumns.get(subject.code)!).letter;
 
         const frequencyFormula = gender === "HM"
           ? 'COUNTIFS(' + frequencyColumn + firstDataRow + ':' + frequencyColumn + lastDataRow + ',"<=20")'
@@ -365,21 +371,27 @@ export async function GET(request: NextRequest) {
           ? 'COUNTIFS(' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',">=0",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',"<=20")'
           : 'COUNTIFS($D$' + firstDataRow + ':$D$' + lastDataRow + ',"' + gender + '",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',">=0",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',"<=20")';
 
+        const secondEvaluatedFormula = gender === "HM"
+          ? "COUNTIFS(" + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=0\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")"
+          : "COUNTIFS($D$" + firstDataRow + ":$D$" + lastDataRow + ",\"" + gender + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=0\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")";
+        const secondPositiveFormula = gender === "HM"
+          ? "COUNTIFS(" + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=10\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")"
+          : "COUNTIFS($D$" + firstDataRow + ":$D$" + lastDataRow + ",\"" + gender + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=10\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")";
         const positiveFormula = gender === "HM"
           ? 'COUNTIFS(' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',">=10",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',"<=20")'
           : 'COUNTIFS($D$' + firstDataRow + ':$D$' + lastDataRow + ',"' + gender + '",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',">=10",' + examColumn + firstDataRow + ':' + examColumn + lastDataRow + ',"<=20")';
 
         if (metric === "Previstos") {
           sheet.getCell(row, cols.first).value = { formula: frequencyFormula };
-          sheet.getCell(row, cols.second).value = { formula: "0" };
+          sheet.getCell(row, cols.second).value = { formula: secondEvaluatedFormula };
           sheet.getCell(row, cols.total).value = { formula: sheet.getCell(row, cols.first).address + "+" + sheet.getCell(row, cols.second).address };
         } else if (metric === "Avaliados") {
           sheet.getCell(row, cols.first).value = { formula: evaluatedFormula };
-          sheet.getCell(row, cols.second).value = { formula: "0" };
+          sheet.getCell(row, cols.second).value = { formula: gender === "HM" ? "COUNTIFS(" + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=0\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")" : "COUNTIFS($D$" + firstDataRow + ":$D$" + lastDataRow + ",\"" + gender + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=0\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")" };
           sheet.getCell(row, cols.total).value = { formula: sheet.getCell(row, cols.first).address + "+" + sheet.getCell(row, cols.second).address };
         } else if (metric === "Positivos") {
           sheet.getCell(row, cols.first).value = { formula: positiveFormula };
-          sheet.getCell(row, cols.second).value = { formula: "0" };
+          sheet.getCell(row, cols.second).value = { formula: gender === "HM" ? "COUNTIFS(" + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=10\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")" : "COUNTIFS($D$" + firstDataRow + ":$D$" + lastDataRow + ",\"" + gender + "\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\">=10\"," + secondExamColumn + firstDataRow + ":" + secondExamColumn + lastDataRow + ",\"<=20\")" };
           sheet.getCell(row, cols.total).value = { formula: sheet.getCell(row, cols.first).address + "+" + sheet.getCell(row, cols.second).address };
         } else {
           sheet.getCell(row, cols.first).value = {
@@ -410,11 +422,11 @@ export async function GET(request: NextRequest) {
       ? 'COUNTA(D' + firstDataRow + ':D' + lastDataRow + ')'
       : 'COUNTIF(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '")' };
     sheet.getCell(summaryRow, 3).value = { formula: gender === "HM"
-      ? 'COUNT(AM' + firstDataRow + ':AM' + lastDataRow + ')'
-      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",AM' + firstDataRow + ':AM' + lastDataRow + ',">=0")' };
+      ? 'COUNT(${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ')'
+      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ',">=0")' };
     sheet.getCell(summaryRow, 4).value = { formula: gender === "HM"
-      ? 'COUNTIF(AM' + firstDataRow + ':AM' + lastDataRow + ',">=10")'
-      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",AM' + firstDataRow + ':AM' + lastDataRow + ',">=10")' };
+      ? 'COUNTIF(${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ',">=10")'
+      : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",${AVG_COLUMN}' + firstDataRow + ':${AVG_COLUMN}' + lastDataRow + ',">=10")' };
     sheet.getCell(summaryRow, 5).value = { formula: 'IFERROR(D' + summaryRow + '/C' + summaryRow + '*100,"")' };
     ["Inscritos", "Examinados", "Positivos", "% Positivos"].forEach((label, index) => {
       if (index === 0) sheet.getCell(summaryStart, index + 2).value = label;
