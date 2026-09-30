@@ -1,5 +1,5 @@
-import { redirect } from "next/navigation";
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/ui/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import {
@@ -7,6 +7,8 @@ import {
   getAcademicYearOptions,
   getAssessmentGradebook,
   getClassGroupDirectory,
+  getClassGroupStudents,
+  getCourseOfferings,
   getStudentDirectory,
 } from "@/lib/sige/queries";
 import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
@@ -22,7 +24,11 @@ export default async function PautasPage({
   const year = years.find((item) => item.status === "OPEN") ?? years[0];
   const classes = year ? await getClassGroupDirectory(year.id) : [];
   const { supabase } = await requireAuthenticatedServerClient();
-  const { data: pathways } = await supabase.from("academic_pathways").select("id,name,code").eq("active", true).order("code");
+  const { data: pathways } = await supabase
+    .from("academic_pathways")
+    .select("id,name,code")
+    .eq("active", true)
+    .order("code");
   const pathwayMap = new Map((pathways ?? []).map((pathway) => [pathway.id, pathway.name]));
 
   if (!params.classGroupId) {
@@ -59,14 +65,40 @@ export default async function PautasPage({
   if (!selectedClass) redirect("/pautas");
 
   const pathwayName = selectedClass.pathway_id ? pathwayMap.get(selectedClass.pathway_id) ?? null : null;
-  const [gradebook, publishedResults, students, schoolResult] = await Promise.all([
+  const [gradebook, publishedResults, students, roster, courseOfferings, schoolResult] = await Promise.all([
     getAssessmentGradebook({ class_group_id: params.classGroupId }),
     getAcademicResultPauta({ class_group_id: params.classGroupId }),
     getStudentDirectory(),
+    getClassGroupStudents(params.classGroupId),
+    getCourseOfferings(params.classGroupId),
     supabase.from("schools").select("name").eq("active", true).order("created_at").limit(1).maybeSingle(),
   ]);
 
-  const examRows = gradebook.filter((row) => row.type === "EXAM");\n  const pathwayCode = pathwayName?.match(/Grupo ([ABC])/i)?.[1]?.toUpperCase() ?? "";\n  const officialSubjects = pathwayCode === "A"\n    ? [\n        ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],\n        ["FRA", "Francês", 3], ["HIS", "História", 3], ["GEO", "Geografia", 3], ["TIC", "TICs", 1],\n        ["NE", "N.E", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],\n      ] as const\n    : pathwayCode === "B"\n      ? [\n          ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],\n          ["BIO", "Biologia", 3], ["QUI", "Química", 3], ["FIS", "Física", 3], ["TIC", "TICs", 1],\n          ["AGP", "AGP", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],\n        ] as const\n      : courseOfferings.map((item) => [item.subject_code, item.subject_name, 3] as const);\n  const subjectByCode = new Map(courseOfferings.map((item) => [item.subject_code, item]));\n  const officialPautaSubjects = officialSubjects.map(([code, name, span]) => ({\n    subjectCode: code,\n    subjectName: name,\n    span,\n    courseOfferingId: subjectByCode.get(code)?.id ?? null,\n  }));
+  const examRows = gradebook.filter((row) => row.type === "EXAM");
+  const pathwayCode = pathwayName?.match(/Grupo ([ABC])/i)?.[1]?.toUpperCase() ?? "";
+
+  const officialSubjects = pathwayCode === "A"
+    ? [
+        ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],
+        ["FRA", "Francês", 3], ["HIS", "História", 3], ["GEO", "Geografia", 3], ["TIC", "TICs", 1],
+        ["NE", "N.E", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],
+      ] as const
+    : pathwayCode === "B"
+      ? [
+          ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],
+          ["BIO", "Biologia", 3], ["QUI", "Química", 3], ["FIS", "Física", 3], ["TIC", "TICs", 1],
+          ["AGP", "AGP", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],
+        ] as const
+      : courseOfferings.map((item) => [item.subject_code, item.subject_name, 3] as const);
+
+  const subjectByCode = new Map(courseOfferings.map((item) => [item.subject_code, item]));
+  const officialPautaSubjects = officialSubjects.map(([code, name, span]) => ({
+    subjectCode: code,
+    subjectName: name,
+    span,
+    courseOfferingId: subjectByCode.get(code)?.id ?? null,
+  }));
+
   const studentMap = new Map(students.map((student) => [student.id, student]));
   const resultMap = new Map(
     publishedResults.map((result) => [
@@ -79,6 +111,7 @@ export default async function PautasPage({
     const student = studentMap.get(row.student_id);
     const frequency = resultMap.get(`${row.student_id}:${row.course_offering_id}:FREQUENCY`);
     const final = resultMap.get(`${row.student_id}:${row.course_offering_id}:FINAL`);
+
     return {
       studentId: row.student_id,
       studentNumber: row.student_number,
@@ -97,6 +130,13 @@ export default async function PautasPage({
       finalValue: final?.display_value ?? null,
     };
   });
+
+  const pautaStudents = roster.map((student) => ({
+    studentId: student.student_id,
+    studentNumber: student.school_number,
+    studentName: student.student_name,
+    gender: studentMap.get(student.student_id)?.gender ?? null,
+  }));
 
   return (
     <div className="space-y-6">
@@ -119,16 +159,17 @@ export default async function PautasPage({
 
       {!rows.length ? (
         <div className="rounded-xl border p-8 text-sm text-muted-foreground">
-          Ainda não existem avaliações de exame para esta turma. A pauta oficial será preenchida automaticamente quando as avaliações forem criadas.
+          Ainda não existem avaliações de exame para esta turma. A estrutura oficial da pauta já está definida e será preenchida quando as avaliações forem criadas.
         </div>
       ) : (
         <OfficialPautaEditor
           schoolName={schoolResult.data?.name ?? "Escola Secundária"}
           province="Província"
           academicYear={year?.label ?? ""}
-          gradeName={selectedClass.grade_level_name}
           className={selectedClass.name ?? selectedClass.section_code}
           pathwayName={pathwayName}
+          subjects={officialPautaSubjects}
+          students={pautaStudents}
           rows={rows}
         />
       )}
