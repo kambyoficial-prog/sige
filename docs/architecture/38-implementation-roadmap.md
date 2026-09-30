@@ -1,15 +1,17 @@
 # 38 — SIGE implementation roadmap
 
 ## Status
-Approved execution roadmap — 2026-09-29.
+Approved execution roadmap — 2026-09-30. R0 stabilization is now the active gate.
 
 This is the execution control document for the product. It prevents isolated screens, duplicated workflows and UI work unsupported by the domain model.
 
 ## Current baseline
 
 - Backend/domain: school domain, academic lifecycle, curriculum, assessment, timetable, finance, authorization and application-contract layers are already substantially defined.
-- Frontend: Next.js application is currently a minimal shell; design architecture is documented, but the runtime/design-system foundation is not implemented.
-- External dependencies: the SIGE Supabase project is not connected here. The currently connected Supabase project belongs to another product and must not be used for SIGE.
+- Frontend: Next.js application, shell, operational primitives, access boundary and domain surfaces are implemented; current work is integration/runtime stabilization.
+- Supabase: the authoritative SIGE project is connected and has the academic, finance and security schema plus DEMO fixtures.
+- Vercel: SIGE has a production project. The previous production commit was READY, while current main commit 194b82c is ERROR during build; release is blocked.
+- Current priority: stabilize existing architecture before adding product modules.
 
 ## Execution model
 
@@ -23,6 +25,7 @@ No placeholder data may masquerade as production data.
 
 | Block | Scope | Main output | Gate |
 |---|---|---|---|
+| R0 | Stabilization & integration gate | build, Server/Client boundaries, auth, grants, RLS, runtime, deployment | production build + runtime baseline green |
 | F0 | Design-system/runtime foundation | tokens, theme, primitives, shell foundation, accessibility baseline | web compiles + visual verification |
 | F1 | Authentication & access context | login, callback, session boundary, capability-derived shell | real auth contract + protected routes | Implemented; runtime auth verification pending SIGE Supabase |
 | F2 | Operational primitives | tables, filters, pagination, forms, dialogs, errors, empty/loading states | reusable patterns proven on real queries | Implemented baseline; runtime verification pending |
@@ -48,6 +51,27 @@ No placeholder data may masquerade as production data.
 - no client-side business-rule duplication;
 - generated database types after SIGE database connection;
 - migration/test verification on an authorized PostgreSQL/Supabase environment.
+
+## R0 — Stabilization & integration gate
+
+Status: ACTIVE. No new product module should be started until this gate is green.
+
+Verified work items:
+- Current main production deployment is failing at the Vercel build step.
+- Current database lacked SELECT privilege for authenticated on student_registrations.
+- The student_enrollments read policy had a teacher-access path that queried the same relation through a helper, creating an RLS recursion path.
+- Current database privileges for has_permission and charge_effective_amount are already present; do not widen them blindly based on historical runtime errors.
+- directory-table is already a Client Component; historical function-serialization errors must be re-verified against a fresh deployment before changing its architecture.
+
+R0 closure sequence:
+1. deterministic repository build;
+2. Server/Client boundary verification;
+3. authentication/session verification;
+4. PostgreSQL grants and RLS verification;
+5. role-based runtime smoke matrix;
+6. fresh Vercel production deployment;
+7. browser verification;
+8. resume F3/F4 homologation.
 
 ## F0 — Design-system/runtime foundation
 

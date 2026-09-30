@@ -5,6 +5,8 @@ import { getCurrentAccessContext } from "@/lib/sige/access";
 import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
+export const dynamic = "force-dynamic";
+
 export default async function AuthenticatedLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   let access;
   try {
