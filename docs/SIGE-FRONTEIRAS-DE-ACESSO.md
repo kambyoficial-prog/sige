@@ -51,6 +51,7 @@ Consequências:
 
 - consulta apenas as turmas onde possui uma atribuição ativa;
 - consulta os alunos pertencentes ao seu contexto pedagógico;
+- não recebe automaticamente BI/identificadores, dados de encarregados ou outros dados administrativos do aluno;
 - lança avaliação apenas nas próprias ofertas, segundo assessment.own.enter;
 - consulta resultados apenas das suas ofertas/alunos;
 - vê o próprio horário;
