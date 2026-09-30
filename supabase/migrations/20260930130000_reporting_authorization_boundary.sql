@@ -53,9 +53,18 @@ begin
   end if;
 
   if p_report='report_finance_summary' then
-    if not (
-      (select private.has_permission('finance.read',s.school_id))
-      or (select private.has_permission('finance.manage',s.school_id))
+    if not exists (
+      select 1
+      from public.app_accounts aa
+      join public.account_roles ar on ar.app_account_id=aa.id
+      join public.role_permissions rp on rp.role_id=ar.role_id
+      join public.permissions perm on perm.id=rp.permission_id
+      where aa.auth_user_id=actor
+        and aa.active
+        and ar.active
+        and (ar.starts_on is null or ar.starts_on <= current_date)
+        and (ar.ends_on is null or ar.ends_on >= current_date)
+        and perm.code in ('finance.read','finance.manage')
     ) then
       raise exception 'FORBIDDEN';
     end if;
