@@ -16,7 +16,7 @@ const paymentSchema = z.object({
 const confirmSchema = z.object({ paymentId: z.string().uuid() });
 const allocationSchema = z.object({ paymentId: z.string().uuid(), chargeId: z.string().uuid(), amount: z.coerce.number().positive() });
 const reversalSchema = z.object({ paymentId: z.string().uuid(), reason: z.string().min(3).max(1000) });
-const receiptSchema = z.object({ paymentId: z.string().uuid(), receiptNumber: z.string().min(1).max(100) });
+const receiptSchema = z.object({ paymentId: z.string().uuid(), receiptNumber: z.string().max(100).default("AUTO") });
 
 export async function recordPaymentAction(input: unknown) {
   try { const value=paymentSchema.parse(input); return await executeCommand("record_payment",{...value,idempotencyKey:crypto.randomUUID()}); }
