@@ -1,7 +1,7 @@
 # R0 — Stabilization & Integration Closeout
 
 Date: 2026-09-30
-Branch: fix/r0-stabilization-boundaries
+Status: infrastructure/application stabilization closed; authenticated browser smoke remains an external verification step because Vercel Deployment Protection blocks the available HTTP/browser connector surface.
 
 ## Purpose
 
@@ -9,8 +9,9 @@ R0 is the integration gate between the implemented SIGE domain/application archi
 
 ## Verified baseline
 
-- GitHub main: 194b82c4b81894a57785a32cfa69e634bfe5efc7.
-- Vercel production for that commit: ERROR at buildStep.
+- R0 merge commit on main: a812dee3884022d3e54d55b78a852088aaa83c24.
+- Vercel production deployment for the R0 merge: READY.
+- R0 preview deployment for the final fix commit: READY.
 - Previous production commit 9777545ca54aa001ebe9cb280cc5584058e178d6: READY.
 - Authoritative Supabase project: pfnxvhwpbvlshjjdwbtj.
 - RLS remains enabled on critical academic and finance relations.
@@ -44,24 +45,33 @@ The following errors were observed in earlier deployments and must not be treate
 
 Current PostgreSQL privilege inspection confirms authenticated EXECUTE for has_permission and charge_effective_amount.
 
-## R0 exit criteria
+## R0 verification evidence
 
-All must be true:
+### Automated quality gate
 
-- [ ] GitHub CI green.
-- [ ] Vercel production build READY.
-- [ ] No new RSC serialization errors.
-- [ ] No RLS recursion errors.
-- [ ] No unexpected function/table privilege errors.
-- [ ] Login/session/access-context verified.
-- [ ] Direction smoke flow verified.
-- [ ] Secretariat smoke flow verified.
-- [ ] Teacher smoke flow verified.
-- [ ] Critical academic read/write flows verified.
-- [ ] Browser smoke on production.
-- [ ] Roadmap and release evidence synchronized.
+- [x] GitHub CI: lint, typecheck, tests and production build all passed on commit 83469a6d713181bde22880d2e5fe83f22d5cdea0.
+- [x] Vercel preview: READY on the same final fix commit.
+- [x] Vercel production: READY on merge commit a812dee3884022d3e54d55b78a852088aaa83c24.
+- [x] Production runtime error scan: no runtime errors in the verification window.
+- [x] Preview runtime error scan: no runtime errors in the verification window.
 
-Only after this gate do we resume F3/F4/F5/F6 product homologation.
+### Database authorization gate
+
+- [x] student_registrations SELECT is granted to authenticated.
+- [x] has_permission EXECUTE is granted to authenticated.
+- [x] charge_effective_amount EXECUTE is granted to authenticated.
+- [x] teacher_has_student_access EXECUTE is granted to authenticated.
+- [x] RLS remains enabled on student_enrollments and student_registrations.
+- [x] student_enrollments.enrollments_read no longer derives teacher access by querying student_enrollments recursively.
+
+### Application/runtime gate
+
+- [x] Root production request returns HTTP 200 and the expected unauthenticated redirect to /login.
+- [x] No current RSC serialization error observed in the final deployment.
+- [x] No current RLS recursion or privilege error observed in the final deployment.
+- [ ] Authenticated browser smoke for Direction, Secretariat and Teacher still requires a browser session that can pass the project's Vercel Deployment Protection. The available connector surface can inspect the deployment and runtime but cannot establish that browser cookie/session, so this item is intentionally not marked complete.
+
+R0 infrastructure/application stabilization is closed. Product homologation resumes only after the authenticated role smoke is performed in a browser-capable environment; it is not being inferred from build success.
 
 ## Non-goals
 
