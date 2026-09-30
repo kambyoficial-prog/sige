@@ -18,6 +18,6 @@ export const navigationSections: NavigationSection[] = [
     { label: "Pautas", href: "/pautas", permission: "assessment.read" }, { label: "Exames", href: "/exames", permission: "assessment.manage" },
   ] },
   { label: "Operações", items: [{ label: "Horários", href: "/horarios", permission: "operations.read" }, { label: "Livro de ponto", href: "/livro-de-ponto", permission: "operations.read" }] },
-  { label: "Financeiro", items: [{ label: "Propinas", href: "/financeiro/propinas", permission: "finance.read" }, { label: "Pagamentos", href: "/financeiro/pagamentos", permission: "finance.read" }, { label: "Saldos", href: "/financeiro/saldos", permission: "finance.read" }] },
+  { label: "Financeiro", items: [{ label: "Propinas", href: "/financeiro/propinas", permission: "finance.read" }, { label: "Pagamentos", href: "/financeiro/pagamentos", permission: "finance.read" }, { label: "Saldos", href: "/financeiro/saldos", permission: "finance.read" }, { label: "Configuração", href: "/financeiro/configuracao", permission: "finance.manage" }] },
   { label: "Relatórios", items: [{ label: "Relatórios", href: "/relatorios" }] },
 ];
