@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Copy, KeyRound, Loader2 } from "lucide-react";
+import { Copy, KeyRound, Loader2, Printer } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { activateStudentAccessAction } from "@/lib/sige/student-access-actions";
@@ -36,13 +36,13 @@ export function StudentAccessCard({ schoolId, studentId, schoolNumber }: { schoo
       <div className="rounded-xl border border-border bg-card p-6 space-y-4">
         <div>
           <div className="flex items-center gap-2 font-semibold"><KeyRound size={17} aria-hidden="true" /> Acesso criado</div>
-          <p className="mt-1 text-sm text-muted-foreground">Entregue esta credencial directamente ao aluno. Ela é apresentada apenas nesta sessão.</p>
+          <p className="mt-1 text-sm text-muted-foreground">Credencial inicial para entrega ao aluno. A senha pode ser alterada pelo próprio aluno depois do acesso.</p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
-          <div className="rounded-lg border border-border p-4"><p className="text-xs text-muted-foreground">Código</p><p className="mt-1 font-mono font-medium">{schoolNumber}</p></div>
+          <div className="rounded-lg border border-border p-4"><p className="text-xs text-muted-foreground">Código</p><p className="mt-1 font-mono font-medium">{schoolNumber}.{new Date().getFullYear()}</p></div>
           <div className="rounded-lg border border-border p-4"><p className="text-xs text-muted-foreground">Palavra-passe temporária</p><p className="mt-1 font-mono font-medium break-all">{credential}</p></div>
         </div>
-        <Button variant="outline" onClick={copyCredential}><Copy size={15} aria-hidden="true" /> Copiar palavra-passe</Button>
+        <div className="flex flex-wrap gap-2"><Button variant="outline" onClick={copyCredential}><Copy size={15} aria-hidden="true" /> Copiar senha</Button><Button variant="outline" onClick={() => window.print()}><Printer size={15} aria-hidden="true" /> Imprimir folha</Button></div>
       </div>
     );
   }
