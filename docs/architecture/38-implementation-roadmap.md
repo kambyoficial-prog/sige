@@ -10,7 +10,7 @@ This is the execution control document for the product. It prevents isolated scr
 - Backend/domain: school domain, academic lifecycle, curriculum, assessment, timetable, finance, authorization and application-contract layers are already substantially defined.
 - Frontend: Next.js application, shell, operational primitives, access boundary and domain surfaces are implemented; current work is integration/runtime stabilization.
 - Supabase: the authoritative SIGE project is connected and has the academic, finance and security schema plus DEMO fixtures.
-- Vercel: SIGE has a production project. The previous production commit was READY, while current main commit 194b82c is ERROR during build; release is blocked.
+- Vercel: SIGE has a production project. The current production deployment for main commit 132e0dd is READY. Main has since received documentation-only closeout changes; no application/database behavior was changed by those commits.
 - Current priority: execute the single remaining Gate B authenticated browser smoke across Direction, Secretariat and Teacher. F3/F4/F5/F6/F7/F8/F9 database/application boundaries are implemented; no new product scope is opened until this evidence is archived.
 
 ## Execution model
@@ -57,7 +57,7 @@ No placeholder data may masquerade as production data.
 Status: CLOSED for infrastructure/application stabilization. Authenticated role-based browser smoke remains the final external verification before Gate B is declared green.
 
 Verified work items:
-- Current main production deployment is failing at the Vercel build step.
+- Current production deployment is READY; historical build failures belong to superseded deployments.
 - Current database lacked SELECT privilege for authenticated on student_registrations.
 - The student_enrollments read policy had a teacher-access path that queried the same relation through a helper, creating an RLS recursion path.
 - Current database privileges for has_permission and charge_effective_amount are already present; do not widen them blindly based on historical runtime errors.
@@ -204,7 +204,7 @@ Expose only reports backed by real projections/queries. Initial families: enroll
 
 ## F9 — Release hardening
 
-Security: Supabase Security/Performance Advisor review, SECURITY DEFINER audit, RLS/function-grant review, session/cache review, secret scan and destructive-operation review.
+Security: Supabase Security/Performance Advisor review, SECURITY DEFINER audit, RLS/function-grant review, Auth password-security configuration review, session/cache review, secret scan and destructive-operation review.
 
 Quality: TypeScript, lint, production build, database migration suite, browser smoke tests, accessibility audit, responsive verification, recovery scenarios and performance budgets.
 
