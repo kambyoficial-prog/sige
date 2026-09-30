@@ -13,6 +13,7 @@ import { SignOutButton } from "@/components/auth/sign-out-button";
 type AppShellProps = {
   children: React.ReactNode;
   permissions?: ReadonlySet<string>;
+  roles?: ReadonlySet<string>;
   personName?: string;
   schoolName?: string;
   academicYearLabel?: string;
@@ -21,6 +22,7 @@ type AppShellProps = {
 export function AppShell({
   children,
   permissions = new Set(),
+  roles = new Set(),
   personName = "Utilizador",
   schoolName = "SIGE",
   academicYearLabel,
@@ -29,7 +31,7 @@ export function AppShell({
   const visibleSections = navigationSections
     .map((section) => ({
       ...section,
-      items: section.items.filter((item) => !item.permission || permissions.has(item.permission)),
+      items: section.items.filter((item) => (!item.permission || permissions.has(item.permission)) && (!item.roles?.length || item.roles.some((role) => roles.has(role)))),
     }))
     .filter((section) => section.items.length > 0);
 

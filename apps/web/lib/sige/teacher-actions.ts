@@ -1,0 +1,6 @@
+"use server";
+import { z } from "zod";
+import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
+import { normalizeSigeError } from "@sige/contracts";
+const schema=z.object({schoolId:z.string().uuid(),employeeCode:z.string().trim().min(2).max(40),fullName:z.string().trim().min(2).max(160),gender:z.string().optional(),birthDate:z.string().optional(),nationalId:z.string().max(80).optional(),phone:z.string().max(40).optional(),address:z.string().max(300).optional()});
+export async function createTeacherAction(input:unknown){const p=schema.safeParse(input);if(!p.success)return{ok:false as const,code:"INVALID_ARGUMENT"};try{const{supabase}=await requireAuthenticatedServerClient();const{data,error}=await supabase.rpc("create_teacher",{p_school_id:p.data.schoolId,p_employee_code:p.data.employeeCode,p_full_name:p.data.fullName,p_gender:p.data.gender||null,p_birth_date:p.data.birthDate||null,p_national_id:p.data.nationalId||null,p_phone:p.data.phone||null,p_address:p.data.address||null,p_idempotency_key:crypto.randomUUID(),p_request_hash:null} as never);if(error)throw error;return{ok:true as const,result:data}}catch(error){const e=normalizeSigeError(error);return{ok:false as const,code:e.code}}}
