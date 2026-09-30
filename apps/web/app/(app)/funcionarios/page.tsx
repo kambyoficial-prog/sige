@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { buttonVariants } from "@/components/ui/button";
-import { PageHeader } from "@/components/sige/page-header";
+import { PageHeader } from "@/components/ui/page-header";
 import { Badge } from "@/components/ui/badge";
 import { getCurrentAccessContext } from "@/lib/sige/access";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
