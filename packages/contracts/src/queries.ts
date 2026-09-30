@@ -60,7 +60,7 @@ export interface ClassGroupDirectory {
   grade_level_id: UUID; grade_level_name: string; academic_cycle_name: string;
   education_level_name: string; section_code: string; name: string | null;
   status: string; shift: string | null; pathway_id: UUID | null; capacity: number | null; student_count: number;
-  director_teacher_id: UUID | null; director_teacher_name: string | null; pathway_id: UUID | null; pathway_name: string | null;
+  director_teacher_id: UUID | null; director_teacher_name: string | null; pathway_name: string | null;
 }
 export interface ClassGroupOverview {
   id: UUID; school_id: UUID; academic_year_id: UUID; grade_level_id: UUID;
