@@ -28,7 +28,7 @@ export interface StudentProfile extends StudentDirectory {
 export interface EnrollmentDirectory {
   id: UUID; school_id: UUID; student_id: UUID; school_number: string;
   student_name: string; academic_year_id: UUID; academic_year_label: string;
-  grade_level_id: UUID; grade_level_name: string; status: string; entry_type: string;
+  grade_level_id: UUID; grade_level_name: string; pathway_id: UUID | null; status: string; entry_type: string;
   enrolled_on: string; exited_on: string | null; exit_reason: string | null;
   enrollment_sequence: number; class_group_id: UUID | null; class_name: string | null;
 }
@@ -59,7 +59,7 @@ export interface ClassGroupDirectory {
   id: UUID; school_id: UUID; academic_year_id: UUID; academic_year_label: string;
   grade_level_id: UUID; grade_level_name: string; academic_cycle_name: string;
   education_level_name: string; section_code: string; name: string | null;
-  status: string; shift: string | null; capacity: number | null; student_count: number;
+  status: string; shift: string | null; pathway_id: UUID | null; capacity: number | null; student_count: number;
   director_teacher_id: UUID | null; director_teacher_name: string | null;
 }
 export interface ClassGroupOverview {
