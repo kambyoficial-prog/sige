@@ -50,5 +50,5 @@ export const navigationSections: NavigationSection[] = [
       { label: "Configuração", href: "/financeiro/configuracao", permission: "finance.manage", roles: ["DIRECTION", "FINANCE"] },
     ],
   },
-  { label: "Relatórios", items: [{ label: "Relatórios", href: "/relatorios", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION", "SECRETARIAT"] }] },
+  { label: "Relatórios", items: [{ label: "Relatórios", href: "/relatorios", permission: "reports.read", roles: ["DIRECTION", "PEDAGOGICAL_DIRECTION"] }] },
 ];
