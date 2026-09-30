@@ -26,7 +26,7 @@ $$;
 revoke all on function private.next_student_school_number(uuid) from public;
 grant execute on function private.next_student_school_number(uuid) to authenticated;
 
-drop function if exists public.register_student(uuid,text,text,text,text,text,date,text,text,text,text,date,text,text);
+drop function if exists public.register_student(uuid,text,text,text,date,text,text,text,text,text,date,text,text);
 
 create function public.register_student(
   p_school_id uuid,
