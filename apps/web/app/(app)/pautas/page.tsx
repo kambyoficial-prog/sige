@@ -66,7 +66,7 @@ export default async function PautasPage({
     supabase.from("schools").select("name").eq("active", true).order("created_at").limit(1).maybeSingle(),
   ]);
 
-  const examRows = gradebook.filter((row) => row.type === "EXAM");
+  const examRows = gradebook.filter((row) => row.type === "EXAM");\n  const pathwayCode = pathwayName?.match(/Grupo ([ABC])/i)?.[1]?.toUpperCase() ?? "";\n  const officialSubjects = pathwayCode === "A"\n    ? [\n        ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],\n        ["FRA", "Francês", 3], ["HIS", "História", 3], ["GEO", "Geografia", 3], ["TIC", "TICs", 1],\n        ["NE", "N.E", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],\n      ] as const\n    : pathwayCode === "B"\n      ? [\n          ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],\n          ["BIO", "Biologia", 3], ["QUI", "Química", 3], ["FIS", "Física", 3], ["TIC", "TICs", 1],\n          ["AGP", "AGP", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],\n        ] as const\n      : courseOfferings.map((item) => [item.subject_code, item.subject_name, 3] as const);\n  const subjectByCode = new Map(courseOfferings.map((item) => [item.subject_code, item]));\n  const officialPautaSubjects = officialSubjects.map(([code, name, span]) => ({\n    subjectCode: code,\n    subjectName: name,\n    span,\n    courseOfferingId: subjectByCode.get(code)?.id ?? null,\n  }));
   const studentMap = new Map(students.map((student) => [student.id, student]));
   const resultMap = new Map(
     publishedResults.map((result) => [
@@ -84,7 +84,7 @@ export default async function PautasPage({
       studentNumber: row.student_number,
       studentName: row.student_name,
       gender: student?.gender ?? null,
-      subjectCode: row.subject_name === "Língua Portuguesa" ? "POR" : row.subject_name.slice(0, 3).toUpperCase(),
+      subjectCode: frequency?.subject_code ?? final?.subject_code ?? row.subject_name.slice(0, 3).toUpperCase(),
       subjectName: row.subject_name,
       courseOfferingId: row.course_offering_id,
       assessmentId: row.assessment_id,
