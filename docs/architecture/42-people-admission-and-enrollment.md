@@ -16,6 +16,14 @@ Não existe uma operação genérica de CRUD que atravesse estas fronteiras.
 
 ## Registo de aluno
 
+A UI não pede um número do aluno. O número escolar é um identificador institucional atribuído pelo SIGE no servidor, em sequência de seis dígitos dentro da escola. Ele não é o documento civil nem a credencial de autenticação.
+
+A admissão inicial é guiada em quatro etapas: identidade, identificação documental, contacto/residência e confirmação.
+
+Documentos são modelados separadamente em `student_identifiers`. O tipo é separado do valor e o valor pode ser nulo quando o documento não possui número utilizável.
+
+Depois da criação, a interface conduz a secretaria para o dossiê de admissão: encarregado, transporte opcional, matrícula, colocação em turma e credenciais. As operações continuam separadas no domínio.
+
 register_student cria, numa transação:
 
 - people;
@@ -30,8 +38,7 @@ O comando valida:
 - sessão autenticada;
 - escola ativa;
 - enrollment.manage;
-- número escolar único na escola;
-- documento nacional não duplicado;
+- documento duplicado na escola;
 - identidade mínima.
 
 A matrícula anual não é criada automaticamente. Isto evita confundir admissão/identidade com a decisão académica de matrícula.
