@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/badge";
 import { PageHeader } from "@/components/ui/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { TimetableGrid } from "@/components/sige/timetable-grid";
+import { StudentAccessCard } from "@/components/students/student-access-card";
 import { getStudentProfile, getStudentEnrollmentHistory, getStudentTimetable } from "@/lib/sige/queries";
 import { cn } from "@/lib/utils";
 
@@ -12,6 +13,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
   const { id } = await params;
   const access = await getCurrentAccessContext();
   const canManage = access.memberships.some((m) => m.permissions.includes("enrollment.manage"));
+  const canManageAccess = access.memberships.some((m) => m.permissions.includes("student.access.manage"));
   const [profileRows, enrollmentRows, timetable] = await Promise.all([
     getStudentProfile(id),
     getStudentEnrollmentHistory(id),
@@ -29,6 +31,7 @@ export default async function StudentProfilePage({ params }: { params: Promise<{
         <div className="rounded-lg border border-border bg-card p-5"><p className="text-xs text-muted-foreground">Turma atual</p><p className="mt-2 font-medium">{student.class_name ?? "Sem turma"}</p></div>
         <div className="rounded-lg border border-border bg-card p-5"><p className="text-xs text-muted-foreground">Ano letivo</p><p className="mt-2 font-medium">{student.academic_year_label ?? "—"}</p></div>
       </section>
+      {canManageAccess ? <StudentAccessCard schoolId={student.school_id} studentId={student.id} schoolNumber={student.school_number} /> : null}
       <section className="grid gap-6 lg:grid-cols-2">
         <div className="rounded-xl border border-border bg-card p-6 space-y-5"><div><h2 className="font-semibold">Dados pessoais</h2><p className="text-sm text-muted-foreground">Leitura do registo institucional.</p></div><dl className="grid gap-4 sm:grid-cols-2">{[["Sexo",student.gender],["Nascimento",student.birth_date],["Telefone",student.phone],["Email",student.email],["Residência",student.address ?? null]].map(([label,value]) => <div key={label as string}><dt className="text-xs text-muted-foreground">{label}</dt><dd className="mt-1 text-sm">{value || "—"}</dd></div>)}</dl></div>
         <div className="rounded-xl border border-border bg-card p-6 space-y-5"><div><h2 className="font-semibold">Encarregados</h2><p className="text-sm text-muted-foreground">Relações familiares associadas ao aluno.</p></div>{student.guardians.length ? <div className="space-y-3">{student.guardians.map((g) => <div key={g.id} className="rounded-lg border border-border p-4"><div className="flex items-center justify-between gap-3"><p className="font-medium">{g.full_name}</p>{g.is_primary ? <Badge variant="secondary">Principal</Badge> : null}</div><p className="mt-1 text-sm text-muted-foreground">{g.relationship || "Relação não indicada"} · {g.phone || "Sem telefone"}</p></div>)}</div> : <p className="text-sm text-muted-foreground">Nenhum encarregado associado.</p>}</div>
