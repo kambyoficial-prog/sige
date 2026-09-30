@@ -31,6 +31,7 @@ export default async function FinancePaymentsPage(){
       <div><span className="text-muted-foreground">Por alocar</span><div>{money(Number(r.unallocated_amount??0))}</div></div>
     </div>
     {r.notes&&<div className="rounded-lg bg-muted/40 p-3 text-sm">{String(r.notes)}</div>}
+    {Array.isArray(r.proofs)&&<PaymentProofPanel paymentId={String(r.id)} proofs={r.proofs as any[]} />}
     <div className="flex flex-wrap gap-2">
       {r.status==="PENDING"&&<form action={confirm}><input type="hidden" name="paymentId" value={String(r.id)}/><button className={buttonVariants({size:"sm"})}>Confirmar pagamento</button></form>}
       {r.status==="CONFIRMED"&&Number(r.unallocated_amount)>0&&Array.isArray(r.charges)&&r.charges.length>0&&
