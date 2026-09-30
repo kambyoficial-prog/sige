@@ -119,6 +119,8 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
     (pathway) => pathway.academic_cycle_id === selectedGrade?.academic_cycle_id,
   );
 
+  const pathwayRequired = availablePathways.length > 0;
+
   const availableClasses = useMemo(
     () =>
       classes.filter(
@@ -211,6 +213,10 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
   function createEnrollment(withPlacement: boolean) {
     if (!studentId || !academicYearId || !gradeLevelId) {
       toast.error("Selecione o ano e a classe.");
+      return;
+    }
+    if (pathwayRequired && !pathwayId) {
+      toast.error("Selecione o grupo / área.");
       return;
     }
 
@@ -474,10 +480,10 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
             <div className="flex items-center justify-between border-t border-border pt-5">
               <Button type="button" variant="outline" onClick={() => setStep(1)}>Anterior</Button>
               <div className="flex gap-2">
-                <Button type="button" variant="ghost" disabled={pending || !gradeLevelId} onClick={() => createEnrollment(false)}>
+                <Button type="button" variant="ghost" disabled={pending || !gradeLevelId || (pathwayRequired && !pathwayId)} onClick={() => createEnrollment(false)}>
                   Matrícula sem turma
                 </Button>
-                <Button type="button" disabled={pending || !gradeLevelId || !classGroupId} onClick={() => createEnrollment(true)}>
+                <Button type="button" disabled={pending || !gradeLevelId || (pathwayRequired && !pathwayId) || !classGroupId} onClick={() => createEnrollment(true)}>
                   {pending ? "A concluir…" : "Concluir processo"}
                 </Button>
               </div>
