@@ -14,9 +14,12 @@ begin
     and (pg_get_functiondef(p.oid) !~* 'auth[.]uid[[:space:]]*[(][[:space:]]*[)]' or pg_get_functiondef(p.oid) !~* 'search_path');
   if insecure_definers is not null then raise exception 'SECURITY DEFINER functions missing auth/search_path invariant: %',insecure_definers; end if;
 
-  select array_agg(r.routine_name order by r.routine_name) into exposed_commands
-  from information_schema.role_routine_grants r
-  where r.grantee='anon' and r.routine_schema='public' and r.privilege_type='EXECUTE';
+  select array_agg(p.proname order by p.proname) into exposed_commands
+  from pg_proc p
+  join pg_namespace n on n.oid=p.pronamespace
+  where n.nspname='public'
+    and p.prosecdef
+    and has_function_privilege('anon',p.oid,'execute');
   if exposed_commands is not null then raise exception 'anonymous execution exposed for public routines: %',exposed_commands; end if;
 
   select array_agg(v.viewname order by v.viewname) into missing_invoker_views
