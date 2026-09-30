@@ -83,7 +83,7 @@ export async function findAdmissionDuplicateMatches(input: {
     const { supabase } = await requireAuthenticatedServerClient();
     const matches = new Map<string, AdmissionDuplicateMatch>();
 
-    if (documentValue) {
+    if (documentType && documentValue) {
       let documentQuery = supabase
         .from("student_identifiers")
         .select("student_id,type,value")
@@ -113,9 +113,7 @@ export async function findAdmissionDuplicateMatches(input: {
             className: student.class_name,
             matchReasons: ["DOCUMENT"],
           });
-        } else if (student === null && identifierError === null) {
-          // RLS intentionally hides records outside the caller's school.
-        }
+
       }
     }
 
