@@ -13,36 +13,23 @@ import {
 } from "@/lib/sige/queries";
 import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 import { OfficialPautaEditor } from "@/components/sige/official-pauta-editor";
+import { OFFICIAL_PAUTA_SUBJECTS, classifyExamCall, normalizePautaGroup } from "@/lib/sige/official-pauta";
 
-export default async function PautasPage({
-  searchParams,
-}: {
-  searchParams: Promise<{ classGroupId?: string }>;
-}) {
+export default async function PautasPage({ searchParams }: { searchParams: Promise<{ classGroupId?: string }> }) {
   const params = await searchParams;
   const years = await getAcademicYearOptions();
   const year = years.find((item) => item.status === "OPEN") ?? years[0];
   const classes = year ? await getClassGroupDirectory(year.id) : [];
   const { supabase } = await requireAuthenticatedServerClient();
-  const { data: pathways } = await supabase
-    .from("academic_pathways")
-    .select("id,name,code")
-    .eq("active", true)
-    .order("code");
+  const { data: pathways } = await supabase.from("academic_pathways").select("id,name,code").eq("active", true).order("code");
   const pathwayMap = new Map((pathways ?? []).map((pathway) => [pathway.id, pathway.name]));
 
   if (!params.classGroupId) {
     return (
       <div className="space-y-6">
-        <PageHeader
-          title="Pautas"
-          description="Pautas oficiais da escola, editáveis no lançamento e prontas para impressão."
-          actions={<Link href="/notas" className={buttonVariants({ variant: "outline" })}>Abrir notas</Link>}
-        />
+        <PageHeader title="Pautas" description="Pautas oficiais da escola, editáveis no lançamento e prontas para impressão/Excel." actions={<Link href="/notas" className={buttonVariants({ variant: "outline" })}>Abrir notas</Link>} />
         {!classes.length ? (
-          <div className="rounded-xl border p-8 text-sm text-muted-foreground">
-            Não existem turmas disponíveis no ano lectivo aberto.
-          </div>
+          <div className="rounded-xl border p-8 text-sm text-muted-foreground">Não existem turmas disponíveis no ano lectivo aberto.</div>
         ) : (
           <form method="get" className="max-w-xl space-y-3 rounded-xl border p-5">
             <label htmlFor="classGroupId" className="text-sm font-medium">Turma</label>
@@ -65,6 +52,7 @@ export default async function PautasPage({
   if (!selectedClass) redirect("/pautas");
 
   const pathwayName = selectedClass.pathway_id ? pathwayMap.get(selectedClass.pathway_id) ?? null : null;
+  const pathwayGroup = normalizePautaGroup(pathwayName);
   const [gradebook, publishedResults, students, roster, courseOfferings, schoolResult] = await Promise.all([
     getAssessmentGradebook({ class_group_id: params.classGroupId }),
     getAcademicResultPauta({ class_group_id: params.classGroupId }),
@@ -75,28 +63,15 @@ export default async function PautasPage({
   ]);
 
   const examRows = gradebook.filter((row) => row.type === "EXAM");
-  const pathwayCode = pathwayName?.match(/Grupo ([ABC])/i)?.[1]?.toUpperCase() ?? "";
-
-  const officialSubjects = pathwayCode === "A"
-    ? [
-        ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],
-        ["FRA", "Francês", 3], ["HIS", "História", 3], ["GEO", "Geografia", 3], ["TIC", "TICs", 1],
-        ["NE", "N.E", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],
-      ] as const
-    : pathwayCode === "B"
-      ? [
-          ["POR", "Português", 3], ["ING", "Inglês", 3], ["FIL", "Filosofia", 3], ["MAT", "Matemática", 3],
-          ["BIO", "Biologia", 3], ["QUI", "Química", 3], ["FIS", "Física", 3], ["TIC", "TICs", 1],
-          ["AGP", "AGP", 1], ["EF", "Ed. Física", 1], ["COMP", "COMP", 1],
-        ] as const
-      : courseOfferings.map((item) => [item.subject_code, item.subject_name, 3] as const);
-
+  const officialSubjects = pathwayGroup
+    ? OFFICIAL_PAUTA_SUBJECTS[pathwayGroup]
+    : courseOfferings.map((item) => ({ code: item.subject_code, name: item.subject_name, span: 3 as const }));
   const subjectByCode = new Map(courseOfferings.map((item) => [item.subject_code, item]));
-  const officialPautaSubjects = officialSubjects.map(([code, name, span]) => ({
-    subjectCode: code,
-    subjectName: name,
-    span,
-    courseOfferingId: subjectByCode.get(code)?.id ?? null,
+  const officialPautaSubjects = officialSubjects.map((subject) => ({
+    subjectCode: subject.code,
+    subjectName: subject.name,
+    span: subject.span,
+    courseOfferingId: subjectByCode.get(subject.code)?.id ?? null,
   }));
 
   const studentMap = new Map(students.map((student) => [student.id, student]));
@@ -111,7 +86,6 @@ export default async function PautasPage({
     const student = studentMap.get(row.student_id);
     const frequency = resultMap.get(`${row.student_id}:${row.course_offering_id}:FREQUENCY`);
     const final = resultMap.get(`${row.student_id}:${row.course_offering_id}:FINAL`);
-
     return {
       studentId: row.student_id,
       studentNumber: row.student_number,
@@ -122,6 +96,8 @@ export default async function PautasPage({
       courseOfferingId: row.course_offering_id,
       assessmentId: row.assessment_id,
       assessmentStatus: row.assessment_status,
+      assessmentTitle: row.title,
+      examCall: classifyExamCall(row.title),
       maxScore: row.max_score,
       examRawScore: row.raw_score,
       examResultId: row.assessment_result_id,
@@ -145,24 +121,22 @@ export default async function PautasPage({
         description={`${selectedClass.grade_level_name} · ${selectedClass.name ?? selectedClass.section_code} · ${pathwayName ?? "Opção não definida"} · ${year?.label ?? ""}`}
         actions={
           <div className="flex gap-2">
+            <Link href={`/api/pautas/export?classGroupId=${params.classGroupId}`} className={buttonVariants({ variant: "outline" })}>Exportar Excel</Link>
             <Link href="/pautas" className={buttonVariants({ variant: "outline" })}>Outra turma</Link>
             <Link href="/notas" className={buttonVariants({ variant: "outline" })}>Notas</Link>
           </div>
         }
       />
-
       {!selectedClass.pathway_id ? (
         <div className="rounded-lg border border-amber-500/30 bg-amber-500/5 p-3 text-sm">
           Esta turma ainda não tem Opção/Grupo A ou B configurado. A pauta pode ser editada, mas a ordem curricular oficial 12A/12B só deve ser aplicada depois dessa configuração.
         </div>
       ) : null}
-
       {!rows.length ? (
         <div className="rounded-lg border border-muted bg-muted/20 p-3 text-sm text-muted-foreground">
           Ainda não existem avaliações de exame para esta turma. A pauta abaixo permanece disponível como modelo preenchível e imprimível.
         </div>
       ) : null}
-
       <OfficialPautaEditor
         schoolName={schoolResult.data?.name ?? "Escola Secundária"}
         province="Província"
