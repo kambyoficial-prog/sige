@@ -21,6 +21,9 @@ export default async function PautasPage({
   const years = await getAcademicYearOptions();
   const year = years.find((item) => item.status === "OPEN") ?? years[0];
   const classes = year ? await getClassGroupDirectory(year.id) : [];
+  const { supabase } = await requireAuthenticatedServerClient();
+  const { data: pathways } = await supabase.from("academic_pathways").select("id,name,code").eq("active", true).order("code");
+  const pathwayMap = new Map((pathways ?? []).map((pathway) => [pathway.id, pathway.name]));
 
   if (!params.classGroupId) {
     return (
@@ -41,7 +44,7 @@ export default async function PautasPage({
               <option value="">Seleccionar turma</option>
               {classes.map((item) => (
                 <option key={item.id} value={item.id}>
-                  {item.grade_level_name} · {item.name ?? item.section_code} · {item.pathway_name ?? "Opção não definida"}
+                  {item.grade_level_name} · {item.name ?? item.section_code} · {item.pathway_id ? pathwayMap.get(item.pathway_id) ?? "Opção" : "Opção não definida"}
                 </option>
               ))}
             </select>
@@ -55,14 +58,12 @@ export default async function PautasPage({
   const selectedClass = classes.find((item) => item.id === params.classGroupId);
   if (!selectedClass) redirect("/pautas");
 
+  const pathwayName = selectedClass.pathway_id ? pathwayMap.get(selectedClass.pathway_id) ?? null : null;
   const [gradebook, publishedResults, students, schoolResult] = await Promise.all([
     getAssessmentGradebook({ class_group_id: params.classGroupId }),
     getAcademicResultPauta({ class_group_id: params.classGroupId }),
     getStudentDirectory(),
-    (async () => {
-      const { supabase } = await requireAuthenticatedServerClient();
-      return supabase.from("schools").select("name").eq("active", true).order("created_at").limit(1).maybeSingle();
-    })(),
+    supabase.from("schools").select("name").eq("active", true).order("created_at").limit(1).maybeSingle(),
   ]);
 
   const examRows = gradebook.filter((row) => row.type === "EXAM");
@@ -101,7 +102,7 @@ export default async function PautasPage({
     <div className="space-y-6">
       <PageHeader
         title="Pauta de Exame"
-        description={`${selectedClass.grade_level_name} · ${selectedClass.name ?? selectedClass.section_code} · ${selectedClass.pathway_name ?? "Opção não definida"} · ${year?.label ?? ""}`}
+        description={`${selectedClass.grade_level_name} · ${selectedClass.name ?? selectedClass.section_code} · ${pathwayName ?? "Opção não definida"} · ${year?.label ?? ""}`}
         actions={
           <div className="flex gap-2">
             <Link href="/pautas" className={buttonVariants({ variant: "outline" })}>Outra turma</Link>
@@ -127,7 +128,7 @@ export default async function PautasPage({
           academicYear={year?.label ?? ""}
           gradeName={selectedClass.grade_level_name}
           className={selectedClass.name ?? selectedClass.section_code}
-          pathwayName={selectedClass.pathway_name}
+          pathwayName={pathwayName}
           rows={rows}
         />
       )}
