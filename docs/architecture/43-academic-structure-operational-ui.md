@@ -105,4 +105,4 @@ F4 é considerado implementado em código quando:
 - leitura é feita por projeções autorizadas;
 - não existem secções A/B/C hardcoded como regras.
 
-Runtime e validação de constraints continuam dependentes da base SIGE autorizada.
+Runtime database verification: completed against the authoritative SIGE Supabase project on 2026-09-30. Browser role smoke remains pending.
