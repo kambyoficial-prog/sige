@@ -11,7 +11,7 @@ This is the execution control document for the product. It prevents isolated scr
 - Frontend: Next.js application, shell, operational primitives, access boundary and domain surfaces are implemented; current work is integration/runtime stabilization.
 - Supabase: the authoritative SIGE project is connected and has the academic, finance and security schema plus DEMO fixtures.
 - Vercel: SIGE has a production project. The previous production commit was READY, while current main commit 194b82c is ERROR during build; release is blocked.
-- Current priority: stabilize existing architecture before adding product modules.
+- Current priority: close Gate B role-based browser homologation for the implemented F3/F4/F5 slices before expanding product scope.
 
 ## Execution model
 
@@ -25,12 +25,12 @@ No placeholder data may masquerade as production data.
 
 | Block | Scope | Main output | Gate |
 |---|---|---|---|
-| R0 | Stabilization & integration gate | build, Server/Client boundaries, auth, grants, RLS, runtime, deployment | production build + runtime baseline green |
+| R0 | Stabilization & integration gate | build, Server/Client boundaries, auth, grants, RLS, runtime, deployment | **Closed for infrastructure/application; authenticated browser smoke remains open** |
 | F0 | Design-system/runtime foundation | tokens, theme, primitives, shell foundation, accessibility baseline | web compiles + visual verification |
 | F1 | Authentication & access context | login, callback, session boundary, capability-derived shell | real auth contract + protected routes | Implemented; runtime auth verification pending SIGE Supabase |
 | F2 | Operational primitives | tables, filters, pagination, forms, dialogs, errors, empty/loading states | reusable patterns proven on real queries | Implemented baseline; runtime verification pending |
-| F3 | Pessoas & matrícula | students, teachers, guardians, enrollment lifecycle | real commands/queries + no duplicate workflows | Implemented in code; runtime DB verification pending |
-| F4 | Estrutura pedagógica | classes, subjects/offers, curriculum, teacher assignments | class workflows use real backend contracts | Implemented in code; runtime DB verification pending |
+| F3 | Pessoas & matrícula | students, teachers, guardians, enrollment lifecycle | real commands/queries + no duplicate workflows | **Implemented; authoritative DB verification completed; browser role smoke pending** |
+| F4 | Estrutura pedagógica | classes, subjects/offers, curriculum, teacher assignments | class workflows use real backend contracts | **Implemented; authoritative DB verification completed; browser role smoke pending** |
 | F5 | Horários & operações | timetable, calendar, class sessions, livro de ponto | conflict-aware workflow + responsive verification |
 | F6 | Avaliação & pautas | gradebook, publication, results, reports | deterministic results + period/year state |
 | F7 | Financeiro | obligations, payments, allocations, receipts, balances, transport | year-scoped financial lifecycle | **Implemented; runtime DB gate verified; browser/CI verification pending** |
@@ -54,7 +54,7 @@ No placeholder data may masquerade as production data.
 
 ## R0 — Stabilization & integration gate
 
-Status: ACTIVE. No new product module should be started until this gate is green.
+Status: CLOSED for infrastructure/application stabilization. Authenticated role-based browser smoke remains the final external verification before Gate B is declared green.
 
 Verified work items:
 - Current main production deployment is failing at the Vercel build step.
@@ -64,14 +64,14 @@ Verified work items:
 - directory-table is already a Client Component; historical function-serialization errors must be re-verified against a fresh deployment before changing its architecture.
 
 R0 closure sequence:
-1. deterministic repository build;
-2. Server/Client boundary verification;
-3. authentication/session verification;
-4. PostgreSQL grants and RLS verification;
-5. role-based runtime smoke matrix;
-6. fresh Vercel production deployment;
-7. browser verification;
-8. resume F3/F4 homologation.
+1. deterministic repository build — complete;
+2. Server/Client boundary verification — complete;
+3. authentication/session infrastructure verification — complete;
+4. PostgreSQL grants and RLS verification — complete;
+5. role-based runtime smoke matrix — pending authenticated browser session;
+6. fresh Vercel production deployment — complete;
+7. browser verification — pending authenticated browser session;
+8. resume F3/F4 homologation — database verification complete; browser gate remains.
 
 ## F0 — Design-system/runtime foundation
 
@@ -147,7 +147,7 @@ A/B/C-style labels remain configurable section/pathway data, never hardcoded bus
 
 ## F5 — Operações
 
-Status: operational vertical slice implemented; database runtime verification completed for the command boundary and RLS gate. Browser QA remains pending because SIGE is not connected to a Vercel project in the available account.
+Status: operational vertical slice implemented; database runtime verification completed for the command boundary and RLS gate. Browser QA remains pending authenticated browser session.
 
 Implemented in the current vertical slice:
 - timetable grid by class;
