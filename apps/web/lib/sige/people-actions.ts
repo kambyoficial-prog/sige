@@ -6,13 +6,12 @@ import { executeCommand } from "@/lib/sige/commands";
 
 const registerStudentSchema = z.object({
   schoolId: z.string().uuid(),
-  schoolNumber: z.string().trim().min(1).max(40),
-  fullName: z.string().trim().min(2).max(160),
-  firstName: z.string().trim().max(80).optional(),
-  lastName: z.string().trim().max(80).optional(),
-  gender: z.string().trim().max(40).optional(),
+  firstName: z.string().trim().min(2).max(120),
+  lastName: z.string().trim().max(120).optional(),
+  gender: z.enum(["M", "F"]).optional(),
   birthDate: z.string().optional(),
-  nationalId: z.string().trim().max(80).optional(),
+  documentType: z.string().trim().max(40).optional(),
+  documentValue: z.string().trim().max(120).optional(),
   phone: z.string().trim().max(40).optional(),
   email: z.string().trim().email().max(160).optional().or(z.literal("")),
   address: z.string().trim().max(240).optional(),
