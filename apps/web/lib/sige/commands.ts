@@ -119,6 +119,7 @@ function toRpcArgs<Name extends CommandName>(
       p_student_id: i.studentId,
       p_academic_year_id: i.academicYearId,
       p_grade_level_id: i.gradeLevelId,
+      p_pathway_id: i.pathwayId ?? null,
       p_entry_type: i.entryType ?? "INITIAL",
       p_enrolled_on: i.enrolledOn ?? undefined,
       ...common,
