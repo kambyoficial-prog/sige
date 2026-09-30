@@ -16,7 +16,7 @@ No service-role/secret key is committed.
 
 ## Migration state
 
-All migrations present in `supabase/migrations/` through `20260929240100_teacher_roster_read_boundary` are applied to the remote SIGE project.
+The authoritative project has applied migrations through `20260930073624_r0_stabilization_boundaries_v2`. This includes curriculum RLS, F6/F7/F8 hardening, demo homologation data, student access lifecycle and the R0 authorization boundary.
 
 The database contains the expected operational tables, including:
 
@@ -83,7 +83,7 @@ The test extension has not been installed merely for production verification.
 
 ## Environment separation
 
-The previously connected Supabase project was a Kamby/marketplace database and was not used for SIGE. The SIGE project is now isolated under its own project ref.
+The previously connected Supabase project was a Kamby/marketplace database and is not used for SIGE. The SIGE project is isolated under its own project ref.
 
 Frontend configuration expects:
 
