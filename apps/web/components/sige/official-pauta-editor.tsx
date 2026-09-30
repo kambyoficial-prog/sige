@@ -4,6 +4,11 @@ import { useMemo, useState, useTransition } from "react";
 import { Button } from "@/components/ui/button";
 import { PrintButton } from "@/components/finance/print-button";
 import { correctPublishedResultAction, saveAssessmentResultAction } from "@/lib/sige/assessment-actions";
+import {
+  PAUTA_BANDS,
+  buildOverallPautaStats,
+  buildPautaSubjectStats,
+} from "@/lib/sige/official-pauta";
 
 type PautaRow = {
   studentId: string;
@@ -15,6 +20,8 @@ type PautaRow = {
   courseOfferingId: string;
   assessmentId: string;
   assessmentStatus: string;
+  assessmentTitle: string | null;
+  examCall: 1 | 2;
   maxScore: number | null;
   examRawScore: number | null;
   examResultId: string | null;
@@ -49,15 +56,20 @@ type Props = {
 };
 
 function normalizeGender(value: string | null) {
-  if (!value) return "—";
+  if (!value) return null;
   const v = value.toUpperCase();
-  if (v.startsWith("F")) return "M";
-  if (v.startsWith("M")) return "H";
-  return value;
+  if (v.startsWith("F")) return "M" as const;
+  if (v.startsWith("M")) return "H" as const;
+  if (v.startsWith("H")) return "H" as const;
+  return null;
 }
 
 function display(value: number | null) {
   return value == null ? "—" : String(Math.round(value));
+}
+
+function percent(value: number | null) {
+  return value == null ? "—" : `${value.toFixed(1)}%`;
 }
 
 export function OfficialPautaEditor(props: Props) {
@@ -74,6 +86,37 @@ export function OfficialPautaEditor(props: Props) {
   const byKey = useMemo(
     () => new Map(props.rows.map((row) => [`${row.studentId}:${row.courseOfferingId}`, row])),
     [props.rows],
+  );
+
+  const subjectStats = useMemo(
+    () =>
+      buildPautaSubjectStats(
+        students.map((student) => ({ studentId: student.studentId, gender: normalizeGender(student.gender) })),
+        props.rows.map((row) => ({
+          studentId: row.studentId,
+          subjectCode: row.subjectCode,
+          frequency: row.frequency,
+          examCall: row.examCall,
+          examScore: row.examRawScore,
+        })),
+        props.subjects.map((subject) => ({ code: subject.subjectCode, name: subject.subjectName, span: subject.span })),
+      ),
+    [students, props.rows, props.subjects],
+  );
+
+  const overallStats = useMemo(
+    () =>
+      buildOverallPautaStats(
+        students.map((student) => ({ studentId: student.studentId, gender: normalizeGender(student.gender) })),
+        props.rows.map((row) => ({
+          studentId: row.studentId,
+          subjectCode: row.subjectCode,
+          frequency: row.frequency,
+          examCall: row.examCall,
+          examScore: row.examRawScore,
+        })),
+      ),
+    [students, props.rows],
   );
 
   function save(row: PautaRow) {
@@ -116,34 +159,12 @@ export function OfficialPautaEditor(props: Props) {
     });
   }
 
-  const statistics = useMemo(() => {
-    const buckets = [
-      { label: "0 – 5,9", min: 0, max: 5.9 },
-      { label: "6 – 8,9", min: 6, max: 8.9 },
-      { label: "9 – 13,9", min: 9, max: 13.9 },
-      { label: "14 – 16,9", min: 14, max: 16.9 },
-      { label: "17 – 20", min: 17, max: 20 },
-    ];
-
-    return buckets.map((bucket) => {
-      let M = 0;
-      let H = 0;
-      for (const student of students) {
-        const value = props.rows.find((row) => row.studentId === student.studentId)?.finalValue;
-        if (value == null || value < bucket.min || value > bucket.max) continue;
-        if (normalizeGender(student.gender) === "M") M++;
-        if (normalizeGender(student.gender) === "H") H++;
-      }
-      return { ...bucket, M, H };
-    });
-  }, [students, props.rows]);
-
   return (
     <div className="space-y-5">
       <div className="flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div>
           <div className="text-sm font-medium">Pauta de Exame · {props.pathwayName ?? "Opção não definida"}</div>
-          <div className="text-xs text-muted-foreground">Editável durante o lançamento; correcções de resultados publicados ficam auditadas.</div>
+          <div className="text-xs text-muted-foreground">Modelo oficial editável; correcções publicadas ficam auditadas.</div>
         </div>
         <PrintButton />
       </div>
@@ -171,9 +192,7 @@ export function OfficialPautaEditor(props: Props) {
                 <th rowSpan={2} className="border px-2 py-1">Género</th>
                 <th rowSpan={2} className="border px-2 py-1">Turma</th>
                 {props.subjects.map((subject) => (
-                  <th key={subject.subjectCode} colSpan={subject.span} className="border px-1 py-1 text-center">
-                    {subject.subjectName}
-                  </th>
+                  <th key={subject.subjectCode} colSpan={subject.span} className="border px-1 py-1 text-center">{subject.subjectName}</th>
                 ))}
                 <th rowSpan={2} className="border px-2 py-1">Média</th>
                 <th colSpan={2} className="border px-2 py-1">RESULTADO FINAL</th>
@@ -190,16 +209,13 @@ export function OfficialPautaEditor(props: Props) {
                 <th className="border px-1 py-1">Reprovado</th>
               </tr>
             </thead>
-
             <tbody>
               {students.map((student, index) => {
                 const subjectRows = props.subjects.map((subject) =>
                   subject.courseOfferingId ? byKey.get(`${student.studentId}:${subject.courseOfferingId}`) : undefined,
                 );
                 const finalValues = subjectRows.map((row) => row?.finalValue).filter((value): value is number => value != null);
-                const global = finalValues.length
-                  ? Math.round(finalValues.reduce((sum, value) => sum + value, 0) / finalValues.length)
-                  : null;
+                const global = finalValues.length ? Math.round(finalValues.reduce((sum, value) => sum + value, 0) / finalValues.length) : null;
                 const hasFailed = subjectRows.some((row) => row?.finalValue != null && row.finalValue < 10);
 
                 return (
@@ -207,19 +223,12 @@ export function OfficialPautaEditor(props: Props) {
                     <td className="border px-2 py-1 text-center">{index + 1}</td>
                     <td className="border px-2 py-1 text-center">{student.studentNumber}</td>
                     <td className="border px-2 py-1">{student.studentName}</td>
-                    <td className="border px-2 py-1 text-center">{normalizeGender(student.gender)}</td>
+                    <td className="border px-2 py-1 text-center">{normalizeGender(student.gender) ?? "—"}</td>
                     <td className="border px-2 py-1 text-center">{props.className}</td>
-
                     {subjectRows.map((row, subjectIndex) => {
                       const subject = props.subjects[subjectIndex];
-
-                      if (!row) {
-                        return <td key={subject.subjectCode} colSpan={subject.span} className="border px-1 py-1 text-center">—</td>;
-                      }
-
-                      if (subject.span === 1) {
-                        return <td key={subject.subjectCode} className="border px-1 py-1 text-center">{display(row.finalValue)}</td>;
-                      }
+                      if (!row) return <td key={subject.subjectCode} colSpan={subject.span} className="border px-1 py-1 text-center">—</td>;
+                      if (subject.span === 1) return <td key={subject.subjectCode} className="border px-1 py-1 text-center">{display(row.finalValue)}</td>;
 
                       const key = `${row.studentId}:${row.courseOfferingId}`;
                       const draft = drafts[key];
@@ -231,35 +240,15 @@ export function OfficialPautaEditor(props: Props) {
                           <div className="grid grid-cols-3 items-center gap-1">
                             <span className="text-center">{display(row.frequency)}</span>
                             <div className="text-center">
-                              <input
-                                aria-label={`${student.studentName} — ${row.subjectName} — exame`}
-                                value={current}
-                                disabled={pending || !editable}
-                                onChange={(event) => setDrafts((state) => ({ ...state, [key]: event.target.value }))}
-                                inputMode="decimal"
-                                className="h-7 w-12 border border-black/30 bg-white text-center text-[10px] outline-none focus:ring-1 focus:ring-black disabled:bg-black/5"
-                              />
-                              {draft !== undefined ? (
-                                <Button size="sm" variant="ghost" className="h-6 px-1 text-[9px]" onClick={() => save(row)} disabled={pending}>
-                                  Guardar
-                                </Button>
-                              ) : null}
-                              {row.examResultStatus === "PUBLISHED" ? (
-                                <input
-                                  aria-label={`Motivo da correção — ${student.studentName} — ${row.subjectName}`}
-                                  value={reasons[key] ?? ""}
-                                  onChange={(event) => setReasons((state) => ({ ...state, [key]: event.target.value }))}
-                                  placeholder="Motivo"
-                                  className="mt-1 h-6 w-full border border-black/20 px-1 text-[9px] print:hidden"
-                                />
-                              ) : null}
+                              <input aria-label={`${student.studentName} — ${row.subjectName} — exame`} value={current} disabled={pending || !editable} onChange={(event) => setDrafts((state) => ({ ...state, [key]: event.target.value }))} inputMode="decimal" className="h-7 w-12 border border-black/30 bg-white text-center text-[10px] outline-none focus:ring-1 focus:ring-black disabled:bg-black/5" />
+                              {draft !== undefined ? <Button size="sm" variant="ghost" className="h-6 px-1 text-[9px]" onClick={() => save(row)} disabled={pending}>Guardar</Button> : null}
+                              {row.examResultStatus === "PUBLISHED" ? <input aria-label={`Motivo da correção — ${student.studentName} — ${row.subjectName}`} value={reasons[key] ?? ""} onChange={(event) => setReasons((state) => ({ ...state, [key]: event.target.value }))} placeholder="Motivo" className="mt-1 h-6 w-full border border-black/20 px-1 text-[9px] print:hidden" /> : null}
                             </div>
                             <span className="text-center font-semibold">{display(row.finalValue)}</span>
                           </div>
                         </td>
                       );
                     })}
-
                     <td className="border px-2 py-1 text-center font-semibold">{display(global)}</td>
                     <td className="border px-2 py-1 text-center font-semibold">{global != null && !hasFailed ? "X" : ""}</td>
                     <td className="border px-2 py-1 text-center font-semibold">{global != null && hasFailed ? "X" : ""}</td>
@@ -271,39 +260,80 @@ export function OfficialPautaEditor(props: Props) {
         </div>
 
         <div className="grid grid-cols-2 gap-6 border-t p-4 text-[10px]">
-          <div>
-            <div className="font-semibold">Legenda</div>
-            <p>c) Concluiu · d) Não faz a disciplina · A Ausente · F Fraude · Exc Excluído.</p>
-          </div>
-          <div className="text-right">
-            <div>O Presidente do Conselho de Exame</div>
-            <div className="mt-8 border-t border-black/50 pt-1">Assinatura</div>
-          </div>
+          <div><div className="font-semibold">Legenda</div><p>c) Concluiu · d) Não faz a disciplina · Exc Excluído · A Ausente · F Fraude.</p></div>
+          <div className="text-right"><div>O Presidente do Conselho de Exame</div><div className="mt-8 border-t border-black/50 pt-1">Assinatura</div></div>
         </div>
       </section>
 
       <section className="official-pauta border bg-white p-4 text-black print:break-before-page">
         <h2 className="mb-3 text-center text-xs font-bold uppercase">Mapa de Aproveitamento Pedagógico</h2>
-        <table className="w-full border-collapse text-[10px]">
-          <thead>
-            <tr>
-              <th className="border px-2 py-1 text-left">Escala de notas</th>
-              <th className="border px-2 py-1">M</th>
-              <th className="border px-2 py-1">H</th>
-              <th className="border px-2 py-1">HM</th>
-            </tr>
-          </thead>
-          <tbody>
-            {statistics.map((row) => (
-              <tr key={row.label}>
-                <td className="border px-2 py-1">{row.label}</td>
-                <td className="border px-2 py-1 text-center">{row.M}</td>
-                <td className="border px-2 py-1 text-center">{row.H}</td>
-                <td className="border px-2 py-1 text-center">{row.M + row.H}</td>
+        <div className="overflow-x-auto">
+          <table className="min-w-[1500px] w-full border-collapse text-[9px]">
+            <thead>
+              <tr>
+                <th rowSpan={2} className="border px-1 py-1 text-left">Escala de Notas</th>
+                <th rowSpan={2} className="border px-1 py-1">Gen.</th>
+                {subjectStats.map((subject) => <th key={subject.code} colSpan={3} className="border px-1 py-1 text-center">{subject.name}</th>)}
               </tr>
-            ))}
-          </tbody>
-        </table>
+              <tr>
+                {subjectStats.flatMap((subject) => [1, 2, "T"].map((call) => <th key={`${subject.code}-${call}`} className="border px-1 py-1">{call === "T" ? "Total" : `${call}ª Ch`}</th>))}
+              </tr>
+            </thead>
+            <tbody>
+              {PAUTA_BANDS.map((band, bandIndex) =>
+                (["M", "H", "HM"] as const).map((gender) => (
+                  <tr key={`${band.label}-${gender}`}>
+                    {gender === "M" ? <td rowSpan={3} className="border px-1 py-1">{band.label}</td> : null}
+                    <td className="border px-1 py-1 text-center">{gender}</td>
+                    {subjectStats.flatMap((subject) => {
+                      const a = subject.calls[1][gender].bands[bandIndex];
+                      const b = subject.calls[2][gender].bands[bandIndex];
+                      return [a[gender === "HM" ? "HM" : gender], b[gender === "HM" ? "HM" : gender], (a[gender === "HM" ? "HM" : gender] + b[gender === "HM" ? "HM" : gender])].map((value, index) => <td key={index} className="border px-1 py-1 text-center">{value}</td>);
+                    })}
+                  </tr>
+                )),
+              )}
+              {(["Previstos", "Avaliados", "Positivos", "% dos Positivos"] as const).flatMap((metric) =>
+                (["M", "H", "HM"] as const).map((gender, index) => (
+                  <tr key={`${metric}-${gender}`}>
+                    {index === 0 ? <td rowSpan={3} colSpan={1} className="border px-1 py-1 font-semibold">{metric}</td> : null}
+                    <td className="border px-1 py-1 text-center">{gender}</td>
+                    {subjectStats.flatMap((subject) => {
+                      const value = (call: 1 | 2) => {
+                        const s = subject.calls[call][gender];
+                        if (metric === "Previstos") return s.previstos;
+                        if (metric === "Avaliados") return s.avaliados;
+                        if (metric === "Positivos") return s.positivos;
+                        return s.percentPositive;
+                      };
+                      const a = value(1);
+                      const b = value(2);
+                      const total = metric === "% dos Positivos" ? null : Number(a) + Number(b);
+                      return [a, b, total].map((v, i) => <td key={i} className="border px-1 py-1 text-center">{metric === "% dos Positivos" ? percent(v as number | null) : v ?? "—"}</td>);
+                    })}
+                  </tr>
+                )),
+              )}
+            </tbody>
+          </table>
+        </div>
+
+        <div className="mt-5 grid gap-4 md:grid-cols-4">
+          {(["M", "H", "HM"] as const).map((gender) => (
+            <div key={gender} className="border p-3 text-[10px]">
+              <div className="font-semibold">{gender}</div>
+              <div>Examinados: {overallStats.byGender[gender].examined}</div>
+              <div>Positivos: {overallStats.byGender[gender].positive}</div>
+              <div>% Positivos: {percent(overallStats.byGender[gender].percentPositive)}</div>
+            </div>
+          ))}
+          <div className="border p-3 text-[10px]">
+            <div className="font-semibold">HM</div>
+            <div>Examinados: {overallStats.examined}</div>
+            <div>Positivos: {overallStats.positives}</div>
+            <div>% Positivos: {percent(overallStats.percentPositive)}</div>
+          </div>
+        </div>
       </section>
 
       <style jsx global>{`
