@@ -8,7 +8,7 @@ const enrollmentSchema = z.object({
   studentId: z.string().uuid(),
   academicYearId: z.string().uuid(),
   gradeLevelId: z.string().uuid(),
-  pathwayId: z.string().uuid().optional(),
+  pathwayId: z.preprocess((value)=>value===""?undefined:value,z.string().uuid().optional()),
   entryType: z.enum(["INITIAL","TRANSFER_IN","REENTRY"]),
   enrolledOn: z.string().min(10),
 });
