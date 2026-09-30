@@ -4,6 +4,7 @@ import { PageHeader } from "@/components/ui/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { getFinancePaymentWorkbench } from "@/lib/sige/queries";
 import { confirmPaymentAction, allocatePaymentAction, issueReceiptAction } from "@/lib/sige/finance-actions";
+import { PaymentProofPanel } from "@/components/finance/payment-proof-panel";
 
 const money=(v:number)=>v.toLocaleString("pt-MZ",{minimumFractionDigits:2,maximumFractionDigits:2})+" MT";
 const labels:Record<string,string>={PENDING:"Pendente",CONFIRMED:"Confirmado",REVERSED:"Estornado"};
