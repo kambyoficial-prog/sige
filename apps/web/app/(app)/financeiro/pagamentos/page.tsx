@@ -34,7 +34,8 @@ export default async function FinancePaymentsPage(){
     {r.notes&&<div className="rounded-lg bg-muted/40 p-3 text-sm">{String(r.notes)}</div>}
     {Array.isArray(r.proofs)&&<PaymentProofPanel paymentId={String(r.id)} proofs={r.proofs as any[]} />}
     <div className="flex flex-wrap gap-2">
-      {r.status==="PENDING"&&<form action={confirm}><input type="hidden" name="paymentId" value={String(r.id)}/><button className={buttonVariants({size:"sm"})}>Confirmar pagamento</button></form>}
+      {r.status==="PENDING"&&(String(r.method)==="CASH"||((r.proofs as any[])??[]).some((p:any)=>p.status==="VERIFIED"))&&<form action={confirm}><input type="hidden" name="paymentId" value={String(r.id)}/><button className={buttonVariants({size:"sm"})}>Confirmar pagamento</button></form>}
+      {r.status==="PENDING"&&String(r.method)!=="CASH"&&!((r.proofs as any[])??[]).some((p:any)=>p.status==="VERIFIED")&&<span className="inline-flex items-center rounded-md border px-2.5 py-1.5 text-sm text-muted-foreground">Aguardar comprovativo verificado</span>}
       {r.status==="CONFIRMED"&&Number(r.unallocated_amount)>0&&Array.isArray(r.charges)&&r.charges.length>0&&
         (r.charges as any[]).map((c:any)=><form key={String(c.id)} action={allocate} className="flex items-center gap-1">
           <input type="hidden" name="paymentId" value={String(r.id)}/><input type="hidden" name="chargeId" value={String(c.id)}/>
