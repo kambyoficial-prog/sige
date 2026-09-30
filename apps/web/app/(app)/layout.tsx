@@ -2,7 +2,6 @@ import { redirect } from "next/navigation";
 import { SigeApplicationError } from "@sige/contracts";
 import { AppShell } from "@/components/app-shell";
 import { getCurrentAccessContext } from "@/lib/sige/access";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
@@ -20,13 +19,13 @@ export default async function AuthenticatedLayout({ children }: Readonly<{ child
   const supabase = await createSupabaseServerClient();
   const { data: userData } = await supabase.auth.getUser();
   if (userData.user) {
-    const admin = createSupabaseAdminClient();
-    const { data: account } = await admin
+    const { data: account, error } = await supabase
       .from("app_accounts")
       .select("first_access_required")
-      .eq("auth_user_id", userData.user.id)
       .eq("active", true)
       .maybeSingle();
+
+    if (error) throw error;
     if (account?.first_access_required) redirect("/primeiro-acesso");
   }
 
