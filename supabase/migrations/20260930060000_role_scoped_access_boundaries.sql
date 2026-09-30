@@ -494,3 +494,63 @@ using (
   )
   or id = private.current_teacher_id()
 );
+
+
+-- Final privacy boundary: teachers do not receive administrative placement,
+-- guardian or student-identifier data merely because they teach the student.
+
+drop policy if exists class_placements_read on public.class_placements;
+create policy class_placements_read on public.class_placements
+for select to authenticated
+using (
+  exists (
+    select 1 from public.class_groups cg
+    where cg.id = class_placements.class_group_id
+      and (
+        private.has_permission('enrollment.read', cg.school_id)
+        or private.has_permission('enrollment.manage', cg.school_id)
+        or private.has_permission('operations.manage', cg.school_id)
+        or (
+          private.has_permission('operations.read', cg.school_id)
+          and private.current_teacher_id() is null
+          and private.current_student_id() is null
+        )
+        or exists (
+          select 1 from public.student_enrollments se
+          where se.id = class_placements.enrollment_id
+            and se.student_id = private.current_student_id()
+        )
+        or private.teacher_has_class_access(cg.id)
+      )
+  )
+);
+
+drop policy if exists student_guardians_read on public.student_guardians;
+create policy student_guardians_read on public.student_guardians
+for select to authenticated
+using (
+  exists (
+    select 1 from public.students s
+    where s.id = student_guardians.student_id
+      and (
+        private.has_permission('enrollment.read', s.school_id)
+        or private.has_permission('enrollment.manage', s.school_id)
+        or s.id = private.current_student_id()
+      )
+  )
+);
+
+drop policy if exists student_identifiers_read on public.student_identifiers;
+create policy student_identifiers_read on public.student_identifiers
+for select to authenticated
+using (
+  exists (
+    select 1 from public.students s
+    where s.id = student_identifiers.student_id
+      and (
+        private.has_permission('enrollment.read', s.school_id)
+        or private.has_permission('enrollment.manage', s.school_id)
+        or s.id = private.current_student_id()
+      )
+  )
+);
