@@ -9,7 +9,10 @@ export const navigationSections: NavigationSection[] = [
     { label: "Funcionários", href: "/funcionarios", permission: "user.read" },
     { label: "Encarregados", href: "/encarregados", permission: "enrollment.read" },
   ] },
-  { label: "Matrículas", items: [{ label: "Matrículas", href: "/matriculas", permission: "enrollment.read" }] },
+  { label: "Matrícula e inscrição", items: [
+    { label: "Matrículas", href: "/matriculas", permission: "enrollment.read" },
+    { label: "Inscrições", href: "/inscricoes", permission: "enrollment.read" },
+  ] },
   { label: "Pedagógico", items: [
     { label: "Turmas", href: "/turmas", permission: "operations.read" }, { label: "Notas", href: "/notas", permission: "assessment.read" },
     { label: "Pautas", href: "/pautas", permission: "assessment.read" }, { label: "Exames", href: "/exames", permission: "assessment.manage" },
