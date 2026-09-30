@@ -11,7 +11,7 @@ This is the execution control document for the product. It prevents isolated scr
 - Frontend: Next.js application, shell, operational primitives, access boundary and domain surfaces are implemented; current work is integration/runtime stabilization.
 - Supabase: the authoritative SIGE project is connected and has the academic, finance and security schema plus DEMO fixtures.
 - Vercel: SIGE has a production project. The previous production commit was READY, while current main commit 194b82c is ERROR during build; release is blocked.
-- Current priority: close Gate B role-based browser homologation for the implemented F3/F4/F5 slices before expanding product scope.
+- Current priority: execute the single remaining Gate B authenticated browser smoke across Direction, Secretariat and Teacher. F3/F4/F5/F6/F7/F8/F9 database/application boundaries are implemented; no new product scope is opened until this evidence is archived.
 
 ## Execution model
 
@@ -31,11 +31,11 @@ No placeholder data may masquerade as production data.
 | F2 | Operational primitives | tables, filters, pagination, forms, dialogs, errors, empty/loading states | reusable patterns proven on real queries | Implemented baseline; runtime verification pending |
 | F3 | Pessoas & matrícula | students, teachers, guardians, enrollment lifecycle | real commands/queries + no duplicate workflows | **Implemented; authoritative DB verification completed; browser role smoke pending** |
 | F4 | Estrutura pedagógica | classes, subjects/offers, curriculum, teacher assignments | class workflows use real backend contracts | **Implemented; authoritative DB verification completed; browser role smoke pending** |
-| F5 | Horários & operações | timetable, calendar, class sessions, livro de ponto | conflict-aware workflow + responsive verification |
-| F6 | Avaliação & pautas | gradebook, publication, results, reports | deterministic results + period/year state |
+| F5 | Horários & operações | timetable, calendar, class sessions, livro de ponto | conflict-aware workflow + responsive verification | **Implemented; authoritative DB verification completed; authenticated browser smoke pending** |
+| F6 | Avaliação & pautas | gradebook, publication, results, reports | deterministic results + period/year state | **Implemented; authoritative DB verification completed; authenticated browser smoke pending** |
 | F7 | Financeiro | obligations, payments, allocations, receipts, balances, transport | year-scoped financial lifecycle | **Implemented; runtime DB gate verified; browser/CI verification pending** |
-| F8 | Relatórios & documentos | reports, exports, PDF/print surfaces | document correctness and auditability |
-| F9 | Hardening & release | security, accessibility, performance, browser QA, deployment | release checklist fully green |
+| F8 | Relatórios & documentos | reports, exports, PDF/print surfaces | document correctness and auditability | **Implemented baseline; reporting DB/export verification completed; authenticated browser smoke pending; PDF/Excel-native rendering remains release sub-block** |
+| F9 | Hardening & release | security, accessibility, performance, browser QA, deployment | release checklist fully green | **Database/application hardening verified; current production READY; browser release gate remains open** |
 
 ## Cross-cutting gates
 
@@ -118,7 +118,7 @@ Status: implemented baseline; runtime verification pending CI/browser environmen
 
 ## F3 — Pessoas & matrícula
 
-Status: implemented in code; runtime verification pending authorized SIGE database.
+Status: implemented; authoritative database verification completed. Authenticated browser smoke remains pending.
 
 Canonical surfaces:
 - student directory;
@@ -133,7 +133,7 @@ The student profile is contextual and read-oriented. Editing occurs through focu
 
 ## F4 — Estrutura pedagógica
 
-Status: implemented in code; runtime verification pending authorized SIGE database.
+Status: implemented; authoritative database verification completed. Authenticated browser smoke remains pending.
 
 - class groups;
 - curriculum/subject configuration;
@@ -147,7 +147,7 @@ A/B/C-style labels remain configurable section/pathway data, never hardcoded bus
 
 ## F5 — Operações
 
-Status: operational vertical slice implemented; database runtime verification completed for the command boundary and RLS gate. Browser QA remains pending authenticated browser session.
+Status: operational vertical slice implemented; authoritative database verification completed for the command boundary, read projections and RLS gate. Production runtime is clean after the current deployment. Authenticated browser QA remains the only open Gate B evidence.
 
 Implemented in the current vertical slice:
 - timetable grid by class;
