@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/ui/page-header";
 import { buttonVariants } from "@/components/ui/button";
 import { getFinancePaymentWorkbench } from "@/lib/sige/queries";
+import { PrintButton } from "@/components/finance/print-button";
 
 export default async function PaymentReceiptPage({params}:{params:Promise<{id:string}>}){
  const {id}=await params;
@@ -9,7 +10,7 @@ export default async function PaymentReceiptPage({params}:{params:Promise<{id:st
  const p=rows.find((row)=>String(row.id)===id) as any;
  if(!p) return <div className="space-y-4"><PageHeader title="Pagamento não encontrado" description="O registo não está disponível para a sua área financeira."/><Link href="/financeiro/pagamentos" className={buttonVariants({variant:"outline"})}>Voltar aos pagamentos</Link></div>;
  return <div className="space-y-6">
-  <div className="print:hidden"><PageHeader title={p.receipt_number ? "Recibo "+String(p.receipt_number) : "Pagamento"} description="Documento financeiro para conferência e impressão." actions={<button onClick={()=>window.print()} className={buttonVariants({variant:"outline"})}>Imprimir</button>}/></div>
+  <div className="print:hidden"><PageHeader title={p.receipt_number ? "Recibo "+String(p.receipt_number) : "Pagamento"} description="Documento financeiro para conferência e impressão." actions={<PrintButton />}/></div>
   <article className="mx-auto max-w-2xl rounded-none border bg-white p-8 text-black shadow-sm print:border-0 print:shadow-none">
    <div className="border-b pb-5 text-center"><h1 className="text-2xl font-semibold">RECIBO DE PAGAMENTO</h1><p className="mt-1 text-sm">{String(p.receipt_number??"Ainda não emitido")}</p></div>
    <div className="grid gap-4 py-6 sm:grid-cols-2 text-sm">
