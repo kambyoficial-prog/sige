@@ -29,7 +29,16 @@ A implementação anterior já redirecionava Novo aluno para /matriculas/nova, m
 
 ### Processo normal
 
-Novo aluno → Aluno → Filiação → Matrícula e turma → Concluído
+Novo aluno → verificação de identidade → Aluno → Filiação → Matrícula e turma → Concluído
+
+Antes de criar `people/students`, o servidor faz uma pré-verificação determinística:
+
+- documento + tipo, quando informado;
+- nome completo + data de nascimento, quando ambos disponíveis.
+
+Uma coincidência documental bloqueia a criação e encaminha a secretaria para o aluno existente. Uma coincidência por nome + data de nascimento abre uma revisão explícita; a secretaria pode rever os dados ou confirmar que se trata de uma pessoa diferente.
+
+A verificação usa as read boundaries/RLS existentes e não cria uma nova tabela nem duplica a regra de unicidade do comando `register_student`.
 
 A jornada apresenta somente decisões que dependem da secretária.
 
@@ -102,8 +111,7 @@ Fonte:
 
 A próxima evolução deve adicionar:
 
-1. pesquisa de possível aluno existente antes de criar uma nova pessoa;
-2. reaproveitamento de pessoa/encarregado já existente;
+1. reaproveitamento de pessoa/encarregado já existente;
 3. estado de processo pendente para admissões interrompidas;
 4. geração/entrega de acesso do aluno quando o domínio de contas estiver pronto;
 5. transporte como etapa opcional pós-admissão, sem bloquear o processo;
