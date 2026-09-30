@@ -93,6 +93,7 @@ begin
    perform private.complete_command('finalize_payment_proof',v_school_id,p_idempotency_key,result); return result;
  end if;
  select exists(select 1 from storage.objects o where o.bucket_id=v_bucket and o.name=v_path) into v_object_exists;
+ if v_status <> 'UPLOADING' then raise exception 'PAYMENT_PROOF_NOT_FINALIZABLE'; end if;
  if not v_object_exists then raise exception 'PAYMENT_PROOF_OBJECT_NOT_FOUND'; end if;
  update public.payment_proofs set status='READY',updated_at=now() where id=p_proof_id;
  insert into public.audit_events(school_id,actor_auth_user_id,action,entity_type,entity_id,after_data)
@@ -118,7 +119,7 @@ begin
  select school_id,payment_id,status into v_school_id,v_payment_id,v_current from public.payment_proofs where id=p_proof_id for update;
  if v_school_id is null then raise exception 'PAYMENT_PROOF_NOT_FOUND'; end if;
  if not (select private.has_permission('finance.manage',v_school_id)) then raise exception 'FORBIDDEN'; end if;
- if v_current not in ('READY','REJECTED') then raise exception 'PAYMENT_PROOF_NOT_READY'; end if;
+ if v_current <> 'READY' then raise exception 'PAYMENT_PROOF_NOT_READY'; end if;
  state:=private.begin_command('verify_payment_proof',v_school_id,p_idempotency_key,p_request_hash);
  if coalesce((state->>'replayed')::boolean,false) then return state->'result'; end if;
  update public.payment_proofs set status=p_status,
