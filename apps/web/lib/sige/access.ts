@@ -8,9 +8,8 @@ import {
 import { requireAuthenticatedServerClient } from "@/lib/supabase/server";
 
 export async function getCurrentAccessContext(): Promise<CurrentAccessContext> {
-  const { supabase } = await requireAuthenticatedServerClient();
-
   try {
+    const { supabase } = await requireAuthenticatedServerClient();
     const { data, error } = await supabase.rpc("current_access_context");
 
     if (error) throw error;
