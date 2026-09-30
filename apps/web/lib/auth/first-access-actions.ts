@@ -2,7 +2,6 @@
 
 import { revalidatePath } from "next/cache";
 import { z } from "zod";
-import { createSupabaseAdminClient } from "@/lib/supabase/admin";
 import { createSupabaseServerClient } from "@/lib/supabase/server";
 
 const schema = z.object({
@@ -18,13 +17,13 @@ export async function completeFirstAccessAction(input: unknown) {
   const user = userData.user;
   if (!user) return { ok: false as const, code: "UNAUTHENTICATED" as const };
 
-  const admin = createSupabaseAdminClient();
-  const { data: account } = await admin
+  const { data: account, error: accountError } = await supabase
     .from("app_accounts")
     .select("id, person_id, first_access_required, active")
-    .eq("auth_user_id", user.id)
+    .eq("active", true)
     .maybeSingle();
 
+  if (accountError) return { ok: false as const, code: "ACCOUNT_STATE_FAILED" as const };
   if (!account?.active) return { ok: false as const, code: "ACCOUNT_INACTIVE" as const };
   if (!account.first_access_required)
     return { ok: false as const, code: "FIRST_ACCESS_NOT_REQUIRED" as const };
@@ -36,16 +35,11 @@ export async function completeFirstAccessAction(input: unknown) {
   if (passwordError)
     return { ok: false as const, code: "PASSWORD_UPDATE_FAILED" as const };
 
-  const { error: accountError } = await admin
-    .from("app_accounts")
-    .update({
-      first_access_required: false,
-      activated_at: new Date().toISOString(),
-    })
-    .eq("id", account.id)
-    .eq("auth_user_id", user.id);
+  const { data: activated, error: activationError } = await supabase.rpc(
+    "complete_first_access_account",
+  );
 
-  if (accountError)
+  if (activationError || !activated)
     return { ok: false as const, code: "ACCOUNT_ACTIVATION_FAILED" as const };
 
   revalidatePath("/", "layout");
