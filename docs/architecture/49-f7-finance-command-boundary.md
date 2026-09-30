@@ -101,3 +101,24 @@ F7 does not introduce:
 - mandatory transport.
 
 Those are separate domains and must not be mixed into school receivables without explicit requirements.
+
+
+## Student payment journey
+
+The student-facing financial flow is read-only until a school employee records a payment:
+
+1. The school configures payment instructions for the academic year: bank, account holder, account number/NIB/IBAN, branch and reference instructions.
+2. The SIGE exposes each student's annual charges as individual obligations. A monthly tuition charge is its own charge record, not a mutable balance label.
+3. The student portal shows the academic year, each obligation, due date, amount, paid amount and remaining amount, plus the school's current payment instructions.
+4. The student/guardian pays externally (for example at the configured bank) and brings the bank proof to the secretariat.
+5. Secretariat records the payment as PENDING, including method, paid date, external reference and notes.
+6. Secretariat verifies the proof and confirms the payment. Only CONFIRMED payments can be allocated.
+7. The confirmed payment is allocated to the exact obligation(s). This is what changes the student's outstanding balance.
+8. SIGE issues the official receipt only after confirmation. The receipt is printable and contains the student, payment, allocated obligation, amount, date and receipt number.
+9. Physical stamping/signature remains an optional school procedure; it is not represented as a fake digital payment state.
+
+The student never marks a charge as paid and never confirms their own payment. This preserves separation of duties and auditability.
+
+### Inscription versus monthly tuition
+
+The same financial lifecycle can represent both the initial enrollment/registration fee and recurring tuition. They remain distinct fee_type/charge instances, allowing the school to configure whether a fee is one-time, monthly or another defined schedule without turning the student's portal into a collection of ad-hoc fields.
