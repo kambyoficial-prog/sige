@@ -70,7 +70,7 @@ export function StudentForm({ schools }: { schools: Array<{ id: string; name: st
       }
       const payload = result.result as { student_id?: string; school_number?: string };
       toast.success(payload.school_number ? `Aluno criado. Número: ${payload.school_number}.` : "Aluno criado.");
-      if (payload.student_id) router.push(`/alunos/${payload.student_id}?admissao=continuar`);
+      if (payload.student_id) router.push(`/matriculas/nova?studentId=${payload.student_id}`);
       else router.push("/alunos");
     });
   }
