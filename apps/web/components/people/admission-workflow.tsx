@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { FormField } from "@/components/ui/form-field";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { registerStudentAction, createGuardianAction } from "@/lib/sige/people-actions";
+import { findAdmissionDuplicateMatches, registerStudentAction, createGuardianAction, type AdmissionDuplicateMatch } from "@/lib/sige/people-actions";
 import { enrollStudentAction, placeStudentAction } from "@/lib/sige/enrollment-actions";
 import { errorMessage } from "@/lib/sige/presentation";
 
@@ -87,6 +87,8 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
   const [studentNumber, setStudentNumber] = useState<string | null>(null);
   const [enrollmentId, setEnrollmentId] = useState<string | null>(null);
   const [placementDone, setPlacementDone] = useState(false);
+  const [duplicateMatches, setDuplicateMatches] = useState<AdmissionDuplicateMatch[]>([]);
+  const [duplicateReview, setDuplicateReview] = useState(false);
 
   const [student, setStudent] = useState({
     firstName: "",
@@ -141,7 +143,7 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
     });
   }
 
-  function createStudent() {
+  function createStudent(skipDuplicateCheck = false) {
     const parsed = studentSchema.safeParse(student);
     if (!parsed.success) {
       toast.error(parsed.error.issues[0]?.message ?? "Verifique os dados do aluno.");
@@ -149,6 +151,28 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
     }
 
     startTransition(async () => {
+      if (!skipDuplicateCheck) {
+        const preflight = await findAdmissionDuplicateMatches({
+          schoolId: school.id,
+          firstName: student.firstName,
+          lastName: student.lastName,
+          birthDate: student.birthDate,
+          documentType: student.documentType || undefined,
+          documentValue: student.documentValue || undefined,
+        });
+
+        if (!preflight.ok) {
+          toast.error(errorMessage(preflight.code as never));
+          return;
+        }
+
+        if (preflight.matches.length) {
+          setDuplicateMatches(preflight.matches);
+          setDuplicateReview(true);
+          return;
+        }
+      }
+
       const result = await registerStudentAction({
         schoolId: school.id,
         ...student,
@@ -169,6 +193,8 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
         return;
       }
 
+      setDuplicateReview(false);
+      setDuplicateMatches([]);
       setStudentId(payload.student_id);
       setStudentNumber(payload.school_number ?? null);
       setStep(1);
@@ -352,9 +378,52 @@ export function AdmissionWorkflow({ school, years, grades, pathways, classes }: 
               </div>
             </div>
 
+            {duplicateReview ? (
+              <div className="space-y-4 rounded-xl border border-amber-500/40 bg-amber-500/5 p-5" role="alert">
+                <div>
+                  <h3 className="font-medium">Possível aluno já existente</h3>
+                  <p className="mt-1 text-sm text-muted-foreground">
+                    O SIGE encontrou um registo compatível. Confirme antes de criar uma nova identidade.
+                  </p>
+                </div>
+
+                <div className="space-y-2">
+                  {duplicateMatches.map((match) => (
+                    <div key={match.id} className="flex flex-col gap-3 rounded-lg border border-border bg-background p-4 sm:flex-row sm:items-center sm:justify-between">
+                      <div>
+                        <p className="font-medium">{match.fullName}</p>
+                        <p className="text-sm text-muted-foreground">
+                          Nº {match.schoolNumber}
+                          {match.birthDate ? " · " + match.birthDate : ""}
+                          {match.className ? " · " + match.className : ""}
+                        </p>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                          {match.matchReasons.includes("DOCUMENT") ? "Documento coincide" : "Nome e data de nascimento coincidem"}
+                        </p>
+                      </div>
+                      <Button type="button" variant="outline" onClick={() => router.push("/alunos/" + match.id)}>
+                        Abrir aluno
+                      </Button>
+                    </div>
+                  ))}
+                </div>
+
+                {duplicateMatches.every((match) => match.matchReasons.includes("NAME_BIRTH_DATE") && !match.matchReasons.includes("DOCUMENT")) ? (
+                  <div className="flex flex-col gap-2 border-t border-border pt-4 sm:flex-row sm:justify-end">
+                    <Button type="button" variant="ghost" disabled={pending} onClick={() => { setDuplicateReview(false); setDuplicateMatches([]); }}>
+                      Rever dados
+                    </Button>
+                    <Button type="button" disabled={pending} onClick={() => createStudent(true)}>
+                      Criar novo aluno
+                    </Button>
+                  </div>
+                ) : null}
+              </div>
+            ) : null}
+
             <div className="flex justify-end border-t border-border pt-5">
-              <Button type="button" disabled={pending} onClick={createStudent}>
-                {pending ? "A guardar…" : "Continuar"}
+              <Button type="button" disabled={pending} onClick={() => createStudent()}>
+                {pending ? "A verificar…" : "Continuar"}
               </Button>
             </div>
           </section>
