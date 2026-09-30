@@ -100,6 +100,12 @@ select e.id,s.school_id,e.student_id,s.school_number,p.full_name as student_name
   where sps.student_id=e.student_id and sps.academic_year_id=e.academic_year_id
     and sps.target_cycle_id=gl.academic_cycle_id and sps.status in ('SELECTED','CONFIRMED')
   order by sps.created_at desc limit 1) as pathway_id,
+ (select ap.name from public.academic_pathways ap
+   where ap.id = (select sps.pathway_id from public.student_pathway_selections sps
+     where sps.student_id=e.student_id and sps.academic_year_id=e.academic_year_id
+       and sps.target_cycle_id=gl.academic_cycle_id and sps.status in ('SELECTED','CONFIRMED')
+     order by sps.created_at desc limit 1)
+ ) as pathway_name,
  placement.class_group_id,coalesce(cg.name,cg.section_code) as class_name
 from public.student_enrollments e join public.students s on s.id=e.student_id join public.people p on p.id=s.person_id
 join public.academic_years ay on ay.id=e.academic_year_id join public.grade_levels gl on gl.id=e.grade_level_id
