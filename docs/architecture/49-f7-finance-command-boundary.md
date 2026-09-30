@@ -122,3 +122,73 @@ The student never marks a charge as paid and never confirms their own payment. T
 ### Inscription versus monthly tuition
 
 The same financial lifecycle can represent both the initial enrollment/registration fee and recurring tuition. They remain distinct fee_type/charge instances, allowing the school to configure whether a fee is one-time, monthly or another defined schedule without turning the student's portal into a collection of ad-hoc fields.
+
+
+## Payment proof evidence boundary
+
+Bank/transfer/card payments are not confirmable merely because an operator clicked the confirmation action.
+
+The evidence lifecycle is:
+
+`UPLOADING -> READY -> VERIFIED`
+or
+`READY -> REJECTED`.
+
+A rejected proof is not re-verified. A new proof is uploaded instead. This keeps each evidence artifact immutable in its verification history.
+
+### Storage
+
+Payment proofs use a dedicated private Supabase Storage bucket:
+
+- bucket: `payment-proofs`;
+- allowed types: PDF, JPEG, PNG;
+- maximum object size: 10 MiB;
+- object path: `payments/<payment_id>/<proof_id>-<sanitized_filename>`.
+
+The bucket is private. Supabase's current Storage guidance states that private buckets are protected by Storage RLS and should be accessed through authenticated downloads or time-limited signed URLs. Uploads are also controlled by `storage.objects` RLS. citeturn0search0turn0search1
+
+The repository defines the bucket in `supabase/config.toml`. The production bucket must be provisioned through the Supabase Storage API/Dashboard or the project's bucket seeding process; the database migration deliberately does not mutate `storage.buckets` directly because Supabase documents the Storage metadata schema as read-only and recommends Storage API operations. citeturn1search2turn1search3
+
+### Confirmation invariant
+
+`confirm_payment` now enforces:
+
+- CASH: may be confirmed by the authorized finance operator without a file;
+- non-CASH: at least one `VERIFIED` payment proof is mandatory.
+
+This is a database invariant, not a frontend convention.
+
+### Receipt invariant
+
+`issue_receipt` now additionally requires:
+
+- payment status = `CONFIRMED`;
+- total allocated amount = payment amount.
+
+Therefore the backend cannot issue a receipt for an incompletely allocated payment even if a client bypasses the UI.
+
+### Audit
+
+The following events are recorded in `audit_events`:
+
+- `CREATE_PAYMENT_PROOF`;
+- `FINALIZE_PAYMENT_PROOF`;
+- `VERIFY_PAYMENT_PROOF`;
+- `CONFIRM_PAYMENT`;
+- `ISSUE_RECEIPT`.
+
+The proof table itself is not writable through generic authenticated CRUD. Mutations cross explicit command functions.
+
+### Operational journey
+
+1. Secretariat records the bank payment as `PENDING`.
+2. Secretariat attaches the bank proof.
+3. SIGE uploads the document to the private bucket and finalizes its evidence record.
+4. Secretariat opens the private proof through a short-lived signed URL.
+5. Secretariat validates or rejects the proof.
+6. Only a verified proof permits confirmation for non-CASH payments.
+7. The confirmed amount is allocated to one or more concrete charges.
+8. Only full allocation permits receipt issuance.
+9. The receipt is generated with a server-side sequential number and remains auditable.
+
+This separates **evidence**, **verification**, **payment confirmation**, **allocation**, and **receipt issuance** instead of collapsing them into one mutable payment flag.
