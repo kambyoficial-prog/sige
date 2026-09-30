@@ -145,9 +145,9 @@ Payment proofs use a dedicated private Supabase Storage bucket:
 - maximum object size: 10 MiB;
 - object path: `payments/<payment_id>/<proof_id>-<sanitized_filename>`.
 
-The bucket is private. Supabase's current Storage guidance states that private buckets are protected by Storage RLS and should be accessed through authenticated downloads or time-limited signed URLs. Uploads are also controlled by `storage.objects` RLS. citeturn0search0turn0search1
+The bucket is private. Supabase's current Storage guidance states that private buckets are protected by Storage RLS and should be accessed through authenticated downloads or time-limited signed URLs. Uploads are also controlled by `storage.objects` RLS.
 
-The repository defines the bucket in `supabase/config.toml`. The production bucket must be provisioned through the Supabase Storage API/Dashboard or the project's bucket seeding process; the database migration deliberately does not mutate `storage.buckets` directly because Supabase documents the Storage metadata schema as read-only and recommends Storage API operations. citeturn1search2turn1search3
+The repository defines the bucket in `supabase/config.toml`. The production bucket must be provisioned through the Supabase Storage API/Dashboard or the project's bucket seeding process; the database migration deliberately does not mutate `storage.buckets` directly because Supabase documents the Storage metadata schema as read-only and recommends Storage API operations.
 
 ### Confirmation invariant
 
