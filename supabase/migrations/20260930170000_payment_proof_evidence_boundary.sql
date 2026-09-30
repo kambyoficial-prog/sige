@@ -380,3 +380,38 @@ $$;
 
 revoke all on function public.get_finance_payment_workbench() from public;
 grant execute on function public.get_finance_payment_workbench() to authenticated;
+
+
+-- Final hardened confirmation command: avoid PL/pgSQL/column name ambiguity and
+-- enforce the non-CASH proof invariant at the database boundary.
+create or replace function public.confirm_payment(p_payment_id uuid,p_idempotency_key text default null,p_request_hash text default null)
+returns jsonb language plpgsql security definer set search_path=''
+as $$
+declare actor uuid := (select auth.uid()); v_school_id uuid; v_student_id uuid; v_status public.payment_status;
+v_amount numeric(12,2); v_confirmed_at timestamptz; v_proof_required boolean; v_verified_proofs integer;
+state jsonb; result jsonb;
+begin
+ if actor is null then raise exception 'AUTH_REQUIRED'; end if;
+ select p.school_id,p.student_id,p.status,p.amount into v_school_id,v_student_id,v_status,v_amount
+ from public.payments p where p.id=p_payment_id for update;
+ if v_school_id is null then raise exception 'PAYMENT_NOT_FOUND'; end if;
+ if not (select private.has_permission('finance.manage',v_school_id)) then raise exception 'FORBIDDEN'; end if;
+ if p_idempotency_key is null then raise exception 'IDEMPOTENCY_KEY_REQUIRED'; end if;
+ state:=private.begin_command('confirm_payment',v_school_id,p_idempotency_key,p_request_hash);
+ if coalesce((state->>'replayed')::boolean,false) then return state->'result'; end if;
+ if v_status='CONFIRMED' then raise exception 'PAYMENT_ALREADY_CONFIRMED'; end if;
+ if v_status<>'PENDING' then raise exception 'PAYMENT_NOT_CONFIRMABLE'; end if;
+ select (p.method <> 'CASH') into v_proof_required from public.payments p where p.id=p_payment_id;
+ select count(*) into v_verified_proofs from public.payment_proofs pp where pp.payment_id=p_payment_id and pp.status='VERIFIED';
+ if v_proof_required and v_verified_proofs=0 then raise exception 'PAYMENT_PROOF_REQUIRED_BEFORE_CONFIRMATION'; end if;
+ v_confirmed_at:=now();
+ update public.payments set status='CONFIRMED',confirmed_at=v_confirmed_at,confirmed_by=actor where id=p_payment_id;
+ insert into public.audit_events(school_id,actor_auth_user_id,action,entity_type,entity_id,before_data,after_data)
+ values(v_school_id,actor,'CONFIRM_PAYMENT','payment',p_payment_id,
+ jsonb_build_object('status',v_status),jsonb_build_object('status','CONFIRMED','confirmed_at',v_confirmed_at,'confirmed_by',actor));
+ result:=jsonb_build_object('payment_id',p_payment_id,'student_id',v_student_id,'amount',v_amount,'status','CONFIRMED','confirmed_at',v_confirmed_at);
+ perform private.complete_command('confirm_payment',v_school_id,p_idempotency_key,result);
+ return result;
+end $$;
+revoke all on function public.confirm_payment(uuid,text,text) from public;
+grant execute on function public.confirm_payment(uuid,text,text) to authenticated;
