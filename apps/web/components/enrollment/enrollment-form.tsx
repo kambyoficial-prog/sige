@@ -20,11 +20,12 @@ const schema=z.object({
   entryType:z.enum(["INITIAL","TRANSFER_IN","REENTRY","RENEWAL"]),
   enrolledOn:z.string().min(10,"Indique a data."),
 });
-type Values=z.infer<typeof schema>;
+type FormInput=z.input<typeof schema>;
+type Values=z.output<typeof schema>;
 
 export function EnrollmentForm({students,years,grades,pathways,initialStudentId}:{students:Array<{id:string;full_name:string;school_number:string}>;years:Array<{id:string;label:string;status:string}>;grades:Array<{id:string;name:string;code:string;academic_cycle_id:string}>;pathways:Array<{id:string;code:string;name:string;academic_cycle_id:string}>;initialStudentId?:string}) {
   const router=useRouter(); const [pending,startTransition]=useTransition();
-  const form=useForm<Values>({resolver:zodResolver(schema),defaultValues:{studentId:initialStudentId??"",academicYearId:years.find(y=>y.status==="OPEN")?.id??"",gradeLevelId:"",pathwayId:"",entryType:"INITIAL",enrolledOn:new Date().toISOString().slice(0,10)}});
+  const form=useForm<FormInput, unknown, Values>({resolver:zodResolver(schema),defaultValues:{studentId:initialStudentId??"",academicYearId:years.find(y=>y.status==="OPEN")?.id??"",gradeLevelId:"",pathwayId:"",entryType:"INITIAL",enrolledOn:new Date().toISOString().slice(0,10)}});
   function submit(values:Values){startTransition(async()=>{const r=await enrollStudentAction(values);if(!r.ok){toast.error(errorMessage(r.code as never));return;}const p=r.result as {enrollment_id?:string};toast.success("Matrícula criada.");router.push(p.enrollment_id?`/matriculas/${p.enrollment_id}`:"/matriculas");});}
   return <form onSubmit={form.handleSubmit(submit)} className="space-y-6">
     <FormField id="studentId" label="Aluno" required error={form.formState.errors.studentId?.message}><select id="studentId" disabled={Boolean(initialStudentId)} {...form.register("studentId")} className="h-10 w-full rounded-md border border-input bg-background px-3 text-sm"><option value="">Selecionar aluno</option>{students.map(s=><option key={s.id} value={s.id}>{s.full_name} · {s.school_number}</option>)}</select></FormField>
