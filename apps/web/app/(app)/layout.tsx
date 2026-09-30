@@ -13,6 +13,7 @@ export default async function AuthenticatedLayout({ children }: Readonly<{ child
   }
   if (!access.memberships.length) redirect("/acesso-negado");
   const permissions = new Set(access.memberships.flatMap(m => m.permissions));
+  const roles = new Set(access.memberships.flatMap(m => m.roles.map(r => r.code)));
   const schoolName = access.memberships.length === 1 ? access.memberships[0].school_name : "SIGE";
-  return <AppShell permissions={permissions} personName={access.person?.full_name ?? "Utilizador"} schoolName={schoolName} academicYearLabel={undefined}>{children}</AppShell>;
+  return <AppShell permissions={permissions} roles={roles} personName={access.person?.full_name ?? "Utilizador"} schoolName={schoolName} academicYearLabel={undefined}>{children}</AppShell>;
 }
