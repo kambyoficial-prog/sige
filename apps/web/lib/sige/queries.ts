@@ -123,6 +123,13 @@ export const getFinanceCharges = (academicYearId?: string) =>
 export const getFinancePayments = () =>
   queryView<Record<string, unknown>>("finance_payment_directory", {});
 
+export async function getFinancePaymentWorkbench() {
+  const { supabase } = await requireAuthenticatedServerClient();
+  const { data, error } = await supabase.rpc("get_finance_payment_workbench");
+  if (error) throw normalizeSigeError(error);
+  return (data ?? []) as Array<Record<string, unknown>>;
+}
+
 export const getFinancialBalances = (academicYearId?: string) =>
   queryView<Record<string, unknown>>("finance_balance_directory", academicYearId ? { academic_year_id: academicYearId } : {});
 
