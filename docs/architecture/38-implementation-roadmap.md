@@ -204,7 +204,7 @@ Expose only reports backed by real projections/queries. Initial families: enroll
 
 ## F9 — Release hardening
 
-Security: Supabase Security/Performance Advisor review, SECURITY DEFINER audit, RLS/function-grant review, session/cache review, secret scan and destructive-operation review.
+Security: Supabase Security/Performance Advisor review, SECURITY DEFINER audit, RLS/function-grant review, explicit reporting authorization boundary, session/cache review, secret scan and destructive-operation review.
 
 Quality: TypeScript, lint, production build, database migration suite, browser smoke tests, accessibility audit, responsive verification, recovery scenarios and performance budgets.
 
