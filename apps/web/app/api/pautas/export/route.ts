@@ -429,7 +429,7 @@ export async function GET(request: NextRequest) {
       : 'COUNTIFS(D' + firstDataRow + ':D' + lastDataRow + ',"' + gender + '",' + sheet.getColumn(averageColumn).letter + firstDataRow + ':' + sheet.getColumn(averageColumn).letter + lastDataRow + ',">=10")' };
     sheet.getCell(summaryRow, 5).value = { formula: 'IFERROR(D' + summaryRow + '/C' + summaryRow + '*100,"")' };
     ["Inscritos", "Examinados", "Positivos", "% Positivos"].forEach((label, index) => {
-      if (index === 0) sheet.getCell(summaryStart, index + 2).value = label;
+      sheet.getCell(summaryStart, index + 2).value = label;
     });
     for (let c = 1; c <= 5; c += 1) {
       sheet.getCell(summaryRow, c).border = borders;
