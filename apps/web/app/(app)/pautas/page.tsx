@@ -158,21 +158,21 @@ export default async function PautasPage({
       ) : null}
 
       {!rows.length ? (
-        <div className="rounded-xl border p-8 text-sm text-muted-foreground">
-          Ainda não existem avaliações de exame para esta turma. A estrutura oficial da pauta já está definida e será preenchida quando as avaliações forem criadas.
+        <div className="rounded-lg border border-muted bg-muted/20 p-3 text-sm text-muted-foreground">
+          Ainda não existem avaliações de exame para esta turma. A pauta abaixo permanece disponível como modelo preenchível e imprimível.
         </div>
-      ) : (
-        <OfficialPautaEditor
-          schoolName={schoolResult.data?.name ?? "Escola Secundária"}
-          province="Província"
-          academicYear={year?.label ?? ""}
-          className={selectedClass.name ?? selectedClass.section_code}
-          pathwayName={pathwayName}
-          subjects={officialPautaSubjects}
-          students={pautaStudents}
-          rows={rows}
-        />
-      )}
+      ) : null}
+
+      <OfficialPautaEditor
+        schoolName={schoolResult.data?.name ?? "Escola Secundária"}
+        province="Província"
+        academicYear={year?.label ?? ""}
+        className={selectedClass.name ?? selectedClass.section_code}
+        pathwayName={pathwayName}
+        subjects={officialPautaSubjects}
+        students={pautaStudents}
+        rows={rows}
+      />
     </div>
   );
 }
