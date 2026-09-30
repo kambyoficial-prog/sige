@@ -31,7 +31,13 @@ export async function signInWithPassword(input: { identifier: string; password: 
 
 export async function signOut() {
   const supabase = await createSupabaseServerClient();
-  await supabase.auth.signOut();
+  const { error } = await supabase.auth.signOut();
+  if (error) return { ok: false as const };
   revalidatePath("/", "layout");
+  return { ok: true as const };
+}
+
+export async function signOutAndRedirect() {
+  await signOut();
   redirect("/login");
 }
