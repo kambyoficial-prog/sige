@@ -4,3 +4,9 @@
 
 [remotes.sige]
 project_id = "pfnxvhwpbvlshjjdwbtj"
+
+
+[storage.buckets.payment-proofs]
+public = false
+file_size_limit = "10MiB"
+allowed_mime_types = ["application/pdf", "image/jpeg", "image/png"]
