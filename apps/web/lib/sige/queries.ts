@@ -247,6 +247,22 @@ export async function getGradeLevelOptions() {
   }
 }
 
+export async function getAcademicPathwayOptions(academicCycleId?: string) {
+  const { supabase } = await requireAuthenticatedServerClient();
+  try {
+    let query = supabase.from("academic_pathways")
+      .select("id,code,name,description,academic_cycle_id")
+      .eq("active", true)
+      .order("code", { ascending: true });
+    if (academicCycleId) query = query.eq("academic_cycle_id", academicCycleId);
+    const { data, error } = await query;
+    if (error) throw error;
+    return data ?? [];
+  } catch (error) {
+    throw normalizeSigeError(error);
+  }
+}
+
 export async function getEnrollment(enrollmentId: string) {
   const { supabase } = await requireAuthenticatedServerClient();
   try {
