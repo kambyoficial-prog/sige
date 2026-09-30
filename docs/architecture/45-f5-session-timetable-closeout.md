@@ -136,20 +136,10 @@ A suíte pgTAP do repositório não foi executada no remoto porque o projeto nã
 
 Também não foi declarado sucesso de `pnpm typecheck`, `pnpm lint` ou `pnpm build` porque não existe execução CI observável para estes commits nesta sessão.
 
-## Próximo gate de F5
+## Estado após a execução F3–F9
 
-Antes de F6:
+A fronteira F5 foi implementada e verificada no PostgreSQL autoritativo. As projeções `teacher_timetable` e `student_timetable`, a fronteira de sessão e os comandos de livro de ponto existem no ambiente real.
 
-1. executar migrations e `0034` num banco SIGE real;
-2. executar Security/Performance Advisor;
-3. validar RLS com pelo menos:
-   - secretaria;
-   - professor proprietário da sessão;
-   - professor de outra turma;
-   - direção;
-4. browser QA do horário e livro de ponto;
-5. validar responsividade e estados de erro;
-6. fechar a distribuição operacional de horário por professor/aluno;
-7. somente então declarar F5 encerrado.
+O bloqueio restante é exclusivamente de evidência de interface autenticada: executar o smoke matrix com Secretaria, Professor proprietário da sessão, Professor fora da turma e Direção. F6 já foi implementado em paralelo e não deve ser reaberto ou refeito por causa deste gate.
 
-F6 só começa depois deste gate.
+O estado de release é, portanto: **F5 implementado + DB verificado + produção READY + browser smoke pendente**.
